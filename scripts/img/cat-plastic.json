@@ -1,0 +1,26 @@
+🚀 Initializing Z-AI SDK...
+🔎 Searching images: "transparent plastic PET bottles collected for recycling"
+✅ Got 2 images
+{
+  "success": true,
+  "query": "transparent plastic PET bottles collected for recycling",
+  "count": 2,
+  "ranked": false,
+  "captioned_count": 0,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/2687c0ec2e81.jpg",
+      "caption": "",
+      "source": "The Guardian",
+      "original_width": "1200px",
+      "original_height": "960px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/095bde95f3a7.jpg",
+      "caption": "",
+      "source": "Our Family Code",
+      "original_width": "1250px",
+      "original_height": "833px"
+    }
+  ]
+}

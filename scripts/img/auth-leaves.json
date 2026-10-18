@@ -1,0 +1,26 @@
+🚀 Initializing Z-AI SDK...
+🔎 Searching images: "fresh green leaves plant sprout growing closeup nature"
+✅ Got 2 images
+{
+  "success": true,
+  "query": "fresh green leaves plant sprout growing closeup nature",
+  "count": 2,
+  "ranked": false,
+  "captioned_count": 0,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/dcfb455b3992.jpg",
+      "caption": "",
+      "source": "StockCake",
+      "original_width": "1024px",
+      "original_height": "1024px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/bc3349485246.jpg",
+      "caption": "",
+      "source": "Harris Seeds",
+      "original_width": "5184px",
+      "original_height": "1836px"
+    }
+  ]
+}

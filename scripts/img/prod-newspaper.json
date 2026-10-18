@@ -1,0 +1,26 @@
+🚀 Initializing Z-AI SDK...
+🔎 Searching images: "stack of old newspapers tied for recycling"
+✅ Got 2 images
+{
+  "success": true,
+  "query": "stack of old newspapers tied for recycling",
+  "count": 2,
+  "ranked": false,
+  "captioned_count": 0,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/0e0602dc0b87.jpg",
+      "caption": "",
+      "source": "Etsy",
+      "original_width": "1997px",
+      "original_height": "1997px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/d491d74bf959.jpg",
+      "caption": "",
+      "source": "Etsy",
+      "original_width": "2250px",
+      "original_height": "3000px"
+    }
+  ]
+}

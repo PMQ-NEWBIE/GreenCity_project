@@ -1,0 +1,33 @@
+🚀 Initializing Z-AI SDK...
+🔎 Searching images: "separated recyclables in different recycling bins"
+✅ Got 3 images
+{
+  "success": true,
+  "query": "separated recyclables in different recycling bins",
+  "count": 3,
+  "ranked": false,
+  "captioned_count": 0,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/2da7de9b86f9.jpg",
+      "caption": "",
+      "source": "City of Merritt",
+      "original_width": "1978px",
+      "original_height": "2560px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/84639d5386f4.jpg",
+      "caption": "",
+      "source": "DKW Thailand",
+      "original_width": "1140px",
+      "original_height": "696px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/f9393d62493d.jpg",
+      "caption": "",
+      "source": "Alamy",
+      "original_width": "1300px",
+      "original_height": "956px"
+    }
+  ]
+}

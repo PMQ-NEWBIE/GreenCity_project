@@ -1,0 +1,26 @@
+🚀 Initializing Z-AI SDK...
+🔎 Searching images: "vintage old electric standing fan retro"
+✅ Got 2 images
+{
+  "success": true,
+  "query": "vintage old electric standing fan retro",
+  "count": 2,
+  "ranked": false,
+  "captioned_count": 0,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/aae3019b91f2.jpg",
+      "caption": "",
+      "source": "us.amazon.com",
+      "original_width": "894px",
+      "original_height": "881px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/4ea69bede76c.jpg",
+      "caption": "",
+      "source": "www.amazon.com",
+      "original_width": "894px",
+      "original_height": "894px"
+    }
+  ]
+}

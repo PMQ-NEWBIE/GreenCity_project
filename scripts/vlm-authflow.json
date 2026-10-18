@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "1. **Yes**, the loading state shows a spinner icon and the text **\"Đang xử lý...\"** (Processing...) inside the green button.\n2. **Yes**, the success state shows a green checkmark icon and the message **\"Đăng nhập thành công!\"** (Login successful!) in a toast notification at the top right, followed by a redirect to the dashboard.\n3. **No major layout issues**; the design is clean, responsive, and uses a consistent green color scheme with clear visual hierarchy for both states.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1792295317,
+  "id": "202610181148345453e851d3154524",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "202610181148345453e851d3154524",
+  "usage": {
+    "completion_tokens": 110,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 3396,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 3506
+  }
+}

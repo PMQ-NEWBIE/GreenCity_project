@@ -1,0 +1,33 @@
+🚀 Initializing Z-AI SDK...
+🔎 Searching images: "recycling bins with separated waste materials"
+✅ Got 3 images
+{
+  "success": true,
+  "query": "recycling bins with separated waste materials",
+  "count": 3,
+  "ranked": false,
+  "captioned_count": 0,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/30d28a034c65.jpg",
+      "caption": "",
+      "source": "eBay",
+      "original_width": "1001px",
+      "original_height": "1001px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/8bc89131b447.jpg",
+      "caption": "",
+      "source": "Dreamstime",
+      "original_width": "1600px",
+      "original_height": "1690px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/8557d0235380.jpg",
+      "caption": "",
+      "source": "eBay",
+      "original_width": "1001px",
+      "original_height": "1001px"
+    }
+  ]
+}

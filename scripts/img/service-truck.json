@@ -1,0 +1,33 @@
+🚀 Initializing Z-AI SDK...
+🔎 Searching images: "waste management truck urban collection"
+✅ Got 3 images
+{
+  "success": true,
+  "query": "waste management truck urban collection",
+  "count": 3,
+  "ranked": false,
+  "captioned_count": 0,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/9ff521aa7d08.jpg",
+      "caption": "",
+      "source": "Waste360",
+      "original_width": "1280px",
+      "original_height": "664px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/1aefe6d81491.jpg",
+      "caption": "",
+      "source": "LinkedIn",
+      "original_width": "1280px",
+      "original_height": "720px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/9e9804b25794.jpg",
+      "caption": "",
+      "source": "YouTube",
+      "original_width": "1280px",
+      "original_height": "720px"
+    }
+  ]
+}

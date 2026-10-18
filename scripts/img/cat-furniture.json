@@ -1,0 +1,33 @@
+🚀 Initializing Z-AI SDK...
+🔎 Searching images: "old wooden table and vintage furniture second hand"
+✅ Got 3 images
+{
+  "success": true,
+  "query": "old wooden table and vintage furniture second hand",
+  "count": 3,
+  "ranked": false,
+  "captioned_count": 0,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/207a0ac95ef6.jpg",
+      "caption": "",
+      "source": "eBay",
+      "original_width": "1178px",
+      "original_height": "1200px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/a45c5f2cc431.jpg",
+      "caption": "",
+      "source": "Reddit",
+      "original_width": "3024px",
+      "original_height": "4032px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/117c9484c202.jpg",
+      "caption": "",
+      "source": "www.ballardconsignment.shop",
+      "original_width": "3840px",
+      "original_height": "2160px"
+    }
+  ]
+}

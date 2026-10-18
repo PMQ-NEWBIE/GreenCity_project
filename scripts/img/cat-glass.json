@@ -1,0 +1,33 @@
+🚀 Initializing Z-AI SDK...
+🔎 Searching images: "glass bottles for recycling collection"
+✅ Got 3 images
+{
+  "success": true,
+  "query": "glass bottles for recycling collection",
+  "count": 3,
+  "ranked": false,
+  "captioned_count": 0,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/c83be7da6714.jpg",
+      "caption": "",
+      "source": "Patch",
+      "original_width": "1009px",
+      "original_height": "900px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/d6e3fdb6c72a.jpg",
+      "caption": "",
+      "source": "Waste360",
+      "original_width": "1280px",
+      "original_height": "664px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/bbfdd4755484.jpg",
+      "caption": "",
+      "source": "The Denver Post",
+      "original_width": "4928px",
+      "original_height": "3280px"
+    }
+  ]
+}

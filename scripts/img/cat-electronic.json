@@ -1,0 +1,26 @@
+🚀 Initializing Z-AI SDK...
+🔎 Searching images: "old electronics laptop keyboard e-waste for recycling"
+✅ Got 2 images
+{
+  "success": true,
+  "query": "old electronics laptop keyboard e-waste for recycling",
+  "count": 2,
+  "ranked": false,
+  "captioned_count": 0,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/912c03ad5680.jpg",
+      "caption": "",
+      "source": "WIRED",
+      "original_width": "1600px",
+      "original_height": "1200px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/597b72687514.jpg",
+      "caption": "",
+      "source": "WIRED",
+      "original_width": "2560px",
+      "original_height": "1706px"
+    }
+  ]
+}

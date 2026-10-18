@@ -1,0 +1,33 @@
+🚀 Initializing Z-AI SDK...
+🔎 Searching images: "aerial view of a modern green city with many trees and sustainable buildings"
+✅ Got 3 images
+{
+  "success": true,
+  "query": "aerial view of a modern green city with many trees and sustainable buildings",
+  "count": 3,
+  "ranked": false,
+  "captioned_count": 0,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/ad2e7a02b700.jpg",
+      "caption": "",
+      "source": "Dreamstime.com",
+      "original_width": "1066px",
+      "original_height": "1690px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/db6a05a46ff2.jpg",
+      "caption": "",
+      "source": "Amazing Architecture",
+      "original_width": "1344px",
+      "original_height": "756px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/b224f2f9bd76.jpg",
+      "caption": "",
+      "source": "Alamy",
+      "original_width": "1300px",
+      "original_height": "820px"
+    }
+  ]
+}

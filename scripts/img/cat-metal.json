@@ -1,0 +1,26 @@
+🚀 Initializing Z-AI SDK...
+🔎 Searching images: "crushed aluminum cans and scrap metal for recycling"
+✅ Got 2 images
+{
+  "success": true,
+  "query": "crushed aluminum cans and scrap metal for recycling",
+  "count": 2,
+  "ranked": false,
+  "captioned_count": 0,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/7d61ef35f55a.jpg",
+      "caption": "",
+      "source": "Business Waste",
+      "original_width": "2560px",
+      "original_height": "1920px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/f7ed1a62ed2d.jpg",
+      "caption": "",
+      "source": "Reddit",
+      "original_width": "3060px",
+      "original_height": "4080px"
+    }
+  ]
+}

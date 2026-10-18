@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Yes, the small labels float **above** the input values (floating label pattern). They do not overlap the typed text.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1792296055,
+  "id": "20261018120053853593d160c74f4a",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "20261018120053853593d160c74f4a",
+  "usage": {
+    "completion_tokens": 26,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 1710,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 1736
+  }
+}

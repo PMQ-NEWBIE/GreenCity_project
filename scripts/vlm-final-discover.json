@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Based on the screenshot of the Vietnamese recycling marketplace \"GreenCity\" Discover page:\n\n**Verification Results:**\n\n1.  **Search Bar:** ✅ **Visible.** Located at the top center with placeholder text \"Tìm ve chai, đồ cũ, khu vực...\" (Search for recyclables, used items, location...).\n2.  **Category Chips Row:** ✅ **Visible.** A horizontal scrollable row of pill-shaped buttons is present below the search bar, including categories like \"Tất cả danh mục\" (All categories), \"Giấy & Bìa carton\", \"Nhựa tái chế\", etc.\n3.  **Product Cards Grid:** ✅ **Visible.** The main content area displays a responsive grid (4 columns wide) containing product cards. Each card features an image, status badge (\"Còn hàng\"), title, price in VND, location, and time posted.\n4.  **Broken Layout:** ❌ **No broken layout detected.** The sidebar navigation, header elements, search area, category filters, and product grid are all properly aligned and rendered without overlapping or visual glitches.\n\n**Summary:** The UI is fully functional and well-structured, displaying 11 products as indicated by the count label.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1792296083,
+  "id": "20261018120120351c946801454fa6",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "20261018120120351c946801454fa6",
+  "usage": {
+    "completion_tokens": 255,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 1719,
+    "prompt_tokens_details": {
+      "cached_tokens": 2
+    },
+    "total_tokens": 1974
+  }
+}

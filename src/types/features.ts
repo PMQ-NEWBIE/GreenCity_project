@@ -237,3 +237,70 @@ export interface Partner {
   note: string;
   active: boolean;
 }
+
+/* ------------------- Thùng thu gom cố định, báo thùng đầy (A3, A5) ------------------- */
+
+export type BinType = "tai-che" | "quan-ao" | "huu-co";
+
+/** binh-thuong → sap-day / day (khi có người báo) → dang-xu-ly (đội đi đổ) → binh-thuong */
+export type BinLevel = "binh-thuong" | "sap-day" | "day" | "dang-xu-ly";
+
+export interface Bin {
+  id: string;
+  /** Mã in trên thùng, ví dụ "TC-014" */
+  code: string;
+  type: BinType;
+  /** Chỗ đặt thùng, ví dụ "Sân chung cư, cạnh nhà xe" */
+  name: string;
+  area: Area;
+  address: string;
+  lat: number;
+  lng: number;
+  level: BinLevel;
+  lastEmptiedAt: string;
+  /** Cộng tác viên phụ trách kiểm tra */
+  collaborator: string;
+}
+
+export type DropoffStatus = "cho-kiem-tra" | "dat" | "khong-dat";
+
+export interface Dropoff {
+  id: string;
+  binId: string;
+  binCode: string;
+  binType: BinType;
+  userId?: string;
+  userName: string;
+  material: string;
+  /** Khối lượng người bỏ ước tính (kg) */
+  estKg: number;
+  photos: string[];
+  at: string;
+  status: DropoffStatus;
+  /** Điểm dự kiến lúc ghi nhận (0 nếu đã chạm giới hạn trong ngày) */
+  points: number;
+  /** true = đã chạm giới hạn ngày nên không cộng điểm */
+  capped: boolean;
+  pointsEntryId?: string;
+  reviewedAt?: string;
+  reviewer?: string;
+  /** Khối lượng cộng tác viên kiểm lại */
+  actualKg?: number;
+  rejectReason?: string;
+}
+
+export type BinReportStatus = "moi" | "da-xac-nhan" | "khong-dung" | "da-xu-ly";
+
+export interface BinReport {
+  id: string;
+  binId: string;
+  level: "sap-day" | "day";
+  userId?: string;
+  userName: string;
+  at: string;
+  status: BinReportStatus;
+  /** Số lượt báo trùng (cùng thùng trong 6 giờ) đã gộp vào báo cáo này */
+  merged: number;
+  points: number;
+  pointsEntryId?: string;
+}

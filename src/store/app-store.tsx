@@ -22,6 +22,7 @@ import { rewardsInitial, rewardsReducer, stockLeft, type RewardsAction, type Rew
 import { swapHydrate, swapInitial, swapReducer, type SwapAction, type SwapState } from "./slices/swap";
 import { collectHydrate, collectInitial, collectReducer, type CollectAction, type CollectState } from "./slices/collect";
 import { partnersInitial, partnersReducer, type PartnersAction, type PartnersState } from "./slices/partners";
+import { binsHydrate, binsInitial, binsReducer, type BinsAction, type BinsState } from "./slices/bins";
 
 export interface AppState {
   /** true sau khi đã đọc localStorage — trước đó chưa biết người dùng đã đăng nhập hay chưa. */
@@ -39,6 +40,7 @@ export interface AppState {
   swap: SwapState;
   collect: CollectState;
   partners: PartnersState;
+  bins: BinsState;
 }
 
 /** Thời điểm và id do nơi gọi tạo ra, để reducer luôn cho cùng kết quả với cùng một action. */
@@ -63,7 +65,8 @@ export type Action =
   | RewardsAction
   | SwapAction
   | CollectAction
-  | PartnersAction;
+  | PartnersAction
+  | BinsAction;
 
 const initialState: AppState = {
   ready: false,
@@ -78,6 +81,7 @@ const initialState: AppState = {
   swap: swapInitial,
   collect: collectInitial,
   partners: partnersInitial,
+  bins: binsInitial,
 };
 
 /** Người dùng chưa có điểm chào mừng thì cộng một lần (đọc số điểm từ POINT_RULES). */
@@ -105,6 +109,7 @@ export function reducer(state: AppState, action: Action): AppState {
     return { ...state, collect: collectReducer(state.collect, action as CollectAction) };
   if (action.type.startsWith("PARTNERS_"))
     return { ...state, partners: partnersReducer(state.partners, action as PartnersAction) };
+  if (action.type.startsWith("BINS_")) return { ...state, bins: binsReducer(state.bins, action as BinsAction) };
   if (action.type !== "REWARDS_REDEEM" && action.type.startsWith("REWARDS_"))
     return { ...state, rewards: rewardsReducer(state.rewards, action as RewardsAction) };
 
@@ -127,8 +132,15 @@ export function reducer(state: AppState, action: Action): AppState {
             swap: d.swap,
             collect: d.collect,
             partners: d.partners,
+            bins: d.bins,
           }
-        : { ...state, ready: true, swap: swapHydrate(null), collect: collectHydrate(null, [], null) };
+        : {
+            ...state,
+            ready: true,
+            swap: swapHydrate(null),
+            collect: collectHydrate(null, [], null),
+            bins: binsHydrate(null),
+          };
       return withWelcome(next, action);
     }
     case "SET_ROLE":
@@ -237,7 +249,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       quotaWarnedRef.current = true;
       toast("error", "Bộ nhớ trình duyệt đã đầy", "Thay đổi mới chỉ giữ trong lần mở này. Xóa bớt tin có ảnh để lưu tiếp.");
     }
-  }, [state.user, state.remember, state.favorites, state.products, state.points, state.rewards, state.swap, state.collect, state.partners, toast]);
+  }, [state.user, state.remember, state.favorites, state.products, state.points, state.rewards, state.swap, state.collect, state.partners, state.bins, toast]);
 
   const login = useCallback(
     (user: DemoUser, remember = true) => dispatch({ type: "LOGIN", user, remember, ...stamp() }),

@@ -5,6 +5,7 @@ import { rewardsHydrate, rewardsPersist, type RewardsState } from "./slices/rewa
 import { swapHydrate, swapPersist, type SwapState } from "./slices/swap";
 import { collectHydrate, collectPersist, type CollectState } from "./slices/collect";
 import { partnersHydrate, partnersPersist, type PartnersState } from "./slices/partners";
+import { binsHydrate, binsPersist, type BinsState } from "./slices/bins";
 
 const KEY_V1 = "greencity-demo-v1";
 const KEY_V2 = "greencity-demo-v2";
@@ -19,6 +20,7 @@ export interface PersistShape {
   swap: SwapState;
   collect: CollectState;
   partners: PartnersState;
+  bins: BinsState;
 }
 
 const ROLES: UserRole[] = ["resident", "collaborator", "business", "operator"];
@@ -50,6 +52,7 @@ function parse(raw: Record<string, unknown>): PersistShape {
     // Bản cũ lưu yêu cầu thu gom ở myRequests (kiểu v1) → chuyển sang đơn bản mới
     collect: collectHydrate(raw.collect, arr<CollectionRequest>(raw.myRequests), user),
     partners: partnersHydrate(raw.partners),
+    bins: binsHydrate(raw.bins),
   };
 }
 
@@ -77,6 +80,7 @@ export function savePersisted(state: AppState): "ok" | "quota" | "error" {
     swap: swapPersist(state.swap),
     collect: collectPersist(state.collect),
     partners: partnersPersist(state.partners),
+    bins: binsPersist(state.bins),
   };
   try {
     window.localStorage.setItem(KEY_V2, JSON.stringify(payload));

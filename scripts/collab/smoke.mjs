@@ -391,6 +391,50 @@ try {
     await sleep(800);
     const balance = await evaluate(`(() => { const dt = [...document.querySelectorAll('dt')].find(d => d.textContent.includes('Điểm thưởng')); return dt?.nextElementSibling?.textContent.trim(); })()`);
     check("Luồng A2: số dư ở Tổng quan = 50 chào mừng + 30", balance === "80", `số dư: ${balance}`);
+
+    // A3 + A5: bỏ đồ vào thùng, báo thùng đầy → đổi sang cộng tác viên → duyệt → điểm vào tài khoản
+    await goto(BASE + "/thung-thu-gom");
+    const firstBin = await evaluate(`document.querySelector('main li[id^="thung-"] .font-mono')?.textContent`);
+    await clickByText("Bỏ đồ");
+    await sleep(400);
+    await clickByText("Chai nhựa PET");
+    await clickByText("1–3kg");
+    await clickByText("Ghi nhận");
+    await sleep(900);
+    await clickByText("Báo đầy");
+    await sleep(400);
+    await clickByText("Gửi báo cáo");
+    await sleep(900);
+    const pendingShown = await evaluate(`document.querySelector('main').innerText.includes('Chờ kiểm tra')`);
+    await shot("luong-a3-bo-do.png");
+    check("Luồng A3: ghi nhận bỏ đồ, hiện 'Chờ kiểm tra' trong hoạt động của bạn", pendingShown);
+
+    await clickByText("Hồ sơ của tôi");
+    await sleep(700);
+    await evaluate(`[...document.querySelectorAll('main label')].find(l => l.textContent.includes('Cộng tác viên'))?.click()`);
+    await sleep(300);
+    await clickByText("Khu cộng tác viên");
+    await sleep(800);
+    const approved = await evaluate(`(() => {
+      const li = [...document.querySelectorAll('main li')].find(l => l.textContent.includes('Người Kiểm Thử'));
+      const b = li && [...li.querySelectorAll('button')].find(x => x.textContent.trim() === 'Đạt');
+      b?.click(); return !!b;
+    })()`);
+    await sleep(500);
+    await clickByText("Thùng báo đầy", { exact: false });
+    await sleep(500);
+    const confirmed = await evaluate(`(() => {
+      const li = [...document.querySelectorAll('main li')].find(l => l.textContent.includes(${JSON.stringify(firstBin ?? "")}));
+      const b = li && [...li.querySelectorAll('button')].find(x => x.textContent.trim() === 'Xác nhận đầy');
+      b?.click(); return !!b;
+    })()`);
+    await sleep(500);
+    await shot("luong-a5-ctv-xac-nhan.png");
+    check("Luồng A3/A5: cộng tác viên duyệt lượt bỏ đồ và xác nhận thùng đầy", approved && confirmed, `duyệt: ${approved}, xác nhận ${firstBin}: ${confirmed}`);
+    await clickByText("Tổng quan");
+    await sleep(800);
+    const balance2 = await evaluate(`(() => { const dt = [...document.querySelectorAll('dt')].find(d => d.textContent.includes('Điểm thưởng')); return dt?.nextElementSibling?.textContent.trim(); })()`);
+    check("Luồng A3/A5: số dư = 50 + 5 (bỏ đồ) + 5 (báo đầy)", balance2 === "60", `số dư: ${balance2}`);
   }
 } catch (err) {
   check("Chạy kiểm tra không lỗi", false, err.message);

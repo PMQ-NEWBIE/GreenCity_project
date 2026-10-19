@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Award, CheckCircle2, Gift, Ticket, AlertCircle } from "lucide-react";
+import { Award, Ticket } from "lucide-react";
 import {
   ROUTES,
   REWARD_CATEGORY_LABEL,
@@ -15,14 +15,14 @@ import {
   type RewardCategory,
   type Redemption,
 } from "@/features/contracts";
-import { SmartImage } from "@/components/greencity/SmartImage";
-import { GcModal } from "@/components/greencity/GcModal";
 import {
   PageContainer,
   PageIntro,
   buttonClass,
 } from "@/components/greencity/ui";
 import { cn } from "@/lib/utils";
+import { RewardCard } from "./components/RewardCard";
+import { RedeemModal } from "./components/RedeemModal";
 
 const CATEGORIES: { id: RewardCategory | "all"; label: string }[] = [
   { id: "all", label: "Tất cả" },
@@ -149,91 +149,14 @@ export function RewardsView() {
       {/* Lưới thẻ quà */}
       <section aria-label="Danh sách quà tặng" className="mt-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
-          {filteredRewards.map((reward) => {
-            const isOutOfStock = reward.stock <= 0;
-            const notEnoughPoints = balance < reward.pointsCost;
-            const pointsNeeded = reward.pointsCost - balance;
-
-            return (
-              <article
-                key={reward.id}
-                className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-border bg-card transition-[border-color,box-shadow] duration-200 hover:border-primary/40 hover:shadow-md"
-              >
-                <div>
-                  <div className="relative aspect-square w-full overflow-hidden">
-                    <SmartImage
-                      src={reward.image}
-                      alt={reward.name}
-                      className="h-full w-full"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 280px"
-                      imgClassName={cn(
-                        "transition-transform duration-300 group-hover:scale-[1.03]",
-                        isOutOfStock && "grayscale"
-                      )}
-                    />
-                    <span className="absolute left-3 top-3 rounded-full bg-card/90 px-2.5 py-0.5 text-[12px] font-semibold text-primary backdrop-blur-sm">
-                      {REWARD_CATEGORY_LABEL[reward.category]}
-                    </span>
-                  </div>
-
-                  <div className="p-4 sm:p-5">
-                    <p className="text-[12px] font-medium text-muted-foreground">
-                      {reward.partnerName}
-                    </p>
-                    <h3 className="mt-1 line-clamp-2 text-[16px] font-bold text-foreground">
-                      {reward.name}
-                    </h3>
-                    <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
-                      {reward.description}
-                    </p>
-
-                    <div className="mt-4 flex items-baseline justify-between border-t border-border pt-3">
-                      <div>
-                        <span className="text-[18px] font-extrabold text-primary">
-                          {reward.pointsCost}
-                        </span>
-                        <span className="ml-1 text-[13px] font-semibold text-muted-foreground">
-                          điểm
-                        </span>
-                      </div>
-                      <span className="text-[12px] text-muted-foreground">
-                        {isOutOfStock ? "Tạm hết hàng" : `Còn ${reward.stock} phần`}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-4 pt-0 sm:p-5 sm:pt-0">
-                  {isOutOfStock ? (
-                    <button
-                      type="button"
-                      disabled
-                      className={cn(buttonClass.secondary, "w-full min-h-11 text-[14px] cursor-not-allowed opacity-60")}
-                    >
-                      Tạm hết
-                    </button>
-                  ) : notEnoughPoints ? (
-                    <button
-                      type="button"
-                      disabled
-                      className={cn(buttonClass.secondary, "w-full min-h-11 text-[13px] cursor-not-allowed opacity-60")}
-                    >
-                      Cần thêm {pointsNeeded} điểm
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => openRedeemModal(reward)}
-                      className={cn(buttonClass.primary, "w-full min-h-11 text-[14px]")}
-                    >
-                      <Gift className="h-4 w-4" aria-hidden="true" />
-                      Đổi quà
-                    </button>
-                  )}
-                </div>
-              </article>
-            );
-          })}
+          {filteredRewards.map((reward) => (
+            <RewardCard
+              key={reward.id}
+              reward={reward}
+              balance={balance}
+              onRedeem={openRedeemModal}
+            />
+          ))}
         </div>
       </section>
 
@@ -280,130 +203,15 @@ export function RewardsView() {
       </section>
 
       {/* Modal xác nhận & kết quả đổi quà */}
-      <GcModal
-        open={!!activeReward}
+      <RedeemModal
+        activeReward={activeReward}
+        successRedemption={successRedemption}
+        redeemError={redeemError}
+        submitting={submitting}
+        balance={balance}
         onClose={closeModal}
-        title={successRedemption ? "Đổi quà thành công" : "Xác nhận đổi quà"}
-        description={
-          successRedemption
-            ? "Mã nhận quà của bạn đã sẵn sàng."
-            : "Vui lòng kiểm tra lại thông tin trước khi dùng điểm."
-        }
-        size="sm"
-      >
-        {activeReward && (
-          <div>
-            {successRedemption ? (
-              /* Màn hình thành công ngay trong modal */
-              <div className="flex flex-col items-center gap-4 text-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <CheckCircle2 className="h-7 w-7" aria-hidden="true" />
-                </div>
-
-                <div>
-                  <p className="text-[15px] font-semibold text-foreground">
-                    {successRedemption.rewardName}
-                  </p>
-                  <p className="mt-1 text-[13px] text-muted-foreground">
-                    Hạn sử dụng mã tới ngày: {formatDate(successRedemption.expiresAt)}
-                  </p>
-                </div>
-
-                <div className="w-full rounded-2xl border-2 border-dashed border-primary/40 bg-accent p-4">
-                  <span className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Mã nhận quà
-                  </span>
-                  <p className="mt-1 font-mono text-[24px] font-extrabold tracking-wider text-primary">
-                    {successRedemption.code}
-                  </p>
-                </div>
-
-                <div className="w-full rounded-xl bg-muted/60 p-3 text-left">
-                  <p className="text-[12px] font-bold text-foreground">Nơi nhận quà:</p>
-                  <p className="mt-0.5 text-[13px] leading-relaxed text-muted-foreground">
-                    {activeReward.pickupNote}
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className={cn(buttonClass.primary, "w-full min-h-12 mt-2")}
-                >
-                  Xong
-                </button>
-              </div>
-            ) : (
-              /* Màn hình xác nhận đổi quà */
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center gap-3 rounded-2xl border border-border p-3.5">
-                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-border">
-                    <SmartImage
-                      src={activeReward.image}
-                      alt={activeReward.name}
-                      className="h-full w-full"
-                      sizes="56px"
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-[15px] font-bold text-foreground">
-                      {activeReward.name}
-                    </p>
-                    <p className="text-[12px] text-muted-foreground">
-                      Đối tác: {activeReward.partnerName}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-2 rounded-xl bg-muted/50 p-4 text-[14px]">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Giá quà:</span>
-                    <strong className="text-foreground">{activeReward.pointsCost} điểm</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Số dư hiện tại:</span>
-                    <span className="font-semibold text-foreground">{balance} điểm</span>
-                  </div>
-                  <div className="flex justify-between border-t border-border pt-2">
-                    <span className="font-semibold text-foreground">Số dư sau khi đổi:</span>
-                    <strong className="text-primary">{balance - activeReward.pointsCost} điểm</strong>
-                  </div>
-                </div>
-
-                <div className="rounded-xl border border-border p-3 text-[13px] text-muted-foreground">
-                  <strong className="text-foreground">Lưu ý nhận quà: </strong>
-                  {activeReward.pickupNote}
-                </div>
-
-                {redeemError && (
-                  <p className="flex items-center gap-1.5 text-[13px] font-semibold text-destructive">
-                    <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
-                    {redeemError}
-                  </p>
-                )}
-
-                <div className="mt-2 flex items-center justify-end gap-3">
-                  <button
-                    type="button"
-                    onClick={closeModal}
-                    className={cn(buttonClass.secondary, "min-h-11 px-4 text-[14px]")}
-                  >
-                    Để sau
-                  </button>
-                  <button
-                    type="button"
-                    onClick={confirmRedeem}
-                    disabled={submitting}
-                    className={cn(buttonClass.primary, "min-h-11 px-5 text-[14px]")}
-                  >
-                    Xác nhận đổi
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </GcModal>
+        onConfirm={confirmRedeem}
+      />
     </PageContainer>
   );
 }

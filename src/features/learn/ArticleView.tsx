@@ -123,7 +123,7 @@ export function ArticleView({ slug }: { slug: string }) {
       </div>
 
       {/* Thân bài: max-w-[68ch] */}
-      <main className="mx-auto mt-8 flex max-w-[68ch] flex-col gap-6 text-[16px] leading-relaxed text-foreground/90 sm:text-[17px]">
+      <article className="mx-auto mt-8 flex max-w-[68ch] flex-col gap-6 text-[16px] leading-relaxed text-foreground/90 sm:text-[17px]">
         {article.blocks.map((block: ArticleBlock, idx: number) => {
           switch (block.type) {
             case "p":
@@ -208,7 +208,7 @@ export function ArticleView({ slug }: { slug: string }) {
             </div>
           </div>
         )}
-      </main>
+      </article>
 
       {/* Hộp hành động liên quan theo chủ đề */}
       <section className="mt-12 rounded-2xl border border-border bg-card p-5 sm:p-6">

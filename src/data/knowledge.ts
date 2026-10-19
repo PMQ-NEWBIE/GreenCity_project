@@ -1,4 +1,4 @@
-import type { Article, SortingGuideItem } from "@/types/features";
+import type { Article, SortingGuideItem } from "@/features/contracts";
 
 export const ARTICLES: Article[] = [
   {
@@ -6,13 +6,13 @@ export const ARTICLES: Article[] = [
     title: "Phân loại rác tại nhà thành 3 nhóm chính",
     summary: "Chỉ cần ba thùng chứa nhỏ trong gian bếp là gia đình bạn đã có thể chủ động phân loại rác hiệu quả mỗi ngày.",
     topic: "phan-loai",
-    readMinutes: 4,
+    readMinutes: 5,
     cover: "/content/learn/phan-loai-rac-tai-nha.webp",
     updatedAt: "2026-10-19T00:00:00.000Z",
     blocks: [
       {
         type: "p",
-        text: "Phân loại rác tại nguồn là bước khởi đầu quan trọng nhất trong việc giữ gìn môi trường sống xung quanh. Khi rác được tách riêng ngay từ gian bếp, quá trình thu gom, tái chế và xử lý rác thải của thành phố sẽ diễn ra nhanh chóng, giảm thiểu lượng rác phải chôn lấp và hạn chế ô nhiễm đất nước.",
+        text: "Phân loại rác tại nguồn là bước khởi đầu quan trọng nhất trong việc giữ gìn môi trường sống xung quanh. Khi rác được tách riêng ngay từ gian bếp, quá trình thu gom, tái chế và xử lý rác thải của thành phố sẽ diễn ra nhanh chóng, giảm thiểu lượng rác phải chôn lấp và hạn chế ô nhiễm đất nước. Việc này không hề phức tạp hay tốn nhiều thời gian như nhiều người vẫn nghĩ, mà chỉ cần hình thành thói quen bỏ đúng món đồ vào đúng thùng ngay từ đầu.",
       },
       {
         type: "h2",
@@ -25,9 +25,9 @@ export const ARTICLES: Article[] = [
       {
         type: "steps",
         items: [
-          "Nhóm rác tái chế: Bao gồm các loại giấy báo, bìa carton, chai lọ nhựa, vỏ lon kim loại và chai lọ thủy tinh còn nguyên vẹn. Nhóm này cần được giữ khô ráo và sạch sẽ trước khi gom.",
-          "Nhóm rác thực phẩm: Gồm thức ăn thừa, cuống rau củ quả, vỏ trứng, bã cà phê, bã trà. Đây là nguồn vật liệu rất tốt để tự làm phân bón hữu cơ tại gia hoặc chuyển giao cho các đơn vị xử lý sinh học.",
-          "Nhóm rác còn lại: Tất cả những món không thể tái chế và không phải thực phẩm như khăn giấy bẩn, tã lót, khẩu trang y tế đã qua sử dụng, bao bì dính nhiều dầu mỡ khó rửa sạch.",
+          "Nhóm rác tái chế: Bao gồm các loại giấy báo, bìa carton, chai lọ nhựa, vỏ lon kim loại và chai lọ thủy tinh còn nguyên vẹn. Nhóm này cần được giữ khô ráo và sạch sẽ trước khi gom lại để bán ve chai hoặc gửi đến điểm tái sinh.",
+          "Nhóm rác thực phẩm: Gồm thức ăn thừa, cuống rau củ quả, vỏ trứng, bã cà phê, bã trà. Đây là nguồn vật liệu rất tốt để tự làm phân bón hữu cơ tại gia hoặc chuyển giao cho các đơn vị xử lý sinh học thành phân compost bón cây.",
+          "Nhóm rác còn lại: Tất cả những món không thể tái chế và không phải thực phẩm như khăn giấy bẩn, tã lót, khẩu trang y tế đã qua sử dụng, bao bì dính nhiều dầu mỡ khó rửa sạch, cùng các loại túi nilon rách dơ.",
         ],
       },
       {
@@ -40,11 +40,23 @@ export const ARTICLES: Article[] = [
       },
       {
         type: "p",
-        text: "Bạn không cần đầu tư những bộ thùng rác đắt tiền. Tận dụng các thùng giấy carton cũ, thùng xốp hoặc giỏ nhựa có sẵn để làm nơi chứa rác tái chế. Đối với rác thực phẩm, ưu tiên dùng xô có nắp đậy kín nhằm ngăn mùi hôi và tránh ruồi bọ xâm nhập.",
+        text: "Bạn không cần đầu tư những bộ thùng rác đắt tiền. Tận dụng các thùng giấy carton cũ, thùng xốp hoặc giỏ nhựa có sẵn để làm nơi chứa rác tái chế. Đối với rác thực phẩm, ưu tiên dùng xô có nắp đậy kín nhằm ngăn mùi hôi và tránh ruồi bọ xâm nhập. Góc ban công hoặc chân cầu thang là nơi lý tưởng để đặt các giỏ đồ tái chế mà không gây cản trở lối đi sinh hoạt của gia đình.",
       },
       {
         type: "p",
         text: "Tập thói quen tráng sơ các hộp sữa, vỏ lon sau khi uống xong rồi xếp gọn. Việc này chỉ mất vài giây nhưng ngăn ngừa được chuột bọ và giúp khu vực chứa đồ tái sinh luôn sạch sẽ suốt tuần.",
+      },
+      {
+        type: "h2",
+        text: "Những lỗi phổ biến cần tránh khi phân loại",
+      },
+      {
+        type: "p",
+        text: "Lỗi thường gặp nhất là bỏ giấy ăn đã qua sử dụng hoặc hộp xốp dính dầu mỡ vào túi đồ tái chế. Giấy dính dầu mỡ không thể tái chế thành bột giấy sạch và có thể làm hỏng cả mẻ nguyên liệu. Tương tự, chai nhựa còn sót nước ngọt hay sữa đặc sẽ nhanh chóng lên men và bốc mùi hôi khó chịu nếu không được tráng sơ qua nước.",
+      },
+      {
+        type: "p",
+        text: "Hãy dán nhãn hoặc ghi chú bằng bút lông rõ ràng lên từng nắp thùng để các thành viên trong gia đình, đặc biệt là trẻ nhỏ và người lớn tuổi, cùng thực hiện dễ dàng mỗi ngày. Sự thống nhất giữa các thành viên chính là chìa khóa duy trì nếp sống xanh lâu dài.",
       },
     ],
   },
@@ -73,7 +85,7 @@ export const ARTICLES: Article[] = [
       {
         type: "steps",
         items: [
-          "Bước 1: Rửa hoặc tráng sạch chất lỏng thừa bên trong chai nhựa, lon sữa và hộp kim loại. Chai sạch không bị mốc meo hay bốc mùi khi lưu kho lâu ngày.",
+          "Bước 1: Rửa hoặc tráng sạch chất lỏng thừa bên trong chai nhựa, lon sữa và hộp kim loại. Chai sạch không bị mốc meo hay bốc mùi khi lưu kho lâu ngày trong nhà.",
           "Bước 2: Bóp dẹt các lon nhôm và chai nhựa PET để giảm tối đa thể tích chiếm chỗ, giúp bạn gom được nhiều hơn trong cùng một diện tích chứa.",
           "Bước 3: Tách riêng từng chất liệu: giấy bìa carton buộc thành từng thếp, chai nhựa trong gom vào một bao, vỏ lon kim loại để riêng, chai thủy tinh xếp cẩn thận vào thùng cứng.",
         ],
@@ -92,7 +104,19 @@ export const ARTICLES: Article[] = [
       },
       {
         type: "p",
-        text: "Tránh để giấy báo hoặc bìa carton bị dính nước mưa vì giấy ẩm vừa dễ mủn nát vừa bị trừ bớt trọng lượng khi cân đo thực tế.",
+        text: "Tránh để giấy báo hoặc bìa carton bị dính nước mưa vì giấy ẩm vừa dễ mủn nát vừa bị trừ bớt trọng lượng khi cân đo thực tế. Hãy để giấy ở nơi khô ráo trên giá đỡ cách mặt đất một khoảng nhỏ.",
+      },
+      {
+        type: "h2",
+        text: "Cách lưu trữ an toàn trước ngày gọi thu gom",
+      },
+      {
+        type: "p",
+        text: "Để không gian nhà cửa luôn ngăn nắp, bạn nên chuẩn bị hai hoặc ba bao tải lưới lớn để phân loại ngay khi phát sinh phế liệu. Với chai lọ thủy tinh dễ vỡ, hãy giữ lại các thùng carton có vách ngăn của thùng bia hay nước ngọt để xếp chai đứng thẳng, vừa an toàn cho trẻ nhỏ vừa tránh đổ vỡ khi vận chuyển.",
+      },
+      {
+        type: "p",
+        text: "Khi gom đủ số lượng khoảng một đến hai bao tải, bạn có thể chủ động đặt lịch hẹn qua ứng dụng thu gom tận nơi để nhận điểm thưởng và tiền tương xứng, tránh để ve chai tích tụ quá nhiều chiếm lối đi.",
       },
     ],
   },
@@ -112,7 +136,7 @@ export const ARTICLES: Article[] = [
     blocks: [
       {
         type: "p",
-        text: "Thay vì vứt bỏ các loại cuống rau, vỏ củ quả và bã trà vào thùng rác chung làm rỉ nước bốc mùi, bạn hoàn toàn có thể tái sinh chúng thành nguồn phân bón giàu dinh dưỡng cho cây trồng trong nhà bằng chiếc thùng xốp bỏ đi.",
+        text: "Thay vì vứt bỏ các loại cuống rau, vỏ củ quả và bã trà vào thùng rác chung làm rỉ nước bốc mùi, bạn hoàn toàn có thể tái sinh chúng thành nguồn phân bón giàu dinh dưỡng cho cây trồng trong nhà bằng chiếc thùng xốp bỏ đi. Tự ủ phân hữu cơ không chỉ giảm lượng rác thải sinh hoạt mà còn tạo ra loại đất mùn màu mỡ cho những chậu rau sạch trên ban công.",
       },
       {
         type: "h2",
@@ -125,10 +149,10 @@ export const ARTICLES: Article[] = [
       {
         type: "steps",
         items: [
-          "Đục vài lỗ thoát nước nhỏ dưới đáy thùng xốp và lót một lớp lá cây khô hoặc trấu mỏng khoảng 3cm dưới cùng.",
-          "Cắt nhỏ các loại rác bếp như vỏ dưa hấu, cuống rau muống, vỏ chuối để vi sinh vật phân hủy nhanh hơn.",
+          "Đục vài lỗ thoát nước nhỏ dưới đáy thùng xốp và lót một lớp lá cây khô hoặc trấu mỏng khoảng 3cm dưới cùng để thoát nước tốt.",
+          "Cắt nhỏ các loại rác bếp như vỏ dưa hấu, cuống rau muống, vỏ chuối để vi sinh vật phân hủy nhanh hơn và hạn chế đọng nước.",
           "Rải xen kẽ một lớp rác bếp dày khoảng 4cm với một lớp đất khô hoặc mùn dừa khoảng 2cm cho đến khi đầy thùng.",
-          "Phủ kín lớp trên cùng bằng một lớp đất dày khoảng 5cm rồi đậy nắp thùng xốp lại để giữ ẩm và ngăn ruồi nhặng.",
+          "Phủ kín lớp trên cùng bằng một lớp đất dày khoảng 5cm rồi đậy nắp thùng xốp lại để giữ ẩm và ngăn ruồi nhặng xâm nhập.",
         ],
       },
       {
@@ -137,11 +161,19 @@ export const ARTICLES: Article[] = [
       },
       {
         type: "h2",
+        text: "Kiểm soát độ ẩm và khử mùi hôi phát sinh",
+      },
+      {
+        type: "p",
+        text: "Độ ẩm lý tưởng cho đống ủ là khi nắm chặt một nắm đất hỗn hợp thấy kết dính lại nhưng không có nước rỉ qua kẽ ngón tay. Nếu đống ủ quá ướt và bắt đầu bốc mùi chua, hãy bổ sung thêm lá cây khô, bìa carton xé nhỏ hoặc xơ dừa rồi dùng xẻng nhỏ đảo đều. Ngược lại, nếu đống ủ quá khô, vi sinh vật sẽ ngưng hoạt động; lúc này bạn chỉ cần tưới thêm một chút nước vo gạo.",
+      },
+      {
+        type: "h2",
         text: "Thời gian thu hoạch và cách sử dụng",
       },
       {
         type: "p",
-        text: "Sau khoảng 4 đến 6 tuần, hỗn hợp trong thùng xốp sẽ chuyển dần sang màu nâu sẫm, tơi xốp như đất rừng và không còn mùi hôi khó chịu. Lúc này phân hữu cơ đã hoai hoàn toàn.",
+        text: "Sau khoảng 4 đến 6 tuần, hỗn hợp trong thùng xốp sẽ chuyển dần sang màu nâu sẫm, tơi xốp như đất rừng và không còn mùi hôi khó chịu. Lúc này phân hữu cơ đã hoai hoàn toàn và sẵn sàng cung cấp dưỡng chất cho rễ cây.",
       },
       {
         type: "p",
@@ -160,7 +192,7 @@ export const ARTICLES: Article[] = [
     blocks: [
       {
         type: "p",
-        text: "Nước ngâm sinh học hay còn gọi là enzyme sinh thái từ vỏ trái cây là giải pháp thân thiện với môi trường, vừa tận dụng được phần vỏ hoa quả bỏ đi, vừa thay thế cho các hóa chất lau dọn công nghiệp có mùi nồng gắt.",
+        text: "Nước ngâm sinh học hay còn gọi là enzyme sinh thái từ vỏ trái cây là giải pháp thân thiện với môi trường, vừa tận dụng được phần vỏ hoa quả bỏ đi, vừa thay thế cho các hóa chất lau dọn công nghiệp có mùi nồng gắt. Dung dịch này lên men hoàn toàn tự nhiên nhờ các vi sinh vật bản địa phân giải đường và tinh dầu vỏ hoa quả thành axit hữu cơ dịu nhẹ.",
       },
       {
         type: "h2",
@@ -173,15 +205,23 @@ export const ARTICLES: Article[] = [
       {
         type: "steps",
         items: [
-          "Chuẩn bị một bình nhựa có nắp vặn kín. Tránh dùng bình thủy tinh vì quá trình lên men sinh khí có thể tạo áp suất lớn.",
-          "Hòa tan đường vào nước sạch theo đúng tỉ lệ trong bình.",
+          "Chuẩn bị một bình nhựa có nắp vặn kín. Tránh dùng bình thủy tinh vì quá trình lên men sinh khí có thể tạo áp suất lớn làm vỡ bình.",
+          "Hòa tan đường vào nước sạch theo đúng tỉ lệ trong bình chứa trước khi cho nguyên liệu thô vào.",
           "Cho các loại vỏ hoa quả nhiều tinh dầu như vỏ cam, chanh, bưởi hoặc vỏ dứa vào ngâm ngập dưới mặt nước.",
-          "Đặt bình nơi thoáng mát, trong tháng đầu tiên mở hé nắp mỗi ngày một lần để xả bớt khí gas tích tụ.",
+          "Đặt bình nơi thoáng mát, trong tháng đầu tiên mở hé nắp mỗi ngày một lần để xả bớt khí gas tích tụ bên trong.",
         ],
       },
       {
         type: "tip",
         text: "Thêm vài nhánh sả đập dập hoặc một củ gừng nhỏ vào bình ngâm sẽ giúp thành phẩm có mùi thơm thảo mộc rất dễ chịu khi lau nhà.",
+      },
+      {
+        type: "h2",
+        text: "Cách chọn vỏ trái cây để mẻ ủ đạt chuẩn",
+      },
+      {
+        type: "p",
+        text: "Vỏ quả dứa chín là nguyên liệu tốt nhất vì chứa lượng enzyme papain và bromelain tự nhiên dồi dào, giúp tẩy sạch dầu mỡ nhanh chóng. Kết hợp vỏ dứa với vỏ cam, chanh, bưởi hoặc vỏ quýt sẽ cho ra mùi thơm sảng khoái. Tránh dùng các loại vỏ có mùi quá nồng hoặc nhiều nhựa mủ như vỏ sầu riêng hay mít vì sẽ làm nước ngâm bị đục và khó ngửi.",
       },
       {
         type: "h2",
@@ -191,6 +231,10 @@ export const ARTICLES: Article[] = [
         type: "p",
         text: "Sau 90 ngày lên men tự nhiên, bạn lọc lấy phần nước cốt màu nâu cánh gián. Dung dịch này pha loãng với nước ấm dùng để lau sàn gạch, chùi bồn rửa, lau mặt bếp ga hoặc khử mùi cống rãnh cực kỳ hiệu quả mà không hại da tay.",
       },
+      {
+        type: "p",
+        text: "Phần bã enzyme còn sót lại sau khi chắt nước có thể đem băm nhỏ chôn vào gốc cây làm phân bón hoặc giữ lại một nắm làm men mồi cho mẻ ủ tiếp theo để rút ngắn thời gian lên men.",
+      },
     ],
   },
   {
@@ -198,7 +242,7 @@ export const ARTICLES: Article[] = [
     title: "Đi chợ ít túi nilon: những thói quen đơn giản mà hiệu quả",
     summary: "Mang theo hộp đựng thực phẩm tươi sống và giỏ cói đi chợ là cách thiết thực nhất để giảm bớt hàng chục túi nilon mỗi tuần.",
     topic: "giam-rac",
-    readMinutes: 4,
+    readMinutes: 5,
     cover: "/content/learn/di-cho-it-tui-nilon.webp",
     updatedAt: "2026-10-15T09:00:00.000Z",
     video: {
@@ -209,7 +253,7 @@ export const ARTICLES: Article[] = [
     blocks: [
       {
         type: "p",
-        text: "Tại các chợ truyền thống và siêu thị ở thành phố, một lần đi mua thực phẩm cho cả tuần có thể mang về từ 10 đến 20 chiếc túi nilon dùng một lần. Phần lớn số túi này mỏng manh, dễ rách và nhanh chóng bị ném vào sọt rác chỉ sau vài chục phút sử dụng.",
+        text: "Tại các chợ truyền thống và siêu thị ở thành phố, một lần đi mua thực phẩm cho cả tuần có thể mang về từ 10 đến 20 chiếc túi nilon dùng một lần. Phần lớn số túi này mỏng manh, dễ rách và nhanh chóng bị ném vào sọt rác chỉ sau vài chục phút sử dụng. Để thay đổi điều này, người tiêu dùng chỉ cần chuẩn bị trước vài vật dụng tái sử dụng quen thuộc.",
       },
       {
         type: "h2",
@@ -217,15 +261,15 @@ export const ARTICLES: Article[] = [
       },
       {
         type: "p",
-        text: "Thay đổi thói quen cần bắt đầu từ việc chuẩn bị sẵn sàng. Hãy gấp gọn hai chiếc túi vải canvas hoặc túi lưới cotton để sẵn trong cốp xe máy hoặc giỏ xách đi làm để có thể ghé chợ bất cứ khi nào cần.",
+        text: "Thay đổi thói quen cần bắt đầu từ việc chuẩn bị sẵn sàng. Hãy gấp gọn hai chiếc túi vải canvas hoặc túi lưới cotton để sẵn trong cốp xe máy hoặc giỏ xách đi làm để có thể ghé chợ bất cứ khi nào cần mà không phải lấy thêm bao bì mới từ người bán.",
       },
       {
         type: "steps",
         items: [
-          "Dùng túi vải to cho các loại củ quả nặng như bí xanh, khoai tây, bắp cải.",
-          "Dùng các túi lưới nhỏ có dây rút để đựng hành ngò, ớt, chanh thay cho từng chiếc bao nilon xốp bé xíu.",
-          "Mang theo hộp nhựa hoặc thau inox nhỏ có nắp khi mua thịt tươi sống, cá tươi hoặc đậu hũ mềm.",
-          "Chủ động nói trước với người bán hàng rằng bạn có túi sẵn và không cần lấy thêm túi nilon.",
+          "Dùng túi vải to cho các loại củ quả nặng như bí xanh, khoai tây, bắp cải và trái cây có vỏ cứng.",
+          "Dùng các túi lưới nhỏ có dây rút để đựng hành ngò, ớt, chanh thay cho từng chiếc bao nilon xốp bé xíu dễ rách.",
+          "Mang theo hộp nhựa hoặc thau inox nhỏ có nắp kín khi mua thịt tươi sống, cá tươi hoặc đậu hũ mềm để tránh rỉ nước.",
+          "Chủ động nói trước với người bán hàng rằng bạn có túi sẵn và không cần lấy thêm túi nilon hay quai xách nhựa.",
         ],
       },
       {
@@ -234,11 +278,19 @@ export const ARTICLES: Article[] = [
       },
       {
         type: "h2",
+        text: "Xử lý đồ tươi sống không rỉ nước ra xe",
+      },
+      {
+        type: "p",
+        text: "Nhiều người ngại từ chối túi nilon vì lo sợ nước từ cá thịt tươi sống rỉ ra cốp xe hoặc giỏ đựng. Giải pháp rất đơn giản là sử dụng các hộp nhựa có gioăng cao su khóa chặt, hoặc mang theo một chiếc túi giữ nhiệt nhỏ có đáy chống thấm. Sau khi về nhà, chỉ cần rửa sạch hộp với nước xà phòng và phơi khô là sẵn sàng cho chuyến đi chợ tiếp theo.",
+      },
+      {
+        type: "h2",
         text: "Tái sử dụng túi nilon đã có sẵn",
       },
       {
         type: "p",
-        text: "Nếu bất đắc dĩ phải nhận túi nilon, hãy giữ chúng lại cẩn thận, giũ sạch phơi khô và dùng để lót sọt rác hoặc đựng đồ trong những lần mua sắm tiếp theo thay vì vứt bỏ ngay.",
+        text: "Nếu bất đắc dĩ phải nhận túi nilon, hãy giữ chúng lại cẩn thận, giũ sạch phơi khô và dùng để lót sọt rác hoặc đựng đồ trong những lần mua sắm tiếp theo thay vì vứt bỏ ngay. Gom các túi nilon sạch cùng loại để đem đến điểm thu gom rác tái chế chuyên dụng cũng là cách giúp kéo dài vòng đời vật liệu.",
       },
     ],
   },
@@ -253,7 +305,7 @@ export const ARTICLES: Article[] = [
     blocks: [
       {
         type: "p",
-        text: "Pin cúc áo, bóng đèn huỳnh quang vỡ, thuốc tây quá hạn và bình xịt côn trùng là những vật dụng rất phổ biến trong mọi ngôi nhà. Khi bị ném lẫn vào thùng rác thông thường và đưa đi chôn lấp, các hóa chất độc hại như thủy ngân, chì và cadimi sẽ ngấm vào mạch nước ngầm gây nguy hại dài lâu.",
+        text: "Pin cúc áo, bóng đèn huỳnh quang vỡ, thuốc tây quá hạn và bình xịt côn trùng là những vật dụng rất phổ biến trong mọi ngôi nhà. Khi bị ném lẫn vào thùng rác thông thường và đưa đi chôn lấp, các hóa chất độc hại như thủy ngân, chì và cadimi sẽ ngấm vào mạch nước ngầm gây nguy hại dài lâu cho sức khỏe cộng đồng. Phân tách rác nguy hại đòi hỏi sự cẩn trọng ngay từ từng gia đình.",
       },
       {
         type: "h2",
@@ -263,7 +315,7 @@ export const ARTICLES: Article[] = [
         type: "steps",
         items: [
           "Gom các viên pin đã cạn năng lượng vào một chiếc hộp nhựa nhỏ hoặc lọ thủy tinh có nắp đậy kín, để xa tầm tay trẻ em.",
-          "Dán băng keo trong che hai đầu cực của pin vuông hoặc pin lithium để phòng ngừa nguy cơ chập cháy do ma sát.",
+          "Dán băng keo trong che hai đầu cực của pin vuông hoặc pin lithium để phòng ngừa nguy cơ chập cháy do ma sát cọ quẹt.",
           "Bọc bóng đèn hỏng vào bìa báo cũ hoặc xốp nổ để tránh mảnh thủy tinh vỡ gây thương tích cho công nhân thu gom rác.",
           "Để nguyên vỉ hoặc chai lọ của thuốc hết hạn, không xả thuốc xuống bồn cầu vì sẽ làm nhiễm độc nguồn nước sinh hoạt.",
         ],
@@ -274,11 +326,23 @@ export const ARTICLES: Article[] = [
       },
       {
         type: "h2",
+        text: "Xử lý nhiệt kế thủy ngân và chai lọ hóa chất",
+      },
+      {
+        type: "p",
+        text: "Nếu chẳng may làm rơi vỡ nhiệt kế y tế có chứa thủy ngân, tuyệt đối không dùng máy hút bụi hay chổi quét vì sẽ làm hạt thủy ngân phân tán thành bụi khí độc. Hãy dùng một miếng bìa cứng hoặc ống nhỏ giọt để gạt các giọt thủy ngân vào lọ thủy tinh có chứa sẵn nước, đậy chặt nắp lại rồi dán nhãn cảnh báo.",
+      },
+      {
+        type: "h2",
         text: "Mang đến các điểm tiếp nhận đúng quy định",
       },
       {
         type: "p",
         text: "Hiện nay tại nhiều chung cư, ủy ban nhân dân phường và các siêu thị lớn đều có đặt thùng thu gom pin cũ chuyên dụng. Hãy tích lũy pin trong vài tháng và mang đến các điểm này một lần để được xử lý theo đúng quy trình an toàn.",
+      },
+      {
+        type: "p",
+        text: "Đối với các loại thuốc tây hết hạn dùng, bạn có thể mang trả lại quầy thuốc bệnh viện hoặc trạm y tế phường trong các đợt phát động thu hồi rác nguy hại định kỳ để được tiêu hủy bằng lò thiêu chuyên dụng.",
       },
     ],
   },
@@ -298,7 +362,7 @@ export const ARTICLES: Article[] = [
     blocks: [
       {
         type: "p",
-        text: "Hằng năm, lượng vải vụn và quần áo cũ thải ra bãi rác ngày càng gia tăng. Phần lớn những chiếc áo sơ mi, váy đầm hay sách truyện chỉ mới qua tay vài lần rồi nằm yên trong góc tủ vì không còn vừa vặn hoặc không còn hợp sở thích.",
+        text: "Hằng năm, lượng vải vụn và quần áo cũ thải ra bãi rác ngày càng gia tăng. Phần lớn những chiếc áo sơ mi, váy đầm hay sách truyện chỉ mới qua tay vài lần rồi nằm yên trong góc tủ vì không còn vừa vặn hoặc không còn hợp sở thích. Thay vì để đồ cũ bám bụi hoặc ném vào xe rác, bạn có thể trao cho chúng một vòng đời mới đầy ý nghĩa bằng cách chia sẻ lại cho những người đang cần.",
       },
       {
         type: "h2",
@@ -308,8 +372,8 @@ export const ARTICLES: Article[] = [
         type: "steps",
         items: [
           "Lấy toàn bộ đồ ra khỏi tủ và chia làm ba nhóm: đồ còn mới muốn mặc tiếp, đồ còn tốt nhưng không mặc nữa, và đồ đã rách hỏng hoàn toàn.",
-          "Với đồ rách hỏng: cắt bỏ cúc áo, dây kéo kim loại để tận dụng làm giẻ lau nhà hoặc lót chuồng thú cưng.",
-          "Với đồ còn sạch đẹp: giặt ủi thơm tho, kiểm tra kỹ các đường chỉ may và gấp phẳng phiu.",
+          "Với đồ rách hỏng: cắt bỏ cúc áo, dây kéo kim loại để tận dụng làm giẻ lau nhà hoặc lót chuồng thú cưng thay vì vứt bỏ.",
+          "Với đồ còn sạch đẹp: giặt ủi thơm tho, kiểm tra kỹ các đường chỉ may, đính lại khuy rơi và gấp phẳng phiu ngay ngắn.",
           "Đăng lên khu trao đổi đồ cũ để tìm người có nhu cầu đổi lấy món khác, hoặc mang tặng cho các hội từ thiện uy tín.",
         ],
       },
@@ -319,11 +383,23 @@ export const ARTICLES: Article[] = [
       },
       {
         type: "h2",
+        text: "Tái chế vải vụn thành vật dụng hữu ích",
+      },
+      {
+        type: "p",
+        text: "Những chiếc quần jean cũ đã sờn rách ở gối là nguồn chất liệu tuyệt vời để may túi xách tote bền bỉ, ví nhỏ đựng tiền lẻ hoặc lót ly thấm nước. Vải cotton mềm từ áo thun cũ có thể cắt thành sợi dài để đan thảm chùi chân phòng tắm hoặc làm bông lau bụi đa năng mà không cần dùng đến hóa chất tẩy rửa.",
+      },
+      {
+        type: "h2",
         text: "Chia sẻ sách vở và truyện tranh",
       },
       {
         type: "p",
         text: "Sách giáo khoa sau mỗi năm học và truyện tranh của con trẻ rất dễ tìm chủ nhân mới. Gom lại theo bộ hoàn chỉnh, tẩy bớt vết bút chì rồi gửi tặng thư viện cộng đồng hoặc trao đổi với các bậc phụ huynh khác trong khu dân cư.",
+      },
+      {
+        type: "p",
+        text: "Mỗi cuốn sách được chuyền tay là thêm một người có cơ hội tiếp cận tri thức mà không tốn tài nguyên giấy in mới. Hãy biến việc trao đổi sách thành nét sinh hoạt văn hóa đẹp giữa những người hàng xóm quanh bạn.",
       },
     ],
   },
@@ -338,7 +414,7 @@ export const ARTICLES: Article[] = [
     blocks: [
       {
         type: "p",
-        text: "Khi chiếc quạt máy quay chậm chạp hay chiếc nồi cơm điện nhảy nút sớm, phản xạ đầu tiên của nhiều người là vứt đi và mua cái mới. Tuy nhiên, việc kéo dài tuổi thọ cho đồ gia dụng không chỉ giúp bạn tiết kiệm chi phí mà còn ngăn chặn một lượng lớn rác thải điện tử khó phân hủy ra ngoài tự nhiên.",
+        text: "Khi chiếc quạt máy quay chậm chạp hay chiếc nồi cơm điện nhảy nút sớm, phản xạ đầu tiên của nhiều người là vứt đi và mua cái mới. Tuy nhiên, việc kéo dài tuổi thọ cho đồ gia dụng không chỉ giúp bạn tiết kiệm chi phí mà còn ngăn chặn một lượng lớn rác thải điện tử khó phân hủy ra ngoài tự nhiên. Đa số các lỗi thiết bị gia đình đều bắt nguồn từ bụi bẩn hoặc lỏng tiếp xúc cơ học.",
       },
       {
         type: "h2",
@@ -349,8 +425,8 @@ export const ARTICLES: Article[] = [
         items: [
           "Quạt bàn quay chậm: Thường do bụi bẩn bám chặt vào trục quay và cạn dầu bôi trơn. Tháo lồng quạt, vệ sinh cánh và nhỏ vài giọt dầu máy may vào bạc đạn là quạt lại chạy êm ru.",
           "Ấm đun nước siêu tốc không vào điện: Kiểm tra tiếp điểm dưới đáy ấm và chân đế cắm. Dùng giấy nhám mịn chà nhẹ lớp muội than bám trên lá đồng dẫn điện.",
-          "Dây điện bị đứt ngầm: Thay đoạn dây nguồn mới hoặc phích cắm mới giá chỉ vài chục ngàn đồng thay vì bỏ cả thiết bị.",
-          "Bàn ghế gỗ bị lung lay: Dùng keo sữa chuyên dụng quét vào mộng gỗ và siết chặt lại góc ghép bằng ke góc kim loại.",
+          "Dây điện bị đứt ngầm: Thay đoạn dây nguồn mới hoặc phích cắm mới giá chỉ vài chục ngàn đồng thay vì bỏ cả thiết bị vẫn còn dùng tốt.",
+          "Bàn ghế gỗ bị lung lay: Dùng keo sữa chuyên dụng quét vào mộng gỗ và siết chặt lại góc ghép bằng ke góc kim loại mua ở tiệm kim khí.",
         ],
       },
       {
@@ -359,11 +435,23 @@ export const ARTICLES: Article[] = [
       },
       {
         type: "h2",
+        text: "Vệ sinh cặn canxi và bảo dưỡng định kỳ",
+      },
+      {
+        type: "p",
+        text: "Các thiết bị đun nước nóng như bình siêu tốc, bàn ủi hơi nước hay máy pha cà phê thường bị đóng cặn canxi vôi hóa sau vài tháng sử dụng khiến thời gian đun lâu và tốn điện. Bạn chỉ cần đổ một chén giấm ăn pha loãng với nước vào bình đun sôi rồi ngâm trong một giờ, cặn trắng sẽ tự động rã ra mà không cần cạo cọ làm xước thành kim loại.",
+      },
+      {
+        type: "h2",
         text: "Khi nào nên mang ra tiệm sửa chữa",
       },
       {
         type: "p",
         text: "Với các sự cố liên quan đến bo mạch điện tử, rò rỉ khí gas máy lạnh hoặc linh kiện bên trong lò vi sóng, bạn nên mang ra các cửa hàng sửa đồ gia dụng gần nhà thay vì tự ý tháo dỡ nếu không có chuyên môn về điện lạnh.",
+      },
+      {
+        type: "p",
+        text: "Hãy ưu tiên tìm kiếm các tiệm sửa chữa điện cơ bình dân trong khu phố của bạn. Việc này vừa ủng hộ kinh tế thợ địa phương vừa tạo thêm nhiều năm sử dụng bền bỉ cho món đồ của bạn.",
       },
     ],
   },
@@ -448,7 +536,7 @@ export const SORTING_GUIDE: SortingGuideItem[] = [
     prep: "Rửa sạch cặn thức ăn dính đáy, tháo quai nhựa nếu tháo được.",
   },
   {
-    id: "chậu-nhua-vo",
+    id: "chau-nhua-vo",
     name: "Thau chậu nhựa rách",
     aliases: ["rổ nhựa hỏng", "thùng nhựa gãy", "ghế nhựa gãy", "nhựa PP"],
     group: "tai-che",
@@ -740,6 +828,14 @@ export const SORTING_GUIDE: SortingGuideItem[] = [
     group: "nguy-hai",
     prep: "Bỏ vào chai nhựa dày có nắp vặn khóa chặt trước khi chuyển cho y tế phường.",
   },
+  {
+    id: "hop-son-dau-cu",
+    name: "Vỏ lon sơn dầu và dung môi pha sơn",
+    aliases: ["thùng sơn cũ", "lon sơn rỗng", "chai xăng thơm"],
+    group: "nguy-hai",
+    prep: "Đậy chặt nắp, để nơi thoáng gió cho khô cặn sơn trước khi mang ra điểm thu hồi rác nguy hại.",
+    note: "Chứa hóa chất dễ cháy và độc hại với nguồn nước.",
+  },
 
   // 5. ĐỒ CỒNG KỀNH (cong-kenh) - Cần hẹn xe ba gác hoặc đội thu gom riêng
   {
@@ -780,7 +876,7 @@ export const SORTING_GUIDE: SortingGuideItem[] = [
     note: "Có thể bán phế liệu giá tốt cho đội thu mua chuyên nghiệp.",
   },
   {
-    id: "bon-cau-chậu-rua-su",
+    id: "bon-cau-chau-rua-su",
     name: "Bồn cầu và lavabo sứ cũ",
     aliases: ["bồn rửa mặt sứ", "bệ xí cũ tháo dỡ"],
     group: "cong-kenh",

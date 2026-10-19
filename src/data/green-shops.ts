@@ -1,4 +1,4 @@
-import type { GreenShop } from "@/types/features";
+import type { GreenShop } from "@/features/contracts";
 
 export const GREEN_SHOPS: GreenShop[] = [
   {

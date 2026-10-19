@@ -104,8 +104,10 @@ export function SwapDetailView({ id }: { id: string }) {
             {item.status !== "open" && (
               <span
                 className={cn(
-                  "absolute left-3 top-3 rounded-full px-3 py-1 text-[12px] font-bold text-white shadow-md",
-                  item.status === "reserved" ? "bg-warn" : "bg-black/75"
+                  "absolute left-3 top-3 rounded-full px-3 py-1 text-[12px] font-bold shadow-md",
+                  item.status === "reserved"
+                    ? "bg-warn text-primary-foreground"
+                    : "bg-foreground/80 text-background"
                 )}
               >
                 {SWAP_STATUS_LABEL[item.status]}

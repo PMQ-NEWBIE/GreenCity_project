@@ -268,12 +268,12 @@ export function SwapView() {
                       {SWAP_CONDITION_LABEL[item.condition]}
                     </span>
                     {isReserved && (
-                      <span className="rounded-full bg-warn px-2.5 py-0.5 text-[11px] font-bold text-white shadow-sm">
+                      <span className="rounded-full bg-warn px-2.5 py-0.5 text-[11px] font-bold text-primary-foreground shadow-sm">
                         Đã có người hẹn
                       </span>
                     )}
                     {isDone && (
-                      <span className="rounded-full bg-black/75 px-2.5 py-0.5 text-[11px] font-bold text-white">
+                      <span className="rounded-full bg-foreground/80 px-2.5 py-0.5 text-[11px] font-bold text-background">
                         Đã trao đổi
                       </span>
                     )}

@@ -198,7 +198,7 @@ export function PointsView() {
                   aria-pressed={active}
                   onClick={() => setFilter(tab.id)}
                   className={cn(
-                    "min-h-10 rounded-full border px-3.5 text-[13px] font-semibold transition-colors duration-150",
+                    "min-h-11 rounded-full border px-3.5 text-[13px] font-semibold transition-colors duration-150",
                     active
                       ? "border-primary bg-primary text-primary-foreground"
                       : "border-border bg-card text-foreground/80 hover:border-primary/40 hover:text-primary"

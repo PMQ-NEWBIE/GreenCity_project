@@ -508,14 +508,35 @@ Mục tiêu: trang mới nhìn **cùng một bộ** với các trang đã có. M
 - **Đủ trạng thái**: màn nào cũng phải xử lý đủ 4 trạng thái: rỗng (`EmptyState`), lỗi (`FieldError` hoặc thông báo trong modal), đang xử lý (`SubmitButton` ở `loading`), thành công (toast).
 
 # ẢNH
-- **Nguồn**: tạo bằng công cụ tạo ảnh của bạn. Không lấy ảnh trên Internet, không dùng ảnh stock.
-- **Phong cách**: giống ảnh lobby.
-  - Ảnh chụp đời thường ở Sài Gòn, ánh sáng sáng sớm ấm dịu, tông xanh lá dịu, chất ảnh thật.
-  - Không chữ, không logo, không watermark.
-  - Người trong ảnh (nếu có) không nhìn vào ống kính, tay chân tự nhiên.
-- **Quy trình**:
-  1. Lưu ảnh PNG thô vào `assets-src/content/<nhóm>/<tên>.png`.
-  2. Chạy `npm run content:image -- <file.png> <đường dẫn .webp trong public/content> <rộng> <cao>`.
+
+## Thứ tự ưu tiên (bắt buộc làm theo, với từng ảnh)
+1. **Ưu tiên 1 — ảnh chụp thật tìm được.** Tìm ảnh chụp thật đúng với nội dung (đúng món quà, đúng loại đồ trao đổi, đúng chủ đề bài viết).
+   - **Chỉ lấy ở nguồn cho dùng miễn phí, kể cả mục đích thương mại**: Unsplash, Pexels, Pixabay, hoặc Wikimedia Commons với giấy phép CC0, CC BY hay CC BY-SA. Không lấy ảnh từ Google Images, báo chí, mạng xã hội, trang bán hàng, hay bất kỳ trang nào không ghi rõ giấy phép.
+   - Ảnh có vấn đề nhỏ thì **chỉnh sửa**: cắt khung cho đúng tỉ lệ, cắt bỏ phần thừa ở mép, chỉnh sáng, cân bằng màu về tông xanh lá dịu, làm thẳng ảnh nghiêng.
+   - **Không được** xóa hay che watermark, logo, chữ ký tác giả trên ảnh. Ảnh có những thứ đó, hoặc có biển hiệu, nhãn hiệu thật rõ nét, thì bỏ và tìm ảnh khác.
+2. **Ưu tiên 2 — tạo ảnh bằng công cụ của bạn.** Chỉ dùng khi đã tìm mà không có ảnh thật nào vừa đúng nội dung, vừa đạt các tiêu chí dưới đây. Ví dụ: ảnh đặc thù Việt Nam như nón lá treo xe ve chai, hẻm Sài Gòn có thùng tái chế. Ảnh tạo ra phải **trông như ảnh chụp thật**, không giống tranh vẽ, render 3D hay "ảnh AI bóng bẩy".
+
+## Tiêu chí chung (cả ảnh tìm được lẫn ảnh tạo)
+- Đúng nội dung: nhìn ảnh là biết đó là món gì, chủ đề gì.
+- Tông màu tự nhiên, nghiêng về xanh lá dịu, ánh sáng ấm. Hợp với ảnh lobby.
+- Không chữ, không logo, không watermark, không biển hiệu đọc được.
+- Người trong ảnh (nếu có) không nhìn vào ống kính, tay chân tự nhiên, được thể hiện đàng hoàng.
+- Không ảnh mờ, vỡ hạt, hay độ phân giải thấp hơn kích thước cần dùng.
+
+## Ghi nguồn
+- Mọi ảnh, kể cả ảnh tự tạo, phải có một dòng trong `public/content/NGUON-ANH.md`, theo mẫu:
+  ```
+  | File | Nguồn | Tác giả | Giấy phép | Link gốc | Đã chỉnh |
+  |---|---|---|---|---|---|
+  | rewards/tui-vai-di-cho.webp | Unsplash | Nguyễn A | Unsplash License | https://... | cắt 1:1, chỉnh sáng |
+  | swap/mau-2.webp | Tự tạo bằng công cụ | — | — | — | — |
+  ```
+- Ảnh CC BY và CC BY-SA bắt buộc ghi đúng tên tác giả và link gốc.
+
+## Quy trình xử lý file
+1. Lưu ảnh gốc (tải về hoặc tự tạo) vào `assets-src/content/<nhóm>/<tên>.<jpg|png|webp>`. Thư mục này không được commit.
+2. Chạy `npm run content:image -- <file gốc> <đường dẫn .webp trong public/content> <rộng> <cao>`. Script tự cắt đúng khung, giữ vùng đáng chú ý và nén WebP.
+3. Mở file `.webp` vừa tạo ra xem lại. Cắt lệch hoặc mất chủ thể thì tự cắt tay ảnh gốc trước, rồi chạy lại bước 2.
 - **Kích thước**:
 
   | Loại ảnh | Kích thước |
@@ -557,7 +578,9 @@ Mục tiêu: trang mới nhìn **cùng một bộ** với các trang đã có. M
 3. `npm run collab:check -- gemini`: ĐẠT.
 4. `git commit -m "[gemini] B<số>: <tên tính năng>"`.
 
-**Bước 3. Ảnh.** Tạo đủ ảnh theo mục ẢNH, tới khi `npm run content:missing` ra 0. Xong thì commit `[gemini] ảnh nội dung`.
+**Bước 3. Ảnh.** Lấy đủ ảnh theo mục ẢNH, đúng thứ tự ưu tiên: tìm ảnh thật trước, không có mới tự tạo.
+- Làm tới khi `npm run content:missing` ra 0, và mọi ảnh đều có dòng trong `public/content/NGUON-ANH.md`.
+- Xong thì commit `[gemini] ảnh nội dung`.
 
 **Bước 4. Kiểm tra kỹ thuật.**
 1. `npm run lint`: 0 lỗi.
@@ -585,7 +608,8 @@ Mục tiêu: trang mới nhìn **cùng một bộ** với các trang đã có. M
 5. Đổi quà: khi thiếu điểm, nút có bị tắt và ghi rõ cần thêm bao nhiêu điểm? Đổi xong có thấy mã nhận quà?
 6. Trao đổi: để trống form rồi bấm đăng thì lỗi có hiện đúng chỗ, và focus có nhảy vào ô sai đầu tiên?
 7. Không còn chữ "Đang xây dựng", không emoji, không gradient, không số liệu bịa?
-8. Mọi ảnh đều là ảnh thật: không ảnh hỏng, không ô xám trống?
+8. Mọi ảnh đều đúng nội dung và trông như ảnh chụp thật: không ảnh hỏng, không ô xám trống, không watermark hay chữ trên ảnh?
+9. `public/content/NGUON-ANH.md` có đủ một dòng cho mỗi ảnh, ghi rõ ảnh nào tìm được (kèm giấy phép, link gốc) và ảnh nào tự tạo?
 
 # ĐỊNH NGHĨA HOÀN THÀNH (đủ tất cả mới được báo xong)
 - [ ] B1–B6 làm đủ mọi mục trong phần mô tả
@@ -593,14 +617,16 @@ Mục tiêu: trang mới nhìn **cùng một bộ** với các trang đã có. M
 - [ ] `npm run lint` 0 lỗi, `npm run build` thành công
 - [ ] `npm run features:smoke -- http://localhost:3100 gemini` in "✓ TẤT CẢ ĐẠT"
 - [ ] `npm run collab:check -- gemini` ĐẠT
-- [ ] Cả 8 tiêu chí giao diện đều là "có"
+- [ ] Cả 9 tiêu chí giao diện đều là "có"
 - [ ] Mọi thay đổi của bạn đã commit trên `main`: `git status` không còn file nào nằm trong vùng của bạn (file của Claude còn dở thì kệ)
 
 # KHI GẶP KHÓ
 - **Thiếu dữ liệu, hàm hoặc route**: ghi vào `gemini-yeu-cau.md`. Tạm thời ẩn phần giao diện đó, làm tiếp việc khác, không ngồi chờ.
 - **Lỗi lint hoặc build nằm trong file của Claude**: làm theo luật làm chung số 7. Không sửa, vẫn hoàn thành phần việc của bạn.
 - **Hook trả dữ liệu khác với mô tả trong prompt**: làm theo `contracts.ts`, ghi khác biệt vào báo cáo.
-- **Công cụ tạo ảnh hỏng hoàn toàn**: dừng phần ảnh, báo chính xác còn thiếu ảnh nào. **Không được báo đã xong.**
+- **Không tìm được ảnh thật phù hợp**: chuyển sang tự tạo ảnh (ưu tiên 2). Không dùng ảnh sai nội dung chỉ vì là ảnh thật.
+- **Không tải được ảnh từ trang nguồn** (bị chặn, lỗi mạng): thử nguồn miễn phí khác trong danh sách. Vẫn không được thì tự tạo.
+- **Cả việc tìm ảnh lẫn công cụ tạo ảnh đều không dùng được**: dừng phần ảnh, báo chính xác còn thiếu ảnh nào. **Không được báo đã xong.**
 - **Cùng một lỗi**: thử tối đa 3 lần. Vẫn không được thì ghi rõ lỗi vào báo cáo, chuyển sang việc khác.
 
 # MẪU BÁO CÁO (bắt buộc đúng mẫu)
@@ -612,7 +638,8 @@ Mục tiêu: trang mới nhìn **cùng một bộ** với các trang đã có. M
 
 ## Dữ liệu
 - Bài viết: N (theo chủ đề: ...) · Sổ tay: N món (theo nhóm: ...)
-- Gian hàng: N · Sản phẩm: N · Ảnh đã tạo: N
+- Gian hàng: N · Sản phẩm: N
+- Ảnh: tổng N · tìm được ảnh thật: N (nguồn: ...) · tự tạo: N (liệt kê file và lý do không tìm được ảnh thật)
 
 ## Lệnh kiểm tra (dán nguyên dòng kết quả cuối của mỗi lệnh)
 - content:missing: ...
@@ -621,7 +648,7 @@ Mục tiêu: trang mới nhìn **cùng một bộ** với các trang đã có. M
 - features:smoke: ...
 - collab:check: ...
 
-## Tiêu chí giao diện (8 câu, có/không + tên ảnh chụp)
+## Tiêu chí giao diện (9 câu, có/không + tên ảnh chụp)
 1. ...
 
 ## Yêu cầu đã gửi Claude

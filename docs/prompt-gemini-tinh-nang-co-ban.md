@@ -77,10 +77,10 @@ Mẫu ghi yêu cầu trong `docs/collab/gemini-yeu-cau.md`. Thêm xuống cuối
 ## Đã có sẵn: không làm lại, không sửa, không "cải thiện"
 - Lobby `/`, đăng nhập, đăng ký, quên mật khẩu (bản demo).
 - `/tong-quan` (tổng quan), `/kham-pha` (khám phá và mua ve chai), `/san-pham/[id]` (chi tiết tin), `/dang-tin` (đăng tin bán), `/yeu-thich` (đã lưu), `/ho-so` (hồ sơ).
-- `/thu-gom` (gọi thu gom tận nhà). Claude đang nâng cấp trang này.
+- `/thu-gom` (gọi thu gom tận nhà, bản đầy đủ của Claude).
 
-## Claude đang làm: bạn không làm, không tạo trang thay
-Với các tính năng này bạn **chỉ được đặt link** tới route của chúng:
+## Claude đã làm xong: bạn không làm, không sửa, không tạo trang thay
+Các tính năng này đã chạy được. Bạn **chỉ được đặt link** tới route của chúng:
 - Thu gom tận nhà bản nâng cấp: `ROUTES.collect`
 - Thùng thu gom cố định và báo thùng đầy: `ROUTES.bins`
 - Báo điểm rác tự phát: `ROUTES.litterReport`
@@ -92,6 +92,17 @@ Với các tính năng này bạn **chỉ được đặt link** tới route c�
 - Khu quản trị: `ROUTES.admin`
 
 Claude cũng nắm toàn bộ logic tính điểm, phân quyền, menu và thanh điều hướng.
+
+## Dữ liệu của bạn được tính năng của Claude dùng lại
+Viết dữ liệu cẩn thận, vì hai tính năng của Claude đọc thẳng từ file của bạn:
+- **`SORTING_GUIDE`** (B1) là nguồn gợi ý tức thì của trang Hỏi cách phân loại (`ROUTES.consult`). Gợi ý so khớp `name` và `aliases` không dấu, nên mỗi món cần đủ các tên mà người dân hay gọi (ví dụ "hộp sữa giấy", "vỏ hộp sữa", "hộp giấy uống sữa").
+- **`GREEN_SHOPS`** (B5) được vẽ lên Bản đồ xanh (`ROUTES.map`). Sai `lat`/`lng` thì điểm nằm lệch quận.
+
+## Cách có dữ liệu thật để tự thử giao diện
+- Mỗi người dùng mới có sẵn 50 điểm chào mừng.
+- Muốn có thêm điểm và lịch sử để thử B3, B4: vào `ROUTES.collect`, gửi một yêu cầu, rồi bấm "Chuyển sang bước tiếp theo" trong khối **Chế độ demo** cho tới khi hoàn tất. Mỗi kg được cộng điểm.
+- Muốn có mục "chờ xác minh" và "không được duyệt": vào `ROUTES.bins` bấm **Bỏ đồ**. Sau đó vào **Hồ sơ → Chế độ demo: đổi vai trò**, chọn Cộng tác viên, rồi duyệt hoặc bác ở **Khu cộng tác viên**.
+- Đổi vai trò chỉ để thử. Xong nhớ đổi lại "Người dân".
 
 # HỢP ĐỒNG DỮ LIỆU: `src/features/contracts.ts`
 File này do Claude viết. Bạn **chỉ import từ đây**, không import thẳng từ store hay từ `mock-data`.
@@ -177,6 +188,10 @@ Các route và file View dưới đây Claude **đã tạo sẵn ở dạng khun
 | B4 | Đổi điểm lấy quà xanh (II.3) | `/doi-qua` → `src/features/rewards/RewardsView.tsx` | Có |
 | B5 | Gian hàng doanh nghiệp xanh (III.4) | `/gian-hang` → `src/features/green-shops/ShopsView.tsx`<br>`/gian-hang/[slug]` → `src/features/green-shops/ShopDetailView.tsx` (prop `slug`) | Không |
 | B6 | Khu trao đổi đồ tái sử dụng (II.2) | `/trao-doi` → `src/features/swap/SwapView.tsx`<br>`/trao-doi/dang` → `src/features/swap/SwapPostView.tsx`<br>`/trao-doi/[id]` → `src/features/swap/SwapDetailView.tsx` (prop `id`) | Có |
+
+**Trang công khai (cột "Cần đăng nhập" = Không) mở được khi chưa đăng nhập.** Lúc đó `useCurrentUser()` trả về `null`.
+- Không được giả định có người dùng: không đọc `user.name` khi chưa kiểm tra `null`.
+- Ở trang công khai, nút nào cần tài khoản thì đổi thành link "Đăng nhập để …" dẫn tới `ROUTES.login`.
 
 ## B1. Kiến thức môi trường và sổ tay phân loại
 
@@ -288,6 +303,7 @@ Bạn viết dữ liệu trong `src/data/knowledge.ts`, export đúng 2 tên `AR
     - `title`.
     - Thời gian `formatDateTime(at)`.
     - Nhãn trạng thái, chỉ hiện khi khác `confirmed`.
+    - `note` nếu có, chữ nhỏ màu `text-muted-foreground`. Đây là lý do bị từ chối hoặc lý do nhóm vận hành chỉnh điểm tay.
     - Số điểm canh phải: số dương có dấu `+` màu `text-primary`; số âm có dấu `−` màu `text-foreground`; `rejected` thì gạch ngang và màu `text-muted-foreground`.
 - Chưa có mục nào thì hiện `EmptyState` dẫn tới `ROUTES.collect`.
 

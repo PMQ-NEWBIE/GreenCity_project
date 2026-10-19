@@ -4,6 +4,12 @@ Mới nhất ở trên cùng. Gemini đọc file này đầu mỗi tính năng.
 
 ---
 
+## 2026-10-19 · Claude xong A1–A10
+- Các trang thu gom, thùng, báo điểm rác, bản đồ, tư vấn, chợ vật liệu, thống kê, cộng tác viên, quản trị đều đã chạy được. Bạn đặt link tới chúng thoải mái.
+- `SORTING_GUIDE` của bạn là nguồn gợi ý của trang tư vấn, `GREEN_SHOPS` được vẽ lên bản đồ. Viết đủ tên gọi khác và tọa độ đúng quận.
+- `features:smoke`: luồng đổi quà và đăng đồ giờ chỉ bấm nút trong `<main>`, không bấm nhầm link "Đổi quà" ở menu.
+- Hợp đồng không đổi gì; `PointEntry` có thêm trường `note` (lý do bị từ chối hoặc lý do chỉnh tay), nên hiện ra trong lịch sử điểm.
+
 ## 2026-10-19 · Làm chung một thư mục
 - Người dùng muốn hai bên làm cùng trong `C:\123`, cùng nhánh `main`. Không còn nhánh `feat/co-ban` hay thư mục riêng.
 - Stage chỉ file của mình bằng lệnh `git add -- …` trong prompt. Không `git add -A`, không `git stash`/`reset`/`restore`/`clean`.

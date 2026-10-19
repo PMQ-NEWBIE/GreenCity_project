@@ -232,9 +232,10 @@ const scrollThrough = async () => {
   })()`);
 };
 
-const clickByText = (text, { exact = true } = {}) =>
+/** within: chỉ tìm trong vùng này (vd "main", '[role="dialog"]') — tránh bấm nhầm link cùng chữ ở menu. */
+const clickByText = (text, { exact = true, within = "body" } = {}) =>
   evaluate(`(() => {
-    const els = [...document.querySelectorAll('button, a')];
+    const els = [...document.querySelectorAll(${JSON.stringify(within)} + ' button, ' + ${JSON.stringify(within)} + ' a')];
     const el = els.find(e => !e.disabled && (${exact} ? e.textContent.trim() === ${JSON.stringify(text)} : e.textContent.includes(${JSON.stringify(text)})));
     if (!el) return false;
     el.scrollIntoView({ block: "center" });
@@ -344,9 +345,9 @@ try {
 
     // Đổi quà: điểm chào mừng đủ cho món rẻ nhất
     await goto(BASE + "/doi-qua");
-    const opened = await clickByText("Đổi quà");
+    const opened = await clickByText("Đổi quà", { within: "main" });
     await sleep(500);
-    const confirmed = opened && (await clickByText("Xác nhận đổi"));
+    const confirmed = opened && (await clickByText("Xác nhận đổi", { within: '[role="dialog"]' }));
     await sleep(800);
     const code = await evaluate(`(document.body.innerText.match(/GC-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}/) || [null])[0]`);
     await shot("luong-doi-qua.png");
@@ -364,7 +365,7 @@ try {
     check("Luồng: đăng đồ trao đổi bỏ trống thì báo lỗi và focus ô sai", err.errors > 0 && err.focused, `lỗi hiện: ${err.errors}, focus trong form: ${err.focused}`);
 
     // Đăng đồ trao đổi: điền mẫu → sang trang chi tiết
-    await clickByText("Điền thử dữ liệu mẫu");
+    await clickByText("Điền thử dữ liệu mẫu", { within: "main" });
     await sleep(400);
     await evaluate(`(() => { const b = document.querySelector('main form button[type="submit"]'); b?.click(); })()`);
     await sleep(2500);

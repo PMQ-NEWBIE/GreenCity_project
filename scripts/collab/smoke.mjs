@@ -242,6 +242,17 @@ const clickByText = (text, { exact = true } = {}) =>
     return true;
   })()`);
 
+/** Gõ giá trị vào ô input/textarea/select theo cách React nhận được (setter gốc + sự kiện). */
+const setField = (selector, value) =>
+  evaluate(`(() => {
+    const el = document.querySelector(${JSON.stringify(selector)});
+    if (!el) return false;
+    const proto = el instanceof HTMLSelectElement ? HTMLSelectElement.prototype : el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+    Object.getOwnPropertyDescriptor(proto, "value").set.call(el, ${JSON.stringify(value)});
+    el.dispatchEvent(new Event(el instanceof HTMLSelectElement ? "change" : "input", { bubbles: true }));
+    return true;
+  })()`);
+
 const results = [];
 const check = (name, ok, detail = "") => results.push({ name, ok: !!ok, detail });
 
@@ -348,7 +359,39 @@ try {
     check("Luồng: đăng đồ trao đổi bằng dữ liệu mẫu rồi sang trang chi tiết", after.startsWith("/trao-doi/s-"), `đang ở ${after}`);
   }
 
-  // Luồng của Claude được thêm vào đây khi làm từng tính năng (A2–A5, A7).
+  /* ------------------------- Luồng của Claude (A2–A5, A7) ------------------------- */
+  if (SIDE === "claude" || SIDE === "all") {
+    await viewport(VIEWPORTS[1]);
+    await seed("resident", "light");
+
+    // A2: gửi yêu cầu thu gom → chế độ demo đi hết các bước → được cộng điểm
+    await goto(BASE + "/thu-gom");
+    await clickByText("Lon nhôm");
+    await clickByText("Chai nhựa PET");
+    await evaluate(`document.querySelector('main input[type="checkbox"]')?.click()`);
+    await setField("#collect-quantity", "2 bao, khoảng 10kg");
+    await setField("#collect-area", "Quận 3");
+    await setField("#collect-address", "Đường Trần Quốc Thảo, Phường Võ Thị Sáu");
+    await clickByText("Linh hoạt");
+    await evaluate(`document.querySelector('main form button[type="submit"]').click()`);
+    await sleep(1800);
+    const detail = await evaluate("location.pathname");
+    check("Luồng A2: gửi yêu cầu thu gom rồi sang trang theo dõi", detail.startsWith("/thu-gom/r-"), `đang ở ${detail}`);
+    for (let i = 0; i < 3; i++) {
+      await clickByText("Chuyển sang bước tiếp theo");
+      await sleep(400);
+    }
+    await clickByText("Nhận tiền và hoàn tất");
+    await sleep(600);
+    const done = await evaluate(`({ done: !!document.querySelector('main')?.innerText.includes('Hoàn tất'), pts: (document.querySelector('main')?.innerText.match(/\\+(\\d+) điểm/) || [])[1] })`);
+    await shot("luong-a2-thu-gom-hoan-tat.png");
+    // 10kg × 2 điểm + 10 điểm phân loại sẵn = 30
+    check("Luồng A2: đi hết 5 bước và được cộng điểm đúng quy tắc", done.done && done.pts === "30", `điểm hiện: ${done.pts ?? "không thấy"}`);
+    await clickByText("Tổng quan");
+    await sleep(800);
+    const balance = await evaluate(`(() => { const dt = [...document.querySelectorAll('dt')].find(d => d.textContent.includes('Điểm thưởng')); return dt?.nextElementSibling?.textContent.trim(); })()`);
+    check("Luồng A2: số dư ở Tổng quan = 50 chào mừng + 30", balance === "80", `số dư: ${balance}`);
+  }
 } catch (err) {
   check("Chạy kiểm tra không lỗi", false, err.message);
 } finally {

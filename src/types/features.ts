@@ -171,3 +171,69 @@ export interface GreenShop {
   isPartnerReward: boolean;
   products: GreenShopProduct[];
 }
+
+/* --------------------------- Thu gom tận nhà (A2) --------------------------- */
+
+/** cho-nhan → da-nhan → dang-den → da-can → hoan-tat; hủy được ở cho-nhan, da-nhan */
+export type PickupStatus = "cho-nhan" | "da-nhan" | "dang-den" | "da-can" | "hoan-tat" | "da-huy";
+
+export type PayoutMethod = "tien-mat" | "chuyen-khoan" | "quy-diem";
+
+export interface WeighLine {
+  material: string;
+  kg: number;
+  /** Đơn giá đồng/kg tại thời điểm cân */
+  pricePerKg: number;
+}
+
+export interface PickupEvent {
+  status: PickupStatus;
+  at: string;
+  note?: string;
+}
+
+export interface PickupRequest {
+  id: string;
+  /** Email người gửi; đơn mẫu của người khác thì không có */
+  ownerId?: string;
+  ownerName: string;
+  materials: string[];
+  /** Ước tính của người gửi, ví dụ "2 bao, khoảng 15kg" */
+  quantity: string;
+  area: Area;
+  /** Tên đường và phường (bản demo không ghi số nhà) */
+  address: string;
+  time: string;
+  note: string;
+  /** Ảnh dạng data URL hoặc đường dẫn, tối đa 3 */
+  photos: string[];
+  /** Người gửi khai đã phân loại sẵn */
+  presorted: boolean;
+  createdAt: string;
+  status: PickupStatus;
+  history: PickupEvent[];
+  team?: { id: string; name: string; phoneMasked: string };
+  /** Giờ hẹn (ISO) */
+  appointment?: string;
+  weighLines?: WeighLine[];
+  /** Đội thu gom xác nhận đồ đã được phân loại đúng */
+  sortedConfirmed?: boolean;
+  payout?: { method: PayoutMethod; amount: number; points: number };
+  cancelReason?: string;
+}
+
+/* ------------------------------ Đối tác (A10) ------------------------------ */
+
+export type PartnerKind = "thu-gom" | "che-bien-phan";
+
+export interface Partner {
+  id: string;
+  kind: PartnerKind;
+  name: string;
+  /** Khu vực phụ trách */
+  areas: Area[];
+  phoneMasked: string;
+  contactName: string;
+  note: string;
+  active: boolean;
+}

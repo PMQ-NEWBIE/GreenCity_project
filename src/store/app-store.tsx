@@ -10,9 +10,9 @@ import {
   useRef,
   type ReactNode,
 } from "react";
-import { PRODUCTS, REQUESTS } from "@/data/mock-data";
+import { PRODUCTS } from "@/data/mock-data";
 import { ruleById } from "@/data/point-rules";
-import type { CollectionRequest, DemoUser, Product, ToastItem, UserRole } from "@/types";
+import type { DemoUser, Product, ToastItem, UserRole } from "@/types";
 import type { PointEntry, Redemption } from "@/types/features";
 import { balanceOf, checkRedeem } from "@/lib/points";
 import { REWARDS } from "@/data/rewards";
@@ -20,6 +20,8 @@ import { loadPersisted, savePersisted, type PersistShape } from "./persist";
 import { pointsInitial, pointsReducer, type PointsAction, type PointsState } from "./slices/points";
 import { rewardsInitial, rewardsReducer, stockLeft, type RewardsAction, type RewardsState } from "./slices/rewards";
 import { swapHydrate, swapInitial, swapReducer, type SwapAction, type SwapState } from "./slices/swap";
+import { collectHydrate, collectInitial, collectReducer, type CollectAction, type CollectState } from "./slices/collect";
+import { partnersInitial, partnersReducer, type PartnersAction, type PartnersState } from "./slices/partners";
 
 export interface AppState {
   /** true sau khi đã đọc localStorage — trước đó chưa biết người dùng đã đăng nhập hay chưa. */
@@ -31,11 +33,12 @@ export interface AppState {
   signedOut: boolean;
   products: Product[];
   favorites: string[];
-  requests: CollectionRequest[];
   toasts: ToastItem[];
   points: PointsState;
   rewards: RewardsState;
   swap: SwapState;
+  collect: CollectState;
+  partners: PartnersState;
 }
 
 /** Thời điểm và id do nơi gọi tạo ra, để reducer luôn cho cùng kết quả với cùng một action. */
@@ -52,14 +55,15 @@ export type Action =
   | { type: "TOGGLE_FAVORITE"; id: string }
   | { type: "ADD_PRODUCT"; product: Product }
   | { type: "REMOVE_PRODUCT"; id: string }
-  | { type: "ADD_REQUEST"; request: CollectionRequest }
   | { type: "UPDATE_USER"; name: string; email: string }
   | { type: "PUSH_TOAST"; toast: ToastItem }
   | { type: "DISMISS_TOAST"; id: string }
   | { type: "REWARDS_REDEEM"; redemption: Redemption; entry: PointEntry }
   | PointsAction
   | RewardsAction
-  | SwapAction;
+  | SwapAction
+  | CollectAction
+  | PartnersAction;
 
 const initialState: AppState = {
   ready: false,
@@ -68,11 +72,12 @@ const initialState: AppState = {
   signedOut: false,
   products: PRODUCTS,
   favorites: [],
-  requests: REQUESTS,
   toasts: [],
   points: pointsInitial,
   rewards: rewardsInitial,
   swap: swapInitial,
+  collect: collectInitial,
+  partners: partnersInitial,
 };
 
 /** Người dùng chưa có điểm chào mừng thì cộng một lần (đọc số điểm từ POINT_RULES). */
@@ -96,6 +101,10 @@ function withWelcome(state: AppState, stamp: Stamp): AppState {
 export function reducer(state: AppState, action: Action): AppState {
   if (action.type.startsWith("POINTS_")) return { ...state, points: pointsReducer(state.points, action as PointsAction) };
   if (action.type.startsWith("SWAP_")) return { ...state, swap: swapReducer(state.swap, action as SwapAction) };
+  if (action.type.startsWith("COLLECT_"))
+    return { ...state, collect: collectReducer(state.collect, action as CollectAction) };
+  if (action.type.startsWith("PARTNERS_"))
+    return { ...state, partners: partnersReducer(state.partners, action as PartnersAction) };
   if (action.type !== "REWARDS_REDEEM" && action.type.startsWith("REWARDS_"))
     return { ...state, rewards: rewardsReducer(state.rewards, action as RewardsAction) };
 
@@ -113,12 +122,13 @@ export function reducer(state: AppState, action: Action): AppState {
             user: d.user,
             favorites: d.favorites,
             products: [...d.myListings, ...PRODUCTS],
-            requests: [...d.myRequests, ...REQUESTS],
             points: d.points,
             rewards: d.rewards,
             swap: d.swap,
+            collect: d.collect,
+            partners: d.partners,
           }
-        : { ...state, ready: true, swap: swapHydrate(null) };
+        : { ...state, ready: true, swap: swapHydrate(null), collect: collectHydrate(null, [], null) };
       return withWelcome(next, action);
     }
     case "SET_ROLE":
@@ -134,8 +144,6 @@ export function reducer(state: AppState, action: Action): AppState {
       return { ...state, products: [action.product, ...state.products] };
     case "REMOVE_PRODUCT":
       return { ...state, products: state.products.filter((p) => p.id !== action.id) };
-    case "ADD_REQUEST":
-      return { ...state, requests: [action.request, ...state.requests] };
     case "UPDATE_USER":
       return state.user ? { ...state, user: { ...state.user, name: action.name, email: action.email } } : state;
     case "PUSH_TOAST":
@@ -185,7 +193,6 @@ interface AppContextValue {
   toggleFavorite: (id: string) => void;
   addProduct: (product: Product) => void;
   removeProduct: (id: string) => void;
-  addRequest: (request: CollectionRequest) => void;
   updateUser: (name: string, email: string) => void;
   toast: (kind: ToastItem["kind"], title: string, description?: string) => void;
   dismissToast: (id: string) => void;
@@ -230,7 +237,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       quotaWarnedRef.current = true;
       toast("error", "Bộ nhớ trình duyệt đã đầy", "Thay đổi mới chỉ giữ trong lần mở này. Xóa bớt tin có ảnh để lưu tiếp.");
     }
-  }, [state.user, state.remember, state.favorites, state.products, state.requests, state.points, state.rewards, state.swap, toast]);
+  }, [state.user, state.remember, state.favorites, state.products, state.points, state.rewards, state.swap, state.collect, state.partners, toast]);
 
   const login = useCallback(
     (user: DemoUser, remember = true) => dispatch({ type: "LOGIN", user, remember, ...stamp() }),
@@ -241,10 +248,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const toggleFavorite = useCallback((id: string) => dispatch({ type: "TOGGLE_FAVORITE", id }), [dispatch]);
   const addProduct = useCallback((product: Product) => dispatch({ type: "ADD_PRODUCT", product }), [dispatch]);
   const removeProduct = useCallback((id: string) => dispatch({ type: "REMOVE_PRODUCT", id }), [dispatch]);
-  const addRequest = useCallback(
-    (request: CollectionRequest) => dispatch({ type: "ADD_REQUEST", request }),
-    [dispatch]
-  );
   const updateUser = useCallback(
     (name: string, email: string) => dispatch({ type: "UPDATE_USER", name, email }),
     [dispatch]
@@ -262,12 +265,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       toggleFavorite,
       addProduct,
       removeProduct,
-      addRequest,
       updateUser,
       toast,
       dismissToast,
     }),
-    [state, getState, dispatch, login, logout, setRole, toggleFavorite, addProduct, removeProduct, addRequest, updateUser, toast, dismissToast]
+    [state, getState, dispatch, login, logout, setRole, toggleFavorite, addProduct, removeProduct, updateUser, toast, dismissToast]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

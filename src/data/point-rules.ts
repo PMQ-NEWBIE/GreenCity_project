@@ -30,6 +30,14 @@ export const POINT_RULES: PointRule[] = [
     condition: "Cộng thêm khi đội thu gom xác nhận đồ đã được tách riêng theo loại.",
   },
   {
+    id: "pickup-cash-to-points",
+    reason: "home_pickup",
+    activity: "Nhận điểm thay cho tiền ve chai",
+    points: 1,
+    unit: "1.000đ",
+    condition: "Khi thanh toán, bạn chọn quy đổi số tiền ve chai thành điểm thay vì nhận tiền mặt.",
+  },
+  {
     id: "bin-recycle",
     reason: "bin_dropoff",
     activity: "Bỏ vật liệu tái chế vào thùng thu gom",

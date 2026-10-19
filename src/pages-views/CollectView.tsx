@@ -1,31 +1,35 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, Clock, MapPin, PackageCheck, Send, Weight } from "lucide-react";
-import { useApp } from "@/store/app-store";
+import { useRouter } from "next/navigation";
+import { Send } from "lucide-react";
+import { useCollect, useToast } from "@/store/hooks";
 import { SubmitButton } from "@/components/greencity/SubmitButton";
 import { ChoiceChip, FieldError, PageContainer, PageIntro, StepHeading, inputClass } from "@/components/greencity/ui";
-import { AREAS, MATERIAL_OPTIONS, TIME_OPTIONS, type CollectionRequest, type RequestStatus } from "@/types";
-import { formatHoursAgo } from "@/utils/format";
+import { PhotoPicker } from "@/features/_shared/PhotoPicker";
+import { RequestItem } from "@/features/collect/RequestItem";
+import { ruleById } from "@/data/point-rules";
+import { ROUTES } from "@/lib/routes";
+import { AREAS, MATERIAL_OPTIONS, TIME_OPTIONS, type Area } from "@/types";
 import { cn } from "@/lib/utils";
 
-export const REQUEST_STATUS: Record<RequestStatus, { label: string; cls: string; icon: typeof Clock }> = {
-  pending: { label: "Đang tìm người thu gom", cls: "bg-amber-500/15 text-warn", icon: Clock },
-  matched: { label: "Đã có người nhận", cls: "bg-accent text-primary", icon: CheckCircle2 },
-  done: { label: "Đã thu gom xong", cls: "bg-muted text-muted-foreground", icon: PackageCheck },
-};
-
 export function CollectView() {
-  const { addRequest, toast, state } = useApp();
+  const { mine, create } = useCollect();
+  const toast = useToast();
+  const router = useRouter();
   const [materials, setMaterials] = useState<string[]>([]);
+  const [presorted, setPresorted] = useState(false);
   const [quantity, setQuantity] = useState("");
-  const [area, setArea] = useState("");
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [area, setArea] = useState<Area | "">("");
+  const [address, setAddress] = useState("");
   const [time, setTime] = useState("");
   const [note, setNote] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
 
-  const mine = state.requests.filter((r) => r.isMine);
+  const perKg = ruleById("pickup-kg");
+  const sortedBonus = ruleById("pickup-sorted");
   const clearError = (key: string) => setErrors((er) => (er[key] ? { ...er, [key]: "" } : er));
 
   const toggleMaterial = (m: string) => {
@@ -40,6 +44,7 @@ export function CollectView() {
     if (materials.length === 0) errs.materials = "Chọn ít nhất một loại";
     if (!quantity.trim()) errs.quantity = "Ước chừng là được, ví dụ: 2 bao, 15kg";
     if (!area) errs.area = "Chọn khu vực";
+    if (address.trim().length < 5) errs.address = "Ghi tên đường và phường để đội tìm đường";
     if (!time) errs.time = "Chọn khung giờ bạn có nhà";
     setErrors(errs);
     const firstError = Object.keys(errs)[0];
@@ -50,35 +55,27 @@ export function CollectView() {
 
     setStatus("loading");
     window.setTimeout(() => {
-      const request: CollectionRequest = {
-        id: `r-${Date.now()}`,
+      const request = create({
         materials,
+        presorted,
         quantity: quantity.trim(),
-        area,
+        photos,
+        area: area as Area,
+        address: address.trim(),
         time,
         note: note.trim(),
-        hoursAgo: 0,
-        status: "pending",
-        isMine: true,
-      };
-      addRequest(request);
+      });
       setStatus("success");
-      toast("success", "Đã gửi yêu cầu", "Người thu gom gần bạn sẽ liên hệ để hẹn giờ.");
-      window.setTimeout(() => {
-        setMaterials([]);
-        setQuantity("");
-        setArea("");
-        setTime("");
-        setNote("");
-        setStatus("idle");
-      }, 1200);
+      toast("success", "Đã gửi yêu cầu", "Đội thu gom gần bạn sẽ nhận đơn và hẹn giờ.");
+      router.push(ROUTES.collectRequest(request.id));
     }, 500);
   };
 
   return (
     <PageContainer>
       <PageIntro title="Gọi thu gom tận nhà">
-        Cho chúng tôi biết bạn cần dọn gì và lúc nào có nhà. Người thu gom gần nhất sẽ nhận yêu cầu và gọi lại hẹn giờ.
+        Cho chúng tôi biết bạn cần dọn gì và lúc nào có nhà. Đội thu gom gần nhất sẽ nhận đơn, tới cân tại chỗ và trả
+        tiền cho bạn.
       </PageIntro>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
@@ -95,10 +92,29 @@ export function CollectView() {
               ))}
             </div>
             <FieldError msg={errors.materials} />
+            <label
+              className={cn(
+                "mt-4 flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors",
+                presorted ? "border-primary bg-accent" : "border-border hover:border-primary/40"
+              )}
+            >
+              <input
+                type="checkbox"
+                checked={presorted}
+                onChange={(e) => setPresorted(e.target.checked)}
+                className="mt-0.5 h-5 w-5 accent-primary"
+              />
+              <span>
+                <span className="block text-[15px] font-bold text-foreground">Tôi đã phân loại sẵn</span>
+                <span className="block text-[13px] text-muted-foreground">
+                  Giấy, nhựa, kim loại để riêng từng túi. Được cộng thêm {sortedBonus.points} điểm khi đội thu gom xác nhận.
+                </span>
+              </span>
+            </label>
           </fieldset>
 
           <div>
-            <StepHeading step={2} title="Khoảng bao nhiêu?" />
+            <StepHeading step={2} title="Khoảng bao nhiêu?" hint="Ảnh không bắt buộc, nhưng giúp đội mang đúng xe." />
             <label htmlFor="collect-quantity" className="sr-only">
               Khối lượng hoặc số lượng ước tính
             </label>
@@ -115,33 +131,64 @@ export function CollectView() {
               className={cn(inputClass(errors.quantity), "mt-4")}
             />
             <FieldError id="collect-quantity-err" msg={errors.quantity} />
+            <div className="mt-4">
+              <PhotoPicker id="collect-photos" photos={photos} onChange={setPhotos} />
+            </div>
           </div>
 
           <fieldset>
             <legend className="w-full">
               <StepHeading step={3} title="Ở đâu, lúc nào?" />
             </legend>
-            <label htmlFor="collect-area" className="mb-1.5 mt-4 block text-[14px] font-semibold text-foreground">
-              Khu vực
-            </label>
-            <select
-              id="collect-area"
-              value={area}
-              onChange={(e) => {
-                setArea(e.target.value);
-                clearError("area");
-              }}
-              aria-invalid={!!errors.area}
-              className={cn(inputClass(errors.area), "select-chevron cursor-pointer appearance-none")}
-            >
-              <option value="">Chọn quận…</option>
-              {AREAS.map((a) => (
-                <option key={a} value={a}>
-                  {a}
-                </option>
-              ))}
-            </select>
-            <FieldError msg={errors.area} />
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label htmlFor="collect-area" className="mb-1.5 block text-[14px] font-semibold text-foreground">
+                  Khu vực
+                </label>
+                <select
+                  id="collect-area"
+                  value={area}
+                  onChange={(e) => {
+                    setArea(e.target.value as Area);
+                    clearError("area");
+                  }}
+                  aria-invalid={!!errors.area}
+                  className={cn(inputClass(errors.area), "select-chevron cursor-pointer appearance-none")}
+                >
+                  <option value="">Chọn quận…</option>
+                  {AREAS.map((a) => (
+                    <option key={a} value={a}>
+                      {a}
+                    </option>
+                  ))}
+                </select>
+                <FieldError msg={errors.area} />
+              </div>
+              <div>
+                <label htmlFor="collect-address" className="mb-1.5 block text-[14px] font-semibold text-foreground">
+                  Đường, phường
+                </label>
+                <input
+                  id="collect-address"
+                  value={address}
+                  onChange={(e) => {
+                    setAddress(e.target.value);
+                    clearError("address");
+                  }}
+                  placeholder="VD: Đường Nơ Trang Long, Phường 13"
+                  aria-invalid={!!errors.address}
+                  aria-describedby="collect-address-hint"
+                  className={inputClass(errors.address)}
+                />
+                {errors.address ? (
+                  <FieldError msg={errors.address} />
+                ) : (
+                  <p id="collect-address-hint" className="mt-1.5 text-[13px] text-muted-foreground">
+                    Bản demo không cần số nhà.
+                  </p>
+                )}
+              </div>
+            </div>
             <p className="mb-1.5 mt-4 text-[14px] font-semibold text-foreground">Giờ bạn có nhà</p>
             <div id="collect-time" tabIndex={-1} className="flex flex-wrap gap-2 outline-none">
               {TIME_OPTIONS.map((t) => (
@@ -161,7 +208,7 @@ export function CollectView() {
           </fieldset>
 
           <div>
-            <StepHeading step={4} title="Ghi chú cho người thu gom" hint="Không bắt buộc." />
+            <StepHeading step={4} title="Ghi chú cho đội thu gom" hint="Không bắt buộc." />
             <label htmlFor="collect-note" className="sr-only">
               Ghi chú
             </label>
@@ -188,7 +235,7 @@ export function CollectView() {
             </h3>
             {mine.length === 0 ? (
               <p className="mt-3 rounded-2xl border border-dashed border-border p-5 text-[14px] text-muted-foreground">
-                Bạn chưa gửi yêu cầu nào. Yêu cầu sau khi gửi sẽ hiện ở đây cùng trạng thái.
+                Bạn chưa gửi yêu cầu nào. Yêu cầu sau khi gửi sẽ hiện ở đây, bấm vào để theo dõi từng bước.
               </p>
             ) : (
               <ul className="mt-3 flex flex-col gap-3">
@@ -205,49 +252,21 @@ export function CollectView() {
             </h3>
             <ol className="mt-3 flex flex-col gap-2.5 text-[14px] leading-relaxed text-foreground/85">
               <li>
-                <strong>1.</strong> Người thu gom ở gần bạn nhận được yêu cầu.
+                <strong>1.</strong> Đội thu gom phụ trách khu của bạn nhận đơn và hẹn giờ.
               </li>
               <li>
-                <strong>2.</strong> Họ gọi lại để hẹn giờ và báo giá sơ bộ.
+                <strong>2.</strong> Tới nơi, đội cân từng loại ngay trước mặt bạn.
               </li>
               <li>
-                <strong>3.</strong> Tới nơi, cân đo tại chỗ và trả tiền cho bạn (nếu đồ có giá trị).
+                <strong>3.</strong> Bạn nhận tiền mặt, chuyển khoản, hoặc quy ra điểm thưởng.
+              </li>
+              <li>
+                <strong>4.</strong> Mỗi kg được cộng {perKg.points} điểm, đổi được phân bón, túi vải và quà xanh khác.
               </li>
             </ol>
           </section>
         </div>
       </div>
     </PageContainer>
-  );
-}
-
-export function RequestItem({ request: r }: { request: CollectionRequest }) {
-  const st = REQUEST_STATUS[r.status];
-  return (
-    <li className="rounded-2xl border border-border bg-card p-4">
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-[15px] font-bold text-foreground">{r.materials.join(", ")}</p>
-        <span className={cn("flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-bold", st.cls)}>
-          <st.icon className="h-3.5 w-3.5" aria-hidden="true" />
-          {st.label}
-        </span>
-      </div>
-      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-muted-foreground">
-        <span className="flex items-center gap-1">
-          <Weight className="h-3.5 w-3.5" aria-hidden="true" />
-          {r.quantity}
-        </span>
-        <span className="flex items-center gap-1">
-          <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
-          {r.area}
-        </span>
-        <span className="flex items-center gap-1">
-          <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-          {r.time}
-        </span>
-      </div>
-      {r.note && <p className="mt-2 text-[13px] text-muted-foreground">“{r.note}”</p>}
-      <p className="mt-2 text-[12px] text-muted-foreground">Gửi {formatHoursAgo(r.hoursAgo).toLowerCase()}</p>
-    </li>
   );
 }

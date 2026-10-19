@@ -3,6 +3,8 @@ import type { AppState } from "./app-store";
 import { pointsHydrate, pointsPersist, type PointsState } from "./slices/points";
 import { rewardsHydrate, rewardsPersist, type RewardsState } from "./slices/rewards";
 import { swapHydrate, swapPersist, type SwapState } from "./slices/swap";
+import { collectHydrate, collectPersist, type CollectState } from "./slices/collect";
+import { partnersHydrate, partnersPersist, type PartnersState } from "./slices/partners";
 
 const KEY_V1 = "greencity-demo-v1";
 const KEY_V2 = "greencity-demo-v2";
@@ -12,10 +14,11 @@ export interface PersistShape {
   user: DemoUser | null;
   favorites: string[];
   myListings: Product[];
-  myRequests: CollectionRequest[];
   points: PointsState;
   rewards: RewardsState;
   swap: SwapState;
+  collect: CollectState;
+  partners: PartnersState;
 }
 
 const ROLES: UserRole[] = ["resident", "collaborator", "business", "operator"];
@@ -36,14 +39,17 @@ function readUser(raw: unknown): DemoUser | null {
 const arr = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : []);
 
 function parse(raw: Record<string, unknown>): PersistShape {
+  const user = readUser(raw.user);
   return {
-    user: readUser(raw.user),
+    user,
     favorites: arr<string>(raw.favorites).filter((f) => typeof f === "string"),
     myListings: arr<Product>(raw.myListings),
-    myRequests: arr<CollectionRequest>(raw.myRequests),
     points: pointsHydrate(raw.points),
     rewards: rewardsHydrate(raw.rewards),
     swap: swapHydrate(raw.swap),
+    // Bản cũ lưu yêu cầu thu gom ở myRequests (kiểu v1) → chuyển sang đơn bản mới
+    collect: collectHydrate(raw.collect, arr<CollectionRequest>(raw.myRequests), user),
+    partners: partnersHydrate(raw.partners),
   };
 }
 
@@ -66,10 +72,11 @@ export function savePersisted(state: AppState): "ok" | "quota" | "error" {
     user: state.remember ? state.user : null,
     favorites: state.favorites,
     myListings: state.products.filter((p) => p.isMine),
-    myRequests: state.requests.filter((r) => r.isMine),
     points: pointsPersist(state.points),
     rewards: rewardsPersist(state.rewards),
     swap: swapPersist(state.swap),
+    collect: collectPersist(state.collect),
+    partners: partnersPersist(state.partners),
   };
   try {
     window.localStorage.setItem(KEY_V2, JSON.stringify(payload));

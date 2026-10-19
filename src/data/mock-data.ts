@@ -1,4 +1,4 @@
-import type { Category, CollectionRequest, Product } from "@/types";
+import type { Category, Product } from "@/types";
 
 /** Ảnh sản phẩm mẫu (CDN ngoài, được next/image tối ưu — xem next.config.ts). */
 export const IMAGES = {
@@ -270,38 +270,5 @@ export const PRODUCTS: Product[] = [
     postedHoursAgo: 70,
     status: "available",
     seller: sellerCollector1,
-  },
-];
-
-export const REQUESTS: CollectionRequest[] = [
-  {
-    id: "r1",
-    materials: ["Giấy & bìa carton", "Chai nhựa PET"],
-    quantity: "Khoảng 25kg",
-    area: "Quận 3",
-    time: "Sáng (8h–11h)",
-    note: "Dọn văn phòng, có thang máy, dễ di chuyển.",
-    hoursAgo: 3,
-    status: "pending",
-  },
-  {
-    id: "r2",
-    materials: ["Đồ điện tử cũ", "Sắt & kim loại"],
-    quantity: "4 món đồ điện + 10kg sắt",
-    area: "Bình Thạnh",
-    time: "Cuối tuần",
-    note: "Cần người có xe tải nhỏ, đồ nặng cần khiêng từ tầng 3.",
-    hoursAgo: 9,
-    status: "matched",
-  },
-  {
-    id: "r3",
-    materials: ["Rác tái chế hỗn hợp"],
-    quantity: "2 túi lớn",
-    area: "Thủ Đức",
-    time: "Chiều (13h–17h)",
-    note: "Đã phân loại nhựa và giấy, giờ nào cũng được trong khung chiều.",
-    hoursAgo: 30,
-    status: "done",
   },
 ];

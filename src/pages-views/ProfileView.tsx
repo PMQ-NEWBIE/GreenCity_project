@@ -8,7 +8,8 @@ import { SmartImage } from "@/components/greencity/SmartImage";
 import { EmptyState } from "@/components/greencity/EmptyState";
 import { ThemeToggle } from "@/components/greencity/ThemeToggle";
 import { FieldError, PageContainer, buttonClass, inputClass } from "@/components/greencity/ui";
-import { RequestItem } from "./CollectView";
+import { RequestItem } from "@/features/collect/RequestItem";
+import { useCollect } from "@/store/hooks";
 import { ROUTES } from "@/lib/routes";
 import { ROLE_LABEL } from "@/data/labels";
 import type { UserRole } from "@/types";
@@ -34,7 +35,7 @@ export function ProfileView() {
   const [editError, setEditError] = useState("");
 
   const myListings = state.products.filter((p) => p.isMine);
-  const myRequests = state.requests.filter((r) => r.isMine);
+  const { mine: myRequests } = useCollect();
 
   const saveProfile = (e: React.FormEvent) => {
     e.preventDefault();

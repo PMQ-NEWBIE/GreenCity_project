@@ -4,9 +4,24 @@ import { useCallback, useMemo } from "react";
 import { REWARDS } from "@/data/rewards";
 import { balanceOf, checkRedeem, makeRedeemCode, pendingOf, REDEEM_VALID_DAYS, redemptionStatus } from "@/lib/points";
 import { initialsOf } from "@/utils/format";
-import type { DemoUser, ToastItem } from "@/types";
+import { POINT_RULES } from "@/data/point-rules";
+import {
+  assignTeam,
+  canCancel,
+  cancel as cancelPickup,
+  complete as completePickup,
+  recordWeighing,
+  startTrip,
+  totalAmount,
+  totalKg,
+} from "@/lib/pickup";
+import type { Area, DemoUser, ToastItem } from "@/types";
 import type {
   NewSwapItem,
+  Partner,
+  PayoutMethod,
+  PickupRequest,
+  WeighLine,
   PointEntry,
   RedeemResult,
   Redemption,
@@ -167,4 +182,135 @@ export function useSwap(): {
   );
 
   return { items, addItem, setStatus, removeItem };
+}
+
+/* ------------------------------ Thu gom tận nhà ------------------------------ */
+
+export interface NewPickup {
+  materials: string[];
+  quantity: string;
+  area: Area;
+  address: string;
+  time: string;
+  note: string;
+  photos: string[];
+  presorted: boolean;
+}
+
+/**
+ * Đơn thu gom: người dân tạo/hủy; đội thu gom (qua khu quản trị hoặc nút demo) nhận đơn,
+ * lên đường, cân, thanh toán. Hoàn tất thì tự cộng điểm cho người gửi theo POINT_RULES.
+ */
+export function useCollect() {
+  const { state, getState, dispatch } = useApp();
+  const uid = state.user?.email;
+
+  const requests = useMemo(
+    () => [...state.collect.requests].sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    [state.collect.requests]
+  );
+  const mine = useMemo(() => (uid ? requests.filter((r) => r.ownerId === uid) : []), [requests, uid]);
+
+  const find = useCallback((id: string) => getState().collect.requests.find((r) => r.id === id), [getState]);
+  const save = useCallback((request: PickupRequest) => dispatch({ type: "COLLECT_UPDATE", request }), [dispatch]);
+
+  const create = useCallback(
+    (input: NewPickup): PickupRequest => {
+      const user = getState().user;
+      const now = new Date().toISOString();
+      const request: PickupRequest = {
+        ...input,
+        id: newId("r"),
+        ownerId: user?.email,
+        ownerName: user?.name ?? "Bạn",
+        createdAt: now,
+        status: "cho-nhan",
+        history: [{ status: "cho-nhan", at: now }],
+      };
+      dispatch({ type: "COLLECT_ADD", request });
+      return request;
+    },
+    [getState, dispatch]
+  );
+
+  const cancel = useCallback(
+    (id: string, reason: string) => {
+      const r = find(id);
+      if (r && canCancel(r.status)) save(cancelPickup(r, reason, new Date().toISOString()));
+    },
+    [find, save]
+  );
+
+  const assign = useCallback(
+    (id: string, team: NonNullable<PickupRequest["team"]>, appointment: string) => {
+      const r = find(id);
+      if (r?.status === "cho-nhan") save(assignTeam(r, team, appointment, new Date().toISOString()));
+    },
+    [find, save]
+  );
+
+  const depart = useCallback(
+    (id: string) => {
+      const r = find(id);
+      if (r?.status === "da-nhan") save(startTrip(r, new Date().toISOString()));
+    },
+    [find, save]
+  );
+
+  const weigh = useCallback(
+    (id: string, lines: WeighLine[], sortedConfirmed: boolean) => {
+      const r = find(id);
+      if (r?.status === "dang-den") save(recordWeighing(r, lines, sortedConfirmed, new Date().toISOString()));
+    },
+    [find, save]
+  );
+
+  const finish = useCallback(
+    (id: string, method: PayoutMethod) => {
+      const r = find(id);
+      if (r?.status !== "da-can") return;
+      const now = new Date().toISOString();
+      const { request, points } = completePickup(r, method, POINT_RULES, now);
+      save(request);
+      if (!r.ownerId) return; // đơn mẫu của người khác: không có sổ điểm
+      const kgPoints = points.kg + points.sorted;
+      if (kgPoints > 0)
+        dispatch({
+          type: "POINTS_ADD",
+          entry: {
+            id: newId("pt"),
+            at: now,
+            delta: kgPoints,
+            reason: "home_pickup",
+            title: `Thu gom tận nhà · ${totalKg(r.weighLines).toLocaleString("vi-VN")}kg${points.sorted ? ", đã phân loại" : ""}`,
+            status: "confirmed",
+            refId: r.id,
+            userId: r.ownerId,
+          },
+        });
+      if (points.cash > 0)
+        dispatch({
+          type: "POINTS_ADD",
+          entry: {
+            id: newId("pt"),
+            at: now,
+            delta: points.cash,
+            reason: "home_pickup",
+            title: `Quy đổi tiền ve chai · ${totalAmount(r.weighLines).toLocaleString("vi-VN")}đ`,
+            status: "confirmed",
+            refId: r.id,
+            userId: r.ownerId,
+          },
+        });
+    },
+    [find, save, dispatch]
+  );
+
+  return { requests, mine, create, cancel, assign, depart, weigh, finish };
+}
+
+export function usePartners() {
+  const { state, dispatch } = useApp();
+  const upsert = useCallback((partner: Partner) => dispatch({ type: "PARTNERS_UPSERT", partner }), [dispatch]);
+  return { partners: state.partners.partners, upsert };
 }

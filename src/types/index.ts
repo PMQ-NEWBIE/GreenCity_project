@@ -46,6 +46,7 @@ export interface Product {
   isMine?: boolean;
 }
 
+/** Yêu cầu thu gom bản v1 — chỉ còn dùng để chuyển dữ liệu cũ sang PickupRequest. */
 export type RequestStatus = "pending" | "matched" | "done";
 
 export interface CollectionRequest {

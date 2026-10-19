@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowRight, Check, Compass, Gift, Megaphone, PackagePlus, Recycle, Repeat2, Truck, type LucideIcon } from "lucide-react";
 import { useApp } from "@/store/app-store";
-import { usePoints } from "@/store/hooks";
+import { useCollect, usePoints } from "@/store/hooks";
 import { ProductCard } from "@/components/greencity/ProductCard";
 import { PageContainer, buttonClass } from "@/components/greencity/ui";
 import { ROUTES } from "@/lib/routes";
@@ -44,7 +44,7 @@ export function DashboardView() {
   const { balance } = usePoints();
   const user = state.user!;
   const myListings = state.products.filter((p) => p.isMine).length;
-  const myRequests = state.requests.filter((r) => r.isMine).length;
+  const myRequests = useCollect().mine.length;
   const saved = state.favorites.length;
   const latest = state.products.filter((p) => p.status === "available").slice(0, 4);
   const firstName = user.name.trim().split(/\s+/).slice(-1)[0];

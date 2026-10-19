@@ -4,7 +4,7 @@
 > 1. **Trước khi dán:** tự commit hết các thay đổi đang dở trong `C:\123`. Chạy `git status`, phải báo sạch.
 > 2. Mở Claude Code trong `C:\123`, dán toàn bộ phần từ "BẮT ĐẦU PROMPT" tới "KẾT THÚC PROMPT".
 > 3. Claude làm **Giai đoạn 0** trước. Khi Claude báo **"Nền móng xong"**, mới dán `docs/prompt-gemini-tinh-nang-co-ban.md` vào Antigravity cho Gemini.
-> 4. Hai bên làm song song. Khi Gemini báo xong, nhắn Claude câu `Gemini xong` để vào Giai đoạn gộp.
+> 4. Hai bên làm song song **trong cùng thư mục `C:\123`, cùng nhánh `main`** (người dùng chốt ngày 2026-10-19: không tách thư mục). Khi Gemini báo xong, nhắn Claude câu `Gemini xong` để vào Giai đoạn kiểm thử chung.
 
 ---
 
@@ -60,16 +60,17 @@ Quy tắc chung:
   Cần Gemini đổi gì thì ghi vào `docs/collab/claude-thong-bao.md`, rồi nhờ người dùng chuyển lời.
 - **Hợp đồng `src/features/contracts.ts`.** Sau Giai đoạn 0 chỉ được **thêm**, không được đổi tên, xóa hay đổi kiểu.
   - Thay đổi phá vỡ: **HỎI NGƯỜI DÙNG** trước, rồi ghi rõ vào `claude-thong-bao.md`.
-- **Thay đổi hợp đồng đi qua `main`.**
-  1. Sửa trong worktree `C:\123-main` (nhánh `main`), commit với tiền tố `[claude][hop-dong]`.
-  2. Gộp `main` vào `feat/nang-cao`.
-  3. Ghi vào `claude-thong-bao.md`, rồi nhắc người dùng nhắn Gemini câu `cập nhật nền móng`.
-- **Chỗ làm việc.**
-  - Bạn làm ở `C:\123-nang-cao` (nhánh `feat/nang-cao`). **Không** sửa file trong `C:\123` (nhánh `feat/co-ban` của Gemini).
-  - Bạn dùng cổng `3200` (dev) và `3300` (build). Không tắt tiến trình ở cổng 3000 và 3100.
-- **Trước mỗi commit** chạy `npm run collab:check -- claude`. Commit có tiền tố `[claude]`.
-- **Đọc yêu cầu của Gemini.** Mỗi khi xong một tính năng A, đọc `docs/collab/gemini-yeu-cau.md` (đọc bản trong nhánh `feat/co-ban` bằng `git show feat/co-ban:docs/collab/gemini-yeu-cau.md`).
-  - Yêu cầu nằm trong phần của bạn thì làm ngay, theo luồng thay đổi hợp đồng ở trên.
+  - Thêm gì vào hợp đồng thì commit ngay và ghi một dòng vào `claude-thong-bao.md`. Gemini đọc file này đầu mỗi tính năng.
+- **Chung một thư mục `C:\123`, chung nhánh `main`** với Gemini. Vì vậy:
+  - Stage **chỉ file của mình**: `git add -- . ':!src/features/learn' ':!src/features/points' ':!src/features/rewards' ':!src/features/green-shops' ':!src/features/swap' ':!src/data/knowledge.ts' ':!src/data/green-shops.ts' ':!public/content' ':!docs/collab/gemini-yeu-cau.md' ':!docs/collab/gemini-bao-cao.md'`.
+  - **Cấm** `git add -A`, `git commit -a`, `git stash`, `git reset`, `git restore`/`git checkout -- <file>` trên file của Gemini, `git clean`, đổi nhánh, `git pull`/`git push` khi người dùng chưa bảo.
+  - Build và chạy server bằng thư mục riêng: `NEXT_DIST_DIR=.next-claude npx next build`, `NEXT_DIST_DIR=.next-claude npx next start -p 3300`. Dev thì `NEXT_DIST_DIR=.next-claude npx next dev -p 3200`.
+  - Cổng của bạn là `3200` và `3300`. Không tắt tiến trình ở cổng 3000 và 3100. Tắt server của mình thì tắt theo cổng (tiến trình `node` con có thể còn sống sau khi tắt lệnh `npx`).
+  - **Giữ cây code luôn biên dịch được**, vì Gemini build cùng mã nguồn: viết file mới cho xong rồi mới nối vào chỗ dùng, chạy `npx tsc --noEmit` thường xuyên, không để lỗi kiểu kéo dài.
+  - Lỗi build do file của Gemini đang dở: không sửa, đợi rồi chạy lại; kéo dài thì báo người dùng.
+- **Trước mỗi commit** chạy `npm run collab:check -- claude` (kiểm file đang stage và các commit `[claude]` từ tag `nen-mong`). Commit có tiền tố `[claude]`.
+- **Đọc yêu cầu của Gemini.** Mỗi khi xong một tính năng A, đọc `docs/collab/gemini-yeu-cau.md`.
+  - Yêu cầu nằm trong phần của bạn thì làm ngay, theo luật hợp đồng ở trên.
   - Làm xong thì ghi kết quả vào `claude-thong-bao.md`.
 
 # LUẬT KỸ THUẬT CHUNG
@@ -90,7 +91,7 @@ Quy tắc chung:
   - Khi `localStorage` báo đầy: bắt lỗi `QuotaExceededError`, hiện toast cảnh báo, không làm sập ứng dụng.
 - **Lobby** (`src/lobby/**`, `src/app/page.tsx`): không đụng tới. `npm run lobby:smoke` phải vẫn đạt.
 
-# GIAI ĐOẠN 0: NỀN MÓNG (làm trên `main` trong `C:\123`, trước khi Gemini vào)
+# GIAI ĐOẠN 0: NỀN MÓNG (làm trên `main` trong `C:\123`, trước khi Gemini vào) — ĐÃ XONG 2026-10-19
 
 ## 0.1 Mốc ban đầu
 - Chạy `git status`. Cây làm việc đang có nhiều thay đổi chưa commit từ các đợt trước.
@@ -271,25 +272,16 @@ Viết theo kiểu `scripts/lobby-assets/*.mjs`: Node thuần, không thêm thư
   | `gemini-bao-cao.md` | Để trống |
   | `claude-thong-bao.md` | Dòng đầu tiên: "Nền móng xong, commit <hash>" |
 
-## 0.10 Kiểm tra rồi tách nhánh
+## 0.10 Kiểm tra và đánh dấu mốc
 1. `npm run lint` 0 lỗi, `npm run build` thành công.
 2. Chạy `npm run features:smoke -- http://localhost:3300 all --allow-stub` và phải đạt.
 3. Chạy `npm run lobby:smoke` và phải vẫn đạt.
-4. Commit lên `main`: `[claude] Nền móng cho 18 tính năng mới`, rồi gắn tag `nen-mong`.
-5. Tạo nhánh và worktree:
-   ```
-   git branch feat/co-ban
-   git checkout feat/co-ban                      # C:\123 thuộc về Gemini từ đây
-   git worktree add C:\123-main main
-   git worktree add C:\123-nang-cao -b feat/nang-cao main
-   ```
-6. Chạy `npm ci` trong cả hai worktree.
-7. Báo người dùng đúng câu **"Nền móng xong"**, kèm 3 việc họ cần làm:
-   - dán prompt Gemini vào Antigravity
-   - từ giờ bạn làm việc ở `C:\123-nang-cao`
-   - `start-live.bat` ở `C:\123` sẽ chạy bản của Gemini
+4. Commit lên `main` với tiền tố `[claude]`, rồi gắn tag `nen-mong`.
+5. Báo người dùng đúng câu **"Nền móng xong"**, kèm việc họ cần làm: dán prompt Gemini vào Antigravity, mở ở `C:\123`.
 
-# CÁC TÍNH NĂNG NÂNG CAO (làm ở `C:\123-nang-cao`, mỗi tính năng một commit)
+(Lúc đầu có tách 2 worktree `C:\123-main` và `C:\123-nang-cao`. Người dùng không muốn tách nên đã gom lại một thư mục. Tag `nen-mong` được dời lên commit chuyển sang cách làm chung thư mục.)
+
+# CÁC TÍNH NĂNG NÂNG CAO (làm ở `C:\123`, nhánh `main`, mỗi tính năng một commit `[claude]`)
 
 ## Thứ tự làm và luật cho mọi tính năng
 
@@ -457,18 +449,13 @@ Viết theo kiểu `scripts/lobby-assets/*.mjs`: Node thuần, không thêm thư
 - **Dùng chung với khu cộng tác viên**: các hàng chờ kiểm tra dùng lại component của `/cong-tac-vien`.
 - **Mọi thao tác** đều có xác nhận và toast. Bảng dữ liệu có ô tìm kiếm và bộ lọc trạng thái.
 
-# GIAI ĐOẠN G: GỘP VÀ KIỂM THỬ (khi người dùng nhắn `Gemini xong`)
+# GIAI ĐOẠN G: KIỂM THỬ CHUNG (khi người dùng nhắn `Gemini xong`)
 1. **Chốt yêu cầu của Gemini**: đọc báo cáo và yêu cầu của Gemini. Yêu cầu nào còn tồn thì xử lý xong trước.
-2. **Kiểm tra phía Gemini**: trong `C:\123`, chạy `npm run collab:check -- gemini` (chỉ đọc kết quả, không sửa file).
-3. **Gộp nhánh** trong `C:\123-main`:
-   ```
-   git merge feat/nang-cao
-   git merge feat/co-ban
-   ```
-   Nếu có xung đột trong file của Gemini: lấy bản của Gemini, ghi lại để báo người dùng.
+2. **Kiểm tra cả hai bên**: `npm run collab:check -- gemini` và `npm run collab:check -- claude` đều ĐẠT. Chỉ đọc kết quả, không sửa file của Gemini.
+3. Không cần gộp nhánh: hai bên đã commit chung trên `main`.
 4. **Nối các tính năng với nhau**: link qua lại giữa các phần, các mục ở trang Tổng quan, bước "Làm quen" có thêm "Thử đổi quà" hoặc "Tìm thùng gần bạn" nếu hợp lý.
-5. **Kiểm thử toàn bộ trên `main`**:
-   - `npm run lint` 0 lỗi, `npm run build` thành công.
+5. **Kiểm thử toàn bộ trên `main`** (build ra `.next-claude`):
+   - `npm run lint` 0 lỗi, build thành công.
    - `npm run features:smoke -- http://localhost:3300 all` phải đạt.
    - `npm run lobby:smoke -- http://localhost:3300` phải vẫn đạt.
    - Tự chạy tay một vòng cho mỗi vai trò, ở 390px và 1440px, cả nền sáng và tối:
@@ -481,14 +468,14 @@ Viết theo kiểu `scripts/lobby-assets/*.mjs`: Node thuần, không thêm thư
      | Người dân | Đổi quà |
      | Doanh nghiệp | Đặt giữ lô vật liệu |
      | Vận hành | Xử lý thùng đầy, chỉnh điểm tay |
-6. **Dọn worktree**: chỉ làm khi người dùng đồng ý, bằng `git worktree remove`. Không push khi người dùng chưa bảo.
+6. Không push khi người dùng chưa bảo.
 
 # ĐỊNH NGHĨA HOÀN THÀNH
 - [ ] Giai đoạn 0 xong, đã báo "Nền móng xong", Gemini đã bắt đầu được.
 - [ ] A1–A10 làm đủ các mục ở phần mô tả. Mọi luồng nhiều bước đều chạy hết vòng được ở chế độ demo.
 - [ ] Mọi yêu cầu trong `gemini-yeu-cau.md` đã được xử lý hoặc trả lời.
-- [ ] Trên `main`, các lệnh sau đều đạt: lint, build, `features:smoke all`, `lobby:smoke`, `collab:check -- claude` (đối chiếu từ tag `nen-mong`).
-- [ ] Không có file nào của Gemini bị bạn sửa sau tag `nen-mong` (kiểm bằng `git log nen-mong..feat/nang-cao -- <vùng của Gemini>`).
+- [ ] Trên `main`, các lệnh sau đều đạt: lint, build, `features:smoke all`, `lobby:smoke`, `collab:check -- claude`, `collab:check -- gemini`.
+- [ ] Không commit `[claude]` nào sau tag `nen-mong` sửa file của Gemini (`collab:check -- claude` kiểm điều này).
 
 # MẪU BÁO CÁO CUỐI
 ```

@@ -1,8 +1,14 @@
 # Thông báo của Claude gửi Gemini
 
-Mới nhất ở trên cùng. Khi có mục "cập nhật nền móng", người dùng sẽ nhắn Gemini câu `cập nhật nền móng`.
+Mới nhất ở trên cùng. Gemini đọc file này đầu mỗi tính năng.
 
 ---
+
+## 2026-10-19 · Làm chung một thư mục
+- Người dùng muốn hai bên làm cùng trong `C:\123`, cùng nhánh `main`. Không còn nhánh `feat/co-ban` hay thư mục riêng.
+- Stage chỉ file của mình bằng lệnh `git add -- …` trong prompt. Không `git add -A`, không `git stash`/`reset`/`restore`/`clean`.
+- Claude build ra `.next-claude`, Gemini dùng `.next` mặc định, nên không còn đè nhau.
+- `npm run collab:check -- gemini` giờ kiểm file đang stage và các commit `[gemini]`. File Claude đang sửa dở (chưa stage) không bị tính.
 
 ## 2026-10-19 · Nền móng xong
 - Mốc: tag `nen-mong` trên nhánh `main`.

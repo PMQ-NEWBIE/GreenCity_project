@@ -3,7 +3,7 @@
 > **Cách dùng**
 > 1. **Chỉ dán khi Claude đã báo "Nền móng xong"**. Đó là Giai đoạn 0 trong `docs/prompt-claude-tinh-nang-nang-cao.md`. Dán sớm hơn, Gemini sẽ không tìm thấy hook, route và các lệnh kiểm tra.
 > 2. Mở thư mục `C:\123` trong Antigravity, chọn Gemini 3.8 Flash, rồi dán **toàn bộ** phần từ "BẮT ĐẦU PROMPT" tới "KẾT THÚC PROMPT".
-> 3. Nếu giữa chừng Claude báo có cập nhật nền móng, nhắn cho Gemini đúng câu: `cập nhật nền móng`.
+> 3. Claude làm cùng lúc **trong chính thư mục `C:\123`**. Hai bên chia nhau theo file, không chia thư mục.
 
 ---
 
@@ -25,10 +25,14 @@ Dự án có **hai bên làm cùng lúc**:
 | | Bạn (Gemini) | Claude (Claude Code) |
 |---|---|---|
 | Phần việc | Giao diện của 6 tính năng cơ bản | Nền móng (dữ liệu, store, route, menu, phân quyền) và 10 tính năng nâng cao |
-| Thư mục | `C:\123` | `C:\123-nang-cao` và `C:\123-main` |
-| Nhánh git | `feat/co-ban` | `feat/nang-cao` và `main` |
+| Thư mục | `C:\123` | `C:\123` (chung với bạn) |
+| Nhánh git | `main` | `main` (chung với bạn) |
+| Tiền tố commit | `[gemini]` | `[claude]` |
+| Thư mục build | `.next` (mặc định) | `.next-claude` |
 | Cổng | dev `3000`, kiểm tra `3100` | `3200`, `3300` |
 | Ghi chú gửi bên kia | `docs/collab/gemini-yeu-cau.md` | `docs/collab/claude-thong-bao.md` |
+
+Hai bên **làm cùng lúc, trong cùng một thư mục, trên cùng nhánh `main`**. Vì vậy lúc nào trong thư mục cũng có thể có file Claude đang sửa dở. `git status` sẽ hiện cả file của Claude: **đó không phải việc của bạn, để yên cho chúng.**
 
 **Luật làm chung** (vi phạm bất kỳ điều nào là thất bại):
 1. **Mỗi file chỉ có một chủ.**
@@ -38,17 +42,25 @@ Dự án có **hai bên làm cùng lúc**:
    - Ví dụ: cần thêm trường dữ liệu, thêm hàm vào store, thêm route hay mục menu, sửa lỗi trong file của Claude.
    - Cách làm: ghi vào `docs/collab/gemini-yeu-cau.md` theo mẫu bên dưới, rồi làm tiếp việc khác.
    - **Không tự chế đường vòng**: không tạo store riêng, không đọc/ghi `localStorage` trực tiếp, không copy file của Claude ra để sửa, không tạo route mới.
-3. **Chỉ import từ danh sách ở mục ĐƯỢC IMPORT.** Đó là "hợp đồng" giữa hai bên. Claude cam kết không đổi hợp đồng mà không báo.
-4. **Git:**
-   - Chỉ commit trên nhánh `feat/co-ban`.
-   - Không chạy `merge`, `rebase`, `push`, `reset --hard`, `stash`, không `checkout` sang nhánh khác.
-   - Không đụng nhánh `main` hay `feat/nang-cao`. Không mở thư mục `C:\123-nang-cao` và `C:\123-main`.
-   - Ngoại lệ duy nhất: khi người dùng nhắn `cập nhật nền móng`, chạy `git merge main --no-edit`. Nếu báo xung đột thì chạy `git merge --abort` rồi báo lại người dùng, **không tự giải xung đột**.
+3. **Chỉ import từ danh sách ở mục ĐƯỢC IMPORT.** Đó là "hợp đồng" giữa hai bên. Claude chỉ được **thêm** vào hợp đồng, không đổi hay xóa cái đã có.
+4. **Git: chỉ đụng vào file của mình.**
+   - Chỉ stage file của bạn, bằng **đúng lệnh này** (không dùng cách khác):
+     ```
+     git add -- src/features/learn src/features/points src/features/rewards src/features/green-shops src/features/swap src/data/knowledge.ts src/data/green-shops.ts public/content docs/collab/gemini-yeu-cau.md docs/collab/gemini-bao-cao.md
+     ```
+   - **CẤM tuyệt đối** các lệnh sau. Chúng sẽ commit nhầm hoặc **xóa mất** code Claude đang làm dở trong cùng thư mục:
+     `git add -A`, `git add .`, `git commit -a`, `git stash`, `git reset`, `git restore` (trừ `git restore --staged`), `git checkout -- <file>`, `git clean`, `git checkout <nhánh>`, `git switch`, `git merge`, `git rebase`, `git pull`, `git push`.
+   - Commit báo lỗi `index.lock` nghĩa là Claude cũng đang commit: đợi 10 giây rồi chạy lại.
 5. **Không tắt tiến trình** mà bạn không tự mở. Claude có thể đang chạy server ở cổng 3200 và 3300.
-6. **Trước mỗi commit**, chạy `npm run collab:check -- gemini`.
-   - Nếu báo FAIL, nghĩa là bạn đã đụng file của Claude.
-   - Với file có sẵn: hoàn tác bằng `git checkout main -- <đường dẫn>`. Với file mới lỡ tạo ngoài vùng của bạn: xóa đi.
+6. **Trước mỗi commit**, chạy `npm run collab:check -- gemini`. Lệnh này kiểm file đang stage và các commit `[gemini]` của bạn.
+   - Nếu báo FAIL vì stage nhầm file của Claude: bỏ stage bằng `git restore --staged -- <đường dẫn>`. Lệnh này **không** xóa thay đổi của ai.
+   - Nếu bạn lỡ **sửa** file của Claude: dừng lại, báo người dùng tên file đó. Không tự hoàn tác, vì có thể làm mất code của Claude.
    - Xong chạy lại cho tới khi ĐẠT.
+7. **Lỗi build hoặc lint nằm trong file của Claude** (Claude có thể đang sửa dở):
+   - Không sửa file đó.
+   - Trong lúc chờ, kiểm code của riêng bạn bằng `npx eslint src/features/learn src/features/points src/features/rewards src/features/green-shops src/features/swap src/data/knowledge.ts src/data/green-shops.ts`.
+   - Đợi 2 phút rồi chạy lại, tối đa 5 lần. Vẫn lỗi thì ghi vào `gemini-yeu-cau.md` (kèm dòng lỗi), báo người dùng, và làm tiếp việc khác.
+8. **Đầu mỗi tính năng**, đọc `docs/collab/claude-thong-bao.md`. Claude ghi ở đó khi thêm gì vào hợp đồng, hoặc khi trả lời yêu cầu của bạn.
 
 Mẫu ghi yêu cầu trong `docs/collab/gemini-yeu-cau.md`. Thêm xuống cuối file, không xóa yêu cầu cũ:
 ```
@@ -505,9 +517,10 @@ Mục tiêu: trang mới nhìn **cùng một bộ** với các trang đã có. M
 
 # QUY TRÌNH BẮT BUỘC (làm đủ, đúng thứ tự)
 **Bước 0. Kiểm tra nền móng.** Thiếu bất kỳ mục nào thì **DỪNG**, báo người dùng "Nền móng chưa sẵn sàng: <thiếu gì>", không làm thêm gì.
-- `git branch --show-current` phải ra `feat/co-ban`.
+- `git branch --show-current` phải ra `main`.
+- `git tag --list nen-mong` phải ra `nen-mong`.
 - File `src/features/contracts.ts` tồn tại.
-- `npm install` chạy xong; `npm run lint` và `npm run build` đều đạt.
+- `npm install` chạy xong; `npm run lint` và `npm run build` đều đạt. Nếu lỗi nằm trong file của Claude thì làm theo luật làm chung số 7.
 - `npm run collab:check -- gemini` báo ĐẠT.
 
 **Bước 1. Đọc trước khi code.**
@@ -523,9 +536,10 @@ Mục tiêu: trang mới nhìn **cùng một bộ** với các trang đã có. M
   - các file mẫu ở mục HỆ THỐNG THIẾT KẾ
 
 **Bước 2. Làm lần lượt B1 → B6.** Mỗi tính năng xong thì:
-1. `npm run lint`: 0 lỗi.
-2. `npm run collab:check -- gemini`: ĐẠT.
-3. `git add -A`, rồi `git commit -m "[gemini] B<số>: <tên tính năng>"`.
+1. `npm run lint`: 0 lỗi (lỗi trong file của Claude: làm theo luật làm chung số 7).
+2. Stage bằng đúng lệnh `git add -- …` ở luật làm chung số 4.
+3. `npm run collab:check -- gemini`: ĐẠT.
+4. `git commit -m "[gemini] B<số>: <tên tính năng>"`.
 
 **Bước 3. Ảnh.** Tạo đủ ảnh theo mục ẢNH, tới khi `npm run content:missing` ra 0. Xong thì commit `[gemini] ảnh nội dung`.
 
@@ -564,11 +578,11 @@ Mục tiêu: trang mới nhìn **cùng một bộ** với các trang đã có. M
 - [ ] `npm run features:smoke -- http://localhost:3100 gemini` in "✓ TẤT CẢ ĐẠT"
 - [ ] `npm run collab:check -- gemini` ĐẠT
 - [ ] Cả 8 tiêu chí giao diện đều là "có"
-- [ ] Mọi thay đổi đã commit trên `feat/co-ban`, `git status` sạch
+- [ ] Mọi thay đổi của bạn đã commit trên `main`: `git status` không còn file nào nằm trong vùng của bạn (file của Claude còn dở thì kệ)
 
 # KHI GẶP KHÓ
 - **Thiếu dữ liệu, hàm hoặc route**: ghi vào `gemini-yeu-cau.md`. Tạm thời ẩn phần giao diện đó, làm tiếp việc khác, không ngồi chờ.
-- **Lỗi lint hoặc build nằm trong file của Claude**: không sửa. Ghi yêu cầu, báo người dùng, và vẫn hoàn thành phần việc của bạn.
+- **Lỗi lint hoặc build nằm trong file của Claude**: làm theo luật làm chung số 7. Không sửa, vẫn hoàn thành phần việc của bạn.
 - **Hook trả dữ liệu khác với mô tả trong prompt**: làm theo `contracts.ts`, ghi khác biệt vào báo cáo.
 - **Công cụ tạo ảnh hỏng hoàn toàn**: dừng phần ảnh, báo chính xác còn thiếu ảnh nào. **Không được báo đã xong.**
 - **Cùng một lỗi**: thử tối đa 3 lần. Vẫn không được thì ghi rõ lỗi vào báo cáo, chuyển sang việc khác.
@@ -600,7 +614,7 @@ Mục tiêu: trang mới nhìn **cùng một bộ** với các trang đã có. M
 ## Khác biệt giữa prompt và contracts.ts
 (hoặc "Không có")
 
-## Commit (dán `git log --oneline main..HEAD`)
+## Commit (dán kết quả `git log --oneline --grep="^\[gemini\]" nen-mong..HEAD`)
 ...
 ```
 

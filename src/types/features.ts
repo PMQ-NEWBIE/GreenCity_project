@@ -336,3 +336,44 @@ export interface LitterReport {
   rejectReason?: string;
   cleanedAt?: string;
 }
+
+/* ------------------------- Chợ vật liệu doanh nghiệp (A7) ------------------------- */
+
+export type LotGrade = "A" | "B" | "C";
+
+/** san-sang → dang-giu (doanh nghiệp đặt giữ 48 giờ) → da-ban; hết 48 giờ chưa chốt thì về san-sang */
+export type LotStatus = "san-sang" | "dang-giu" | "da-ban";
+
+export interface LotReservation {
+  businessId: string;
+  businessName: string;
+  at: string;
+  expiresAt: string;
+  /** Giờ hẹn tới lấy hàng */
+  pickupAt: string;
+  note: string;
+}
+
+export interface MaterialLot {
+  id: string;
+  /** Mã lô in trên phiếu kiểm định, ví dụ "LO-1019-03" */
+  code: string;
+  material: string;
+  weightKg: number;
+  pricePerKg: number;
+  grade: LotGrade;
+  /** Độ sạch, % */
+  purity: number;
+  /** Độ ẩm, % */
+  moisture: number;
+  inspector: string;
+  inspectedAt: string;
+  warehouse: string;
+  area: Area;
+  image: string;
+  note: string;
+  status: LotStatus;
+  reservation?: LotReservation;
+  soldAt?: string;
+  soldTo?: string;
+}

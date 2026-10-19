@@ -524,6 +524,37 @@ try {
     await shot("luong-a6-ban-do.png");
     check("Luồng A6: bản đồ vẽ đủ điểm (≥ 30) và tải được ô bản đồ", map.markers >= 30 && map.tiles > 0, `điểm: ${map.markers}, ô bản đồ: ${map.tiles}`);
     check("Luồng A6: ?thung=tc-003 mở popup của thùng TC-003", map.popup.includes("TC-003"), map.popup.slice(0, 80));
+
+    // A7: doanh nghiệp giữ lô 48 giờ → vận hành chốt bán
+    await seed("business", "light");
+    await goto(BASE + "/cho-vat-lieu");
+    const firstLot = await evaluate(`document.querySelector('main li .font-mono')?.textContent`);
+    await clickByText("Giữ lô 48 giờ");
+    await sleep(500);
+    await evaluate(`document.querySelector('[role="dialog"] form button[type="submit"]')?.click()`);
+    await sleep(600);
+    await clickByText("Lô tôi đang giữ", { exact: false });
+    await sleep(500);
+    const holding = await evaluate(`(() => { const t = document.querySelector('main').innerText; return t.includes(${JSON.stringify(firstLot ?? "?")}) && t.includes('Còn'); })()`);
+    await shot("luong-a7-giu-lo.png");
+    check("Luồng A7: doanh nghiệp giữ lô, lô hiện trong 'Lô tôi đang giữ'", holding, firstLot);
+    await clickByText("Hồ sơ của tôi");
+    await sleep(700);
+    await evaluate(`[...document.querySelectorAll('main label')].find(l => l.textContent.includes('Nhóm vận hành'))?.click()`);
+    await sleep(300);
+    await clickByText("Chợ vật liệu");
+    await sleep(700);
+    await clickByText("Quản lý lô");
+    await sleep(500);
+    const sold = await evaluate(`(() => {
+      const tr = [...document.querySelectorAll('main tr')].find(r => r.textContent.includes(${JSON.stringify(firstLot ?? "?")}));
+      const b = tr && [...tr.querySelectorAll('button')].find(x => x.textContent.trim() === 'Chốt đã bán');
+      b?.click();
+      return !!b;
+    })()`);
+    await sleep(400);
+    const soldShown = await evaluate(`[...document.querySelectorAll('main tr')].find(r => r.textContent.includes(${JSON.stringify(firstLot ?? "?")}))?.textContent.includes('Đã bán')`);
+    check("Luồng A7: vận hành chốt bán lô đang giữ", sold && soldShown, `${firstLot}: bấm ${sold}, đã bán ${soldShown}`);
   }
 } catch (err) {
   check("Chạy kiểm tra không lỗi", false, err.message);

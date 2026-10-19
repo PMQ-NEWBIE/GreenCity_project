@@ -13,6 +13,7 @@ import { ARTICLES } from "@/data/knowledge";
 import { SmartImage } from "@/components/greencity/SmartImage";
 import { EmptyState } from "@/components/greencity/EmptyState";
 import { PageContainer, buttonClass } from "@/components/greencity/ui";
+import { cn } from "@/lib/utils";
 
 function topicAction(topic: ArticleTopic) {
   switch (topic) {

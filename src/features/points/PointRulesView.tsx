@@ -21,6 +21,7 @@ import {
   PageIntro,
   buttonClass,
 } from "@/components/greencity/ui";
+import { cn } from "@/lib/utils";
 
 export function PointRulesView() {
   const welcomeRule = POINT_RULES.find((r) => r.id === "welcome");

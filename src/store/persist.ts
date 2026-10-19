@@ -8,6 +8,7 @@ import { partnersHydrate, partnersPersist, type PartnersState } from "./slices/p
 import { binsHydrate, binsPersist, type BinsState } from "./slices/bins";
 import { litterHydrate, litterPersist, type LitterState } from "./slices/litter";
 import { lotsHydrate, lotsPersist, type LotsState } from "./slices/lots";
+import { consultsHydrate, consultsPersist, type ConsultsState } from "./slices/consults";
 
 const KEY_V1 = "greencity-demo-v1";
 const KEY_V2 = "greencity-demo-v2";
@@ -25,6 +26,7 @@ export interface PersistShape {
   bins: BinsState;
   litter: LitterState;
   lots: LotsState;
+  consults: ConsultsState;
 }
 
 const ROLES: UserRole[] = ["resident", "collaborator", "business", "operator"];
@@ -59,6 +61,7 @@ function parse(raw: Record<string, unknown>): PersistShape {
     bins: binsHydrate(raw.bins),
     litter: litterHydrate(raw.litter),
     lots: lotsHydrate(raw.lots),
+    consults: consultsHydrate(raw.consults),
   };
 }
 
@@ -89,6 +92,7 @@ export function savePersisted(state: AppState): "ok" | "quota" | "error" {
     bins: binsPersist(state.bins),
     litter: litterPersist(state.litter),
     lots: lotsPersist(state.lots),
+    consults: consultsPersist(state.consults),
   };
   try {
     window.localStorage.setItem(KEY_V2, JSON.stringify(payload));

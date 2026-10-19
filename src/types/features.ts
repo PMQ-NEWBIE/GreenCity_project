@@ -377,3 +377,32 @@ export interface MaterialLot {
   soldAt?: string;
   soldTo?: string;
 }
+
+/* --------------------------- Tư vấn phân loại (A8) --------------------------- */
+
+export type ConsultStatus = "cho-tu-van" | "da-tra-loi";
+
+/** Một gợi ý phân loại — từ so khớp từ khóa, từ AI (khi bật), hoặc từ người tư vấn. */
+export interface ClassifyResult {
+  group: WasteGroup;
+  itemName: string;
+  guidance: string;
+  /** 0–1 */
+  confidence: number;
+  source: "keyword" | "ai" | "human";
+}
+
+export interface ConsultTicket {
+  id: string;
+  userId?: string;
+  userName: string;
+  photo: string;
+  /** Người hỏi tả món đồ, ví dụ "hộp sữa giấy" */
+  description: string;
+  question: string;
+  at: string;
+  status: ConsultStatus;
+  /** Gợi ý tự động lúc gửi */
+  suggestions: ClassifyResult[];
+  answer?: { group: WasteGroup; guidance: string; by: string; at: string };
+}

@@ -555,6 +555,37 @@ try {
     await sleep(400);
     const soldShown = await evaluate(`[...document.querySelectorAll('main tr')].find(r => r.textContent.includes(${JSON.stringify(firstLot ?? "?")}))?.textContent.includes('Đã bán')`);
     check("Luồng A7: vận hành chốt bán lô đang giữ", sold && soldShown, `${firstLot}: bấm ${sold}, đã bán ${soldShown}`);
+
+    // A8: hỏi cách phân loại → gợi ý tức thì từ sổ tay → cộng tác viên trả lời → người hỏi thấy câu trả lời
+    await seed("resident", "light");
+    await goto(BASE + "/tu-van-phan-loai");
+    await attachPhoto('main input[type="file"]');
+    await sleep(1000);
+    await setField("#consult-description", "chai nhua");
+    await sleep(900);
+    const suggested = await evaluate(`document.querySelector('[aria-labelledby="suggest"]')?.innerText.includes('Chai nhựa')`);
+    await evaluate(`document.querySelector('main form button[type="submit"]').click()`);
+    await sleep(1500);
+    check("Luồng A8: gõ 'chai nhua' có gợi ý 'Chai nhựa'; gửi câu hỏi thì hiện 'Chờ tư vấn'", suggested && (await evaluate(`document.querySelector('main').innerText.includes('Chờ tư vấn')`)), `gợi ý: ${suggested}`);
+    await clickByText("Hồ sơ của tôi");
+    await sleep(700);
+    await evaluate(`[...document.querySelectorAll('main label')].find(l => l.textContent.includes('Cộng tác viên'))?.click()`);
+    await sleep(300);
+    await clickByText("Khu cộng tác viên");
+    await sleep(700);
+    await clickByText("Tư vấn", { exact: false });
+    await sleep(500);
+    const answered = await evaluate(`(() => {
+      const li = [...document.querySelectorAll('main li')].find(l => l.textContent.includes('Người Kiểm Thử'));
+      const b = li && [...li.querySelectorAll('button')].find(x => x.textContent.trim() === 'Gửi câu trả lời');
+      b?.click(); return !!b;
+    })()`);
+    await sleep(400);
+    await clickByText("Hỏi cách phân loại");
+    await sleep(800);
+    const seen = await evaluate(`document.querySelector('main').innerText.includes('Đã trả lời')`);
+    await shot("luong-a8-tu-van.png");
+    check("Luồng A8: cộng tác viên trả lời, người hỏi thấy 'Đã trả lời'", answered && seen, `trả lời: ${answered}, thấy: ${seen}`);
   }
 } catch (err) {
   check("Chạy kiểm tra không lỗi", false, err.message);

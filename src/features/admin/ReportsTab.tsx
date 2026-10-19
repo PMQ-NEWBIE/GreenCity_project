@@ -2,8 +2,9 @@
 
 import { BinReportQueue } from "@/features/ctv/BinReportQueue";
 import { LitterQueue } from "@/features/ctv/LitterQueue";
+import { ConsultQueue } from "@/features/ctv/ConsultQueue";
 
-/** IV.1 — báo thùng đầy và báo điểm rác, kèm phần "đã xác minh, chờ dọn" của nhóm vận hành. */
+/** IV.1 — báo thùng đầy, báo điểm rác (kèm "đã xác minh, chờ dọn") và câu hỏi phân loại. */
 export function ReportsTab() {
   return (
     <div className="flex flex-col gap-10">
@@ -18,6 +19,12 @@ export function ReportsTab() {
           Điểm rác tự phát
         </h3>
         <LitterQueue showCleanup />
+      </section>
+      <section aria-labelledby="rp-consult">
+        <h3 id="rp-consult" className="mb-3 text-[18px] font-bold text-foreground">
+          Câu hỏi phân loại
+        </h3>
+        <ConsultQueue />
       </section>
     </div>
   );

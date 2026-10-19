@@ -6,6 +6,7 @@ import { useCollect } from "@/store/hooks";
 import { useBins } from "@/store/use-bins";
 import { useLitter } from "@/store/use-litter";
 import { useLedger } from "@/store/use-admin";
+import { useConsults } from "@/store/use-consults";
 import { isFinal } from "@/lib/pickup";
 import { BinsTab } from "./BinsTab";
 import { PartnersTab } from "./PartnersTab";
@@ -19,10 +20,13 @@ export function AdminView() {
   const { bins, reports } = useBins();
   const { reports: litter } = useLitter();
   const { redemptions } = useLedger();
+  const { tickets } = useConsults();
 
   const openPickups = requests.filter((r) => !isFinal(r.status)).length;
   const openReports =
-    reports.filter((r) => r.status === "moi").length + litter.filter((r) => r.status === "cho-xac-minh" || r.status === "da-xac-minh").length;
+    reports.filter((r) => r.status === "moi").length +
+    litter.filter((r) => r.status === "cho-xac-minh" || r.status === "da-xac-minh").length +
+    tickets.filter((t) => t.status === "cho-tu-van").length;
   const fullBins = bins.filter((b) => b.level === "day").length;
   const giftsToHand = redemptions.filter((r) => r.status === "ready").length;
 

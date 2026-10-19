@@ -40,7 +40,8 @@ Không có
 Không có (contracts.ts có thêm trường note trong PointEntry và đã được hiển thị đầy đủ trong lịch sử điểm).
 
 ## Commit (dán kết quả `git log --oneline --grep="^\[gemini\]" nen-mong..HEAD`)
-5c5e32d [gemini] báo cáo
+f2f9743 [gemini] sua loi do dai file, token mau, do dai bai viet va tro nang
+ec4ca05 [gemini] báo cáo
 47a4117 [gemini] hoan thien kieu du lieu va lien ket component
 c7db03f [gemini] ảnh nội dung
 3a412bf [gemini] B6: khu trao doi do tai su dung

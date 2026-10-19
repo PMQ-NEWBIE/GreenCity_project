@@ -1,107 +1,91 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useId, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface GcModalProps {
   open: boolean;
   onClose: () => void;
-  title?: string;
+  title: string;
   description?: string;
   children: ReactNode;
-  footer?: ReactNode;
-  className?: string;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md";
 }
 
-/** Modal có animation scale 0.96 → 1, backdrop mờ dần, Escape + click ngoài. */
-export function GcModal({
-  open,
-  onClose,
-  title,
-  description,
-  children,
-  footer,
-  className,
-  size = "md",
-}: GcModalProps) {
+/** Hộp thoại: Escape / bấm nền để đóng, giữ focus trong hộp thoại và trả focus khi đóng. */
+export function GcModal({ open, onClose, title, description, children, size = "md" }: GcModalProps) {
+  const titleId = useId();
+  const panelRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!open) return;
-    const handler = (e: KeyboardEvent) => {
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    panelRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
-    window.addEventListener("keydown", handler);
-    const prev = document.body.style.overflow;
+    window.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
-      window.removeEventListener("keydown", handler);
-      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+      previouslyFocused?.focus();
     };
   }, [open, onClose]);
 
   if (typeof document === "undefined") return null;
 
-  const sizeClass =
-    size === "sm" ? "max-w-md" : size === "lg" ? "max-w-3xl" : "max-w-xl";
-
   return createPortal(
     <AnimatePresence>
       {open && (
-        <motion.div
-          key="modal-backdrop"
+        <m.div
+          key="backdrop"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.22 }}
-          className="fixed inset-0 z-[70] flex items-end justify-center bg-forest/45 p-0 backdrop-blur-[3px] sm:items-center sm:p-6"
+          transition={{ duration: 0.15 }}
+          className="fixed inset-0 z-[70] flex items-end justify-center bg-black/55 sm:items-center sm:p-6"
           onClick={onClose}
-          role="dialog"
-          aria-modal="true"
         >
-          <motion.div
-            key="modal-panel"
-            initial={{ opacity: 0, scale: 0.96, y: 14 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 14 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          <m.div
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            tabIndex={-1}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 16 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className={cn(
-              "relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:rounded-3xl",
-              sizeClass,
-              className
+              "relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-3xl border border-border bg-card text-card-foreground shadow-2xl outline-none sm:rounded-3xl",
+              size === "sm" ? "sm:max-w-md" : "sm:max-w-xl"
             )}
             onClick={(e) => e.stopPropagation()}
           >
-            {(title || description) && (
-              <div className="flex items-start justify-between gap-4 border-b border-border px-6 py-5">
-                <div>
-                  {title && (
-                    <h3 className="text-lg font-bold tracking-tight text-foreground">
-                      {title}
-                    </h3>
-                  )}
-                  {description && (
-                    <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  aria-label="Đóng cửa sổ"
-                  className="rounded-full p-2 text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                >
-                  <X className="h-5 w-5" />
-                </button>
+            <div className="flex items-start justify-between gap-4 border-b border-border px-6 py-5">
+              <div>
+                <h2 id={titleId} className="text-lg font-bold text-foreground">
+                  {title}
+                </h2>
+                {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
               </div>
-            )}
-            <div className="nice-scroll flex-1 overflow-y-auto px-6 py-5">{children}</div>
-            {footer && (
-              <div className="border-t border-border bg-[#fafcfa] px-6 py-4">{footer}</div>
-            )}
-          </motion.div>
-        </motion.div>
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Đóng"
+                className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+              >
+                <X className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 py-5">{children}</div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>,
     document.body

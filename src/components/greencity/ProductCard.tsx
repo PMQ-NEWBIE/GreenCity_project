@@ -1,123 +1,102 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import Link from "next/link";
 import { Clock, Heart, MapPin } from "lucide-react";
-import type { Product } from "@/types";
+import type { Product, ProductStatus } from "@/types";
 import { useApp } from "@/store/app-store";
+import { ROUTES } from "@/lib/routes";
 import { formatHoursAgo, formatPrice } from "@/utils/format";
 import { SmartImage } from "./SmartImage";
 import { cn } from "@/lib/utils";
 
-interface ProductCardProps {
-  product: Product;
-  index?: number;
-}
+const STATUS_LABEL: Record<ProductStatus, string> = {
+  available: "Còn hàng",
+  sold: "Đã bán",
+  draft: "Bản nháp",
+};
 
-export function ProductCard({ product, index = 0 }: ProductCardProps) {
-  const { state, goApp, goAuth, setPending, toggleFavorite, toast } = useApp();
-  const reduced = useReducedMotion();
+export function ProductCard({ product }: { product: Product }) {
+  const { state, toggleFavorite, toast } = useApp();
   const liked = state.favorites.includes(product.id);
   const sold = product.status === "sold";
 
-  const openProduct = () => {
-    if (sold) return;
-    if (state.user) {
-      goApp("product", product.id);
-    } else {
-      setPending({ screen: "app", page: "product", productId: product.id });
-      goAuth("login");
-      toast("info", "Đăng nhập để xem chi tiết", "Chỉ cần vài giây trong chế độ demo.");
-    }
-  };
-
-  const onFavorite = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const onFavorite = () => {
     toggleFavorite(product.id);
-    if (!liked) {
-      toast("success", "Đã thêm vào yêu thích", product.name);
-    }
+    toast("success", liked ? "Đã bỏ khỏi Yêu thích" : "Đã lưu vào Yêu thích", product.name);
   };
 
   return (
-    <motion.article
-      initial={{ opacity: 0, y: reduced ? 0 : 22 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.5, delay: Math.min(index * 0.06, 0.36), ease: [0.22, 1, 0.36, 1] }}
-      whileHover={sold ? undefined : { y: -4 }}
-      onClick={openProduct}
+    <article
       className={cn(
-        "group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-border bg-card transition-shadow duration-300",
-        sold ? "cursor-default" : "hover:elevate-card-hover elevate-card"
+        "group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-[border-color,box-shadow] duration-200",
+        "hover:border-primary/40 hover:shadow-md focus-within:border-primary/40",
+        sold && "opacity-80"
       )}
     >
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div className="relative aspect-[4/3]">
         <SmartImage
           src={product.image}
-          alt={product.name}
+          alt=""
           className="h-full w-full"
-          imgClassName={cn(
-            "transition-transform duration-500 ease-out",
-            !sold && "group-hover:scale-[1.045]",
-            sold && "grayscale-[45%] opacity-80"
-          )}
+          sizes="(max-width: 640px) 100vw, (max-width: 1280px) 33vw, 300px"
+          imgClassName={cn("transition-transform duration-300", !sold && "group-hover:scale-[1.03]", sold && "grayscale-[40%]")}
         />
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-black/25 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         <span
           className={cn(
-            "absolute left-3 top-3 rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide backdrop-blur-sm",
-            sold ? "bg-forest/70 text-white" : "bg-white/90 text-forest"
+            "absolute left-3 top-3 rounded-full px-2.5 py-1 text-[12px] font-semibold",
+            product.status === "available" && "bg-card text-primary",
+            product.status === "sold" && "bg-black/70 text-white",
+            product.status === "draft" && "bg-earth text-white"
           )}
         >
-          {sold ? "Đã bán" : "Còn hàng"}
+          {STATUS_LABEL[product.status]}
         </span>
-        {product.isMine && (
-          <span className="absolute bottom-3 left-3 rounded-full bg-earth/90 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-white">
-            Tin của bạn
-          </span>
-        )}
-        <motion.button
-          type="button"
-          aria-label={liked ? "Bỏ yêu thích" : "Thêm vào yêu thích"}
-          aria-pressed={liked}
-          whileTap={{ scale: 0.82 }}
-          onClick={onFavorite}
-          className={cn(
-            "absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full shadow-sm transition-all duration-200",
-            liked
-              ? "bg-primary text-white shadow-primary/40"
-              : "bg-white/92 text-muted-foreground hover:bg-white hover:text-primary"
-          )}
-        >
-          <motion.span
-            key={liked ? "liked" : "unliked"}
-            initial={reduced ? false : { scale: 0.4 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 500, damping: 17 }}
-          >
-            <Heart className={cn("h-[17px] w-[17px]", liked && "fill-current")} />
-          </motion.span>
-        </motion.button>
       </div>
 
-      <div className="flex flex-1 flex-col gap-1.5 p-4">
-        <h3 className="line-clamp-2 min-h-[44px] text-[15px] font-semibold leading-snug text-foreground transition-colors duration-200 group-hover:text-primary">
-          {product.name}
+      <div className="flex flex-1 flex-col gap-1 p-3 sm:p-4">
+        <h3 className="line-clamp-2 text-[14px] font-semibold leading-snug text-foreground sm:text-[15px]">
+          {/* Link phủ cả thẻ (after:inset-0) — một vùng bấm lớn, vẫn là thẻ <a> thật */}
+          <Link
+            href={ROUTES.product(product.id)}
+            className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
+          >
+            {product.name}
+          </Link>
         </h3>
-        <p className="text-[17px] font-extrabold text-primary">
-          {formatPrice(product.price, product.unit)}
-        </p>
-        <div className="mt-1 flex items-center justify-between gap-2 text-[12.5px] text-muted-foreground">
+        <p className="text-[16px] font-bold text-primary sm:text-[17px]">{formatPrice(product.price, product.unit)}</p>
+        <div className="mt-auto flex items-center justify-between gap-2 pt-1 text-[12px] text-muted-foreground sm:text-[13px]">
           <span className="flex min-w-0 items-center gap-1">
-            <MapPin className="h-3.5 w-3.5 shrink-0" />
+            <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             <span className="truncate">{product.area}</span>
           </span>
-          <span className="flex shrink-0 items-center gap-1">
-            <Clock className="h-3.5 w-3.5" />
+          {/* Thẻ hẹp (2 cột trên điện thoại): ưu tiên chỗ cho khu vực */}
+          <span className="hidden shrink-0 items-center gap-1 sm:flex">
+            <Clock className="h-3.5 w-3.5" aria-hidden="true" />
             {formatHoursAgo(product.postedHoursAgo)}
           </span>
         </div>
       </div>
-    </motion.article>
+
+      {/* Nút tim nằm trên lớp link (z-10) để bấm riêng được */}
+      <button
+        type="button"
+        onClick={onFavorite}
+        aria-label={liked ? `Bỏ yêu thích ${product.name}` : `Lưu ${product.name} vào Yêu thích`}
+        aria-pressed={liked}
+        className={cn(
+          "absolute right-2 top-2 z-10 flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-150",
+          liked ? "text-white" : "text-foreground/70 hover:text-primary"
+        )}
+      >
+        <span
+          className={cn(
+            "flex h-9 w-9 items-center justify-center rounded-full border shadow-sm",
+            liked ? "border-primary bg-primary" : "border-border bg-card"
+          )}
+        >
+          <Heart className={cn("h-[17px] w-[17px]", liked && "fill-current")} aria-hidden="true" />
+        </span>
+      </button>
+    </article>
   );
 }

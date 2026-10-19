@@ -1,22 +1,7 @@
-import type {
-  ActivityItem,
-  Category,
-  CollectionRequest,
-  Product,
-} from "@/types";
+import type { Category, CollectionRequest, Product } from "@/types";
 
-/** Ảnh OSS do image-search thu thập — link ổn định, có thể nhúng trực tiếp. */
+/** Ảnh sản phẩm mẫu (CDN ngoài, được next/image tối ưu — xem next.config.ts). */
 export const IMAGES = {
-  heroMain: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/2da7de9b86f9.jpg",
-  heroCity: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/ad2e7a02b700.jpg",
-  heroCityAlt: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/b224f2f9bd76.jpg",
-  heroRecycleAlt: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/84639d5386f4.jpg",
-  authLeaves: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/dcfb455b3992.jpg",
-  authLeavesAlt: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/bc3349485246.jpg",
-  serviceTruck: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/9ff521aa7d08.jpg",
-  serviceTruckAlt: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/1aefe6d81491.jpg",
-  serviceWorker: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/6cd8d7636ba8.jpg",
-  serviceWorkerAlt: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/ae530f0db2e5.jpg",
   paper: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/ce3ae40f7fb9.jpg",
   plastic: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/095bde95f3a7.jpg",
   metal: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/f7ed1a62ed2d.jpg",
@@ -319,49 +304,4 @@ export const REQUESTS: CollectionRequest[] = [
     hoursAgo: 30,
     status: "done",
   },
-];
-
-export const ACTIVITIES: ActivityItem[] = [
-  {
-    id: "a1",
-    type: "match",
-    title: "Kết nối mới",
-    description: "Chai nhựa PET đã phân loại vừa được người thu mua quan tâm.",
-    time: "12 phút trước",
-  },
-  {
-    id: "a2",
-    type: "listing",
-    title: "Tin đăng mới",
-    description: "Giấy carton sạch — đã ép kiện được đăng tại Bình Thạnh.",
-    time: "2 giờ trước",
-  },
-  {
-    id: "a3",
-    type: "collection",
-    title: "Yêu cầu thu gom",
-    description: "Một hộ gia đình tại Quận 3 yêu cầu thu gom 25kg giấy.",
-    time: "3 giờ trước",
-  },
-  {
-    id: "a4",
-    type: "recycle",
-    title: "Tái chế thành công",
-    description: "Lô lon nhôm 8kg được đưa vào chu trình tái chế.",
-    time: "Hôm qua",
-  },
-  {
-    id: "a5",
-    type: "match",
-    title: "Kết nối mới",
-    description: "Bàn gỗ cũ có 3 lượt liên hệ trong hôm nay.",
-    time: "Hôm qua",
-  },
-];
-
-export const IMPACT_STATS = [
-  { id: "listings", value: 1248, suffix: "+", label: "Tin đăng trên sàn" },
-  { id: "matches", value: 3560, suffix: "+", label: "Lượt kết nối" },
-  { id: "tons", value: 187, suffix: " tấn", label: "Vật liệu đã tái chế" },
-  { id: "requests", value: 2145, suffix: "+", label: "Yêu cầu thu gom" },
 ];

@@ -11,14 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import { PRODUCTS, REQUESTS } from "@/data/mock-data";
-import type {
-  AppPage,
-  CollectionRequest,
-  DemoUser,
-  Product,
-  Route,
-  ToastItem,
-} from "@/types";
+import type { CollectionRequest, DemoUser, Product, ToastItem } from "@/types";
 
 const STORAGE_KEY = "greencity-demo-v1";
 
@@ -30,10 +23,13 @@ interface PersistShape {
 }
 
 interface AppState {
-  route: Route;
-  pendingRoute: Route | null;
-  discoverPreset: string;
+  /** true sau khi đã đọc localStorage — trước đó chưa biết người dùng đã đăng nhập hay chưa. */
+  ready: boolean;
   user: DemoUser | null;
+  /** false → phiên đăng nhập không được lưu lại khi tải lại trang. */
+  remember: boolean;
+  /** true ngay sau khi người dùng tự bấm đăng xuất → về trang chủ thay vì trang đăng nhập. */
+  signedOut: boolean;
   products: Product[];
   favorites: string[];
   requests: CollectionRequest[];
@@ -41,12 +37,9 @@ interface AppState {
 }
 
 type Action =
-  | { type: "NAVIGATE"; route: Route }
-  | { type: "SET_PENDING"; route: Route | null }
-  | { type: "SET_DISCOVER_PRESET"; preset: string }
-  | { type: "LOGIN"; user: DemoUser }
+  | { type: "LOGIN"; user: DemoUser; remember: boolean }
   | { type: "LOGOUT" }
-  | { type: "HYDRATE"; data: PersistShape }
+  | { type: "HYDRATE"; data: PersistShape | null }
   | { type: "TOGGLE_FAVORITE"; id: string }
   | { type: "ADD_PRODUCT"; product: Product }
   | { type: "REMOVE_PRODUCT"; id: string }
@@ -56,10 +49,10 @@ type Action =
   | { type: "DISMISS_TOAST"; id: string };
 
 const initialState: AppState = {
-  route: { screen: "landing" },
-  pendingRoute: null,
-  discoverPreset: "all",
+  ready: false,
   user: null,
+  remember: true,
+  signedOut: false,
   products: PRODUCTS,
   favorites: [],
   requests: REQUESTS,
@@ -68,32 +61,20 @@ const initialState: AppState = {
 
 function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
-    case "NAVIGATE":
-      return { ...state, route: action.route };
-    case "SET_PENDING":
-      return { ...state, pendingRoute: action.route };
-    case "SET_DISCOVER_PRESET":
-      return { ...state, discoverPreset: action.preset };
     case "LOGIN":
-      return {
-        ...state,
-        user: action.user,
-        route: state.pendingRoute ?? { screen: "app", page: "dashboard" },
-        pendingRoute: null,
-      };
+      return { ...state, user: action.user, remember: action.remember, signedOut: false };
     case "LOGOUT":
-      return { ...state, user: null, route: { screen: "landing" }, pendingRoute: null };
+      return { ...state, user: null, signedOut: true };
     case "HYDRATE": {
+      if (!action.data) return { ...state, ready: true };
       const { user, favorites, myListings, myRequests } = action.data;
-      const mine = [...(myListings ?? []), ...PRODUCTS];
-      const reqs = [...(myRequests ?? []), ...REQUESTS];
       return {
         ...state,
+        ready: true,
         user,
         favorites: favorites ?? [],
-        products: mine,
-        requests: reqs,
-        route: user ? { screen: "app", page: "dashboard" } : state.route,
+        products: [...(myListings ?? []), ...PRODUCTS],
+        requests: [...(myRequests ?? []), ...REQUESTS],
       };
     }
     case "TOGGLE_FAVORITE": {
@@ -116,7 +97,7 @@ function reducer(state: AppState, action: Action): AppState {
         ? { ...state, user: { ...state.user, name: action.name, email: action.email } }
         : state;
     case "PUSH_TOAST":
-      return { ...state, toasts: [...state.toasts.slice(-3), action.toast] };
+      return { ...state, toasts: [...state.toasts.slice(-2), action.toast] };
     case "DISMISS_TOAST":
       return { ...state, toasts: state.toasts.filter((t) => t.id !== action.id) };
     default:
@@ -126,26 +107,15 @@ function reducer(state: AppState, action: Action): AppState {
 
 interface AppContextValue {
   state: AppState;
-  navigate: (route: Route) => void;
-  goLanding: () => void;
-  goAuth: (mode?: "login" | "register" | "forgot") => void;
-  goApp: (page: AppPage, productId?: string) => void;
-  setPending: (route: Route | null) => void;
-  setDiscoverPreset: (preset: string) => void;
-  login: (user: DemoUser) => void;
+  login: (user: DemoUser, remember?: boolean) => void;
   logout: () => void;
   toggleFavorite: (id: string) => void;
   addProduct: (product: Product) => void;
   removeProduct: (id: string) => void;
   addRequest: (request: CollectionRequest) => void;
   updateUser: (name: string, email: string) => void;
-  toast: (
-    kind: ToastItem["kind"],
-    title: string,
-    description?: string
-  ) => void;
+  toast: (kind: ToastItem["kind"], title: string, description?: string) => void;
   dismissToast: (id: string) => void;
-  isFavorite: (id: string) => boolean;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -154,118 +124,62 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const hydratedRef = useRef(false);
 
-  // Hydrate persisted demo session on mount
+  // Đọc phiên demo đã lưu
   useEffect(() => {
+    let data: PersistShape | null = null;
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const data = JSON.parse(raw) as PersistShape;
-        dispatch({ type: "HYDRATE", data });
-      }
+      if (raw) data = JSON.parse(raw) as PersistShape;
     } catch {
-      /* ignore corrupted storage */
+      /* dữ liệu hỏng — bắt đầu phiên mới */
     }
+    dispatch({ type: "HYDRATE", data });
     hydratedRef.current = true;
   }, []);
 
-  // Persist demo session
+  // Lưu phiên demo
   useEffect(() => {
     if (!hydratedRef.current) return;
     try {
       const payload: PersistShape = {
-        user: state.user,
+        user: state.remember ? state.user : null,
         favorites: state.favorites,
         myListings: state.products.filter((p) => p.isMine),
         myRequests: state.requests.filter((r) => r.isMine),
       };
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
     } catch {
-      /* storage full — demo still works in-memory */
+      /* bộ nhớ đầy — demo vẫn chạy trong phiên hiện tại */
     }
-  }, [state.user, state.favorites, state.products, state.requests]);
+  }, [state.user, state.remember, state.favorites, state.products, state.requests]);
 
-  const navigate = useCallback((route: Route) => {
-    dispatch({ type: "NAVIGATE", route });
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
-    }
-  }, []);
-
-  const goLanding = useCallback(() => {
-    dispatch({ type: "NAVIGATE", route: { screen: "landing" } });
-    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
-  }, []);
-
-  const goAuth = useCallback((mode: "login" | "register" | "forgot" = "login") => {
-    dispatch({ type: "NAVIGATE", route: { screen: "auth", mode } });
-    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
-  }, []);
-
-  const goApp = useCallback((page: AppPage, productId?: string) => {
-    dispatch({ type: "NAVIGATE", route: { screen: "app", page, productId } });
-    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
-  }, []);
-
-  const setPending = useCallback((route: Route | null) => {
-    dispatch({ type: "SET_PENDING", route });
-  }, []);
-
-  const setDiscoverPreset = useCallback((preset: string) => {
-    dispatch({ type: "SET_DISCOVER_PRESET", preset });
-  }, []);
-
-  const login = useCallback((user: DemoUser) => dispatch({ type: "LOGIN", user }), []);
-  const logout = useCallback(() => dispatch({ type: "LOGOUT" }), []);
-
-  const toggleFavorite = useCallback((id: string) => {
-    dispatch({ type: "TOGGLE_FAVORITE", id });
-  }, []);
-
-  const addProduct = useCallback((product: Product) => {
-    dispatch({ type: "ADD_PRODUCT", product });
-  }, []);
-
-  const removeProduct = useCallback((id: string) => {
-    dispatch({ type: "REMOVE_PRODUCT", id });
-  }, []);
-
-  const addRequest = useCallback((request: CollectionRequest) => {
-    dispatch({ type: "ADD_REQUEST", request });
-  }, []);
-
-  const updateUser = useCallback((name: string, email: string) => {
-    dispatch({ type: "UPDATE_USER", name, email });
-  }, []);
-
-  const dismissToast = useCallback((id: string) => {
-    dispatch({ type: "DISMISS_TOAST", id });
-  }, []);
-
-  const toast = useCallback(
-    (kind: ToastItem["kind"], title: string, description?: string) => {
-      const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-      dispatch({ type: "PUSH_TOAST", toast: { id, kind, title, description } });
-      window.setTimeout(() => {
-        dispatch({ type: "DISMISS_TOAST", id });
-      }, 4200);
-    },
+  const login = useCallback(
+    (user: DemoUser, remember = true) => dispatch({ type: "LOGIN", user, remember }),
     []
   );
-
-  const isFavorite = useCallback(
-    (id: string) => state.favorites.includes(id),
-    [state.favorites]
+  const logout = useCallback(() => dispatch({ type: "LOGOUT" }), []);
+  const toggleFavorite = useCallback((id: string) => dispatch({ type: "TOGGLE_FAVORITE", id }), []);
+  const addProduct = useCallback((product: Product) => dispatch({ type: "ADD_PRODUCT", product }), []);
+  const removeProduct = useCallback((id: string) => dispatch({ type: "REMOVE_PRODUCT", id }), []);
+  const addRequest = useCallback(
+    (request: CollectionRequest) => dispatch({ type: "ADD_REQUEST", request }),
+    []
   );
+  const updateUser = useCallback(
+    (name: string, email: string) => dispatch({ type: "UPDATE_USER", name, email }),
+    []
+  );
+  const dismissToast = useCallback((id: string) => dispatch({ type: "DISMISS_TOAST", id }), []);
+
+  const toast = useCallback((kind: ToastItem["kind"], title: string, description?: string) => {
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    dispatch({ type: "PUSH_TOAST", toast: { id, kind, title, description } });
+    window.setTimeout(() => dispatch({ type: "DISMISS_TOAST", id }), 4000);
+  }, []);
 
   const value = useMemo<AppContextValue>(
     () => ({
       state,
-      navigate,
-      goLanding,
-      goAuth,
-      goApp,
-      setPending,
-      setDiscoverPreset,
       login,
       logout,
       toggleFavorite,
@@ -275,27 +189,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       updateUser,
       toast,
       dismissToast,
-      isFavorite,
     }),
-    [
-      state,
-      navigate,
-      goLanding,
-      goAuth,
-      goApp,
-      setPending,
-      setDiscoverPreset,
-      login,
-      logout,
-      toggleFavorite,
-      addProduct,
-      removeProduct,
-      addRequest,
-      updateUser,
-      toast,
-      dismissToast,
-      isFavorite,
-    ]
+    [state, login, logout, toggleFavorite, addProduct, removeProduct, addRequest, updateUser, toast, dismissToast]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

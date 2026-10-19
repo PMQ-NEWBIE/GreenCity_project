@@ -1,306 +1,246 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import {
-  Bell,
   Compass,
   Heart,
-  LayoutDashboard,
+  House,
   LogOut,
-  Menu,
-  Package,
-  Recycle,
+  PackagePlus,
   Truck,
   UserRound,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import { useApp } from "@/store/app-store";
-import { Logo } from "@/components/greencity/Logo";
-import { DashboardView } from "./DashboardView";
-import { DiscoverView } from "./DiscoverView";
-import { ProductDetailView } from "./ProductDetailView";
-import { SellView } from "./SellView";
-import { CollectView } from "./CollectView";
-import { FavoritesView } from "./FavoritesView";
-import { ProfileView } from "./ProfileView";
+import { Logo, LogoMark } from "@/components/greencity/Logo";
+import { ThemeToggle } from "@/components/greencity/ThemeToggle";
+import { ROUTES, loginHref } from "@/lib/routes";
 import { initialsOf } from "@/utils/format";
 import { cn } from "@/lib/utils";
-import type { AppPage } from "@/types";
 
-const NAV_ITEMS: { page: AppPage; label: string; icon: typeof LayoutDashboard }[] = [
-  { page: "dashboard", label: "Tổng quan", icon: LayoutDashboard },
-  { page: "discover", label: "Khám phá", icon: Compass },
-  { page: "sell", label: "Đăng tin bán", icon: Package },
-  { page: "collect", label: "Yêu cầu thu gom", icon: Truck },
-  { page: "favorites", label: "Yêu thích", icon: Heart },
-  { page: "profile", label: "Hồ sơ cá nhân", icon: UserRound },
-];
-
-const PAGE_TITLES: Record<AppPage, string> = {
-  dashboard: "Tổng quan",
-  discover: "Khám phá sản phẩm",
-  product: "Chi tiết sản phẩm",
-  sell: "Đăng tin bán hàng",
-  collect: "Yêu cầu thu gom",
-  favorites: "Sản phẩm yêu thích",
-  profile: "Hồ sơ cá nhân",
-};
-
-function NavPill({ item, active, onClick, badge }: { item: (typeof NAV_ITEMS)[number]; active: boolean; onClick: () => void; badge?: number }) {
-  const Icon = item.icon;
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-current={active ? "page" : undefined}
-      className={cn(
-        "group relative flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-[14px] font-semibold transition-colors duration-200",
-        active ? "text-primary" : "text-foreground/62 hover:bg-accent/70 hover:text-forest"
-      )}
-    >
-      {active && (
-        <motion.span
-          layoutId="nav-pill"
-          transition={{ type: "spring", stiffness: 420, damping: 32 }}
-          className="absolute inset-0 rounded-2xl bg-accent"
-        />
-      )}
-      <Icon className={cn("relative h-[19px] w-[19px] transition-transform duration-200", !active && "group-hover:scale-110")} />
-      <span className="relative">{item.label}</span>
-      {item.page === "favorites" && badge !== undefined && badge > 0 && (
-        <span className="relative ml-auto rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold text-white">
-          {badge}
-        </span>
-      )}
-    </button>
-  );
+interface NavItem {
+  href: string;
+  label: string;
+  /** Nhãn ngắn cho thanh điều hướng đáy trên điện thoại */
+  short: string;
+  icon: LucideIcon;
 }
 
-export function AppShell() {
-  const { state, goApp, logout, toast, setDiscoverPreset } = useApp();
-  const route = state.route as { screen: "app"; page: AppPage; productId?: string };
-  const page = route.page;
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [notifOpen, setNotifOpen] = useState(false);
-  const favCount = state.favorites.length;
+const NAV: NavItem[] = [
+  { href: ROUTES.dashboard, label: "Tổng quan", short: "Tổng quan", icon: House },
+  { href: ROUTES.discover, label: "Khám phá & mua", short: "Khám phá", icon: Compass },
+  { href: ROUTES.sell, label: "Đăng tin bán", short: "Đăng tin", icon: PackagePlus },
+  { href: ROUTES.collect, label: "Gọi thu gom", short: "Thu gom", icon: Truck },
+  { href: ROUTES.favorites, label: "Đã lưu", short: "Đã lưu", icon: Heart },
+  { href: ROUTES.profile, label: "Hồ sơ của tôi", short: "Hồ sơ", icon: UserRound },
+];
 
+/** Thanh đáy trên điện thoại: 5 mục, "Đăng tin" ở giữa. "Đã lưu" nằm ở thanh trên. */
+const MOBILE_NAV = [NAV[0], NAV[1], NAV[2], NAV[3], NAV[5]];
+
+const PAGE_TITLES: { prefix: string; title: string }[] = [
+  { prefix: ROUTES.dashboard, title: "Tổng quan" },
+  { prefix: ROUTES.discover, title: "Khám phá & mua" },
+  { prefix: "/san-pham", title: "Chi tiết tin đăng" },
+  { prefix: ROUTES.sell, title: "Đăng tin bán" },
+  { prefix: ROUTES.collect, title: "Gọi thu gom" },
+  { prefix: ROUTES.favorites, title: "Đã lưu" },
+  { prefix: ROUTES.profile, title: "Hồ sơ của tôi" },
+];
+
+const DEMO_BANNER_KEY = "greencity-demo-banner-hidden";
+
+function isActive(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+export function AppShell({ children }: { children: React.ReactNode }) {
+  const { state, logout, toast } = useApp();
+  const router = useRouter();
+  const pathname = usePathname();
+  // Banner chỉ hiện sau khi store sẵn sàng (sau hydrate) nên đọc localStorage ngay ở đây không gây lệch HTML
+  const [bannerHidden, setBannerHidden] = useState(() => {
+    try {
+      return typeof window !== "undefined" && window.localStorage.getItem(DEMO_BANNER_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
   const user = state.user;
 
-  // Guard: khi logout, AnimatePresence vẫn giữ shell trong lúc exit — tránh crash null
-  if (!user) return null;
+  // Chưa đăng nhập → sang trang đăng nhập (xong quay lại đúng trang này).
+  // Vừa tự bấm đăng xuất → về trang chủ.
+  useEffect(() => {
+    if (state.ready && !user) router.replace(state.signedOut ? ROUTES.home : loginHref(pathname));
+  }, [state.ready, state.signedOut, user, pathname, router]);
 
-  const goPage = (p: AppPage) => {
-    setDrawerOpen(false);
-    setNotifOpen(false);
-    setDiscoverPreset("all");
-    goApp(p);
+  if (!state.ready || !user) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-background" aria-busy="true">
+        <LogoMark size={64} className="opacity-80" />
+        <span className="sr-only">Đang tải…</span>
+      </div>
+    );
+  }
+
+  const title = PAGE_TITLES.find((p) => pathname.startsWith(p.prefix))?.title ?? "Green City";
+  const favCount = state.favorites.length;
+
+  const onLogout = () => {
+    logout();
+    toast("info", "Đã đăng xuất", "Hẹn gặp lại bạn.");
   };
 
-  const sidebarContent = (
-    <div className="flex h-full flex-col">
-      <div className="px-6 pb-4 pt-6">
-        <Logo size={40} />
-      </div>
-      <nav className="nice-scroll flex flex-1 flex-col gap-1 overflow-y-auto px-4" aria-label="Điều hướng ứng dụng">
-        {NAV_ITEMS.map((item) => (
-          <NavPill key={item.page} item={item} active={page === item.page} onClick={() => goPage(item.page)} badge={item.page === "favorites" ? favCount : undefined} />
-        ))}
-      </nav>
-      <div className="mt-4 border-t border-border px-4 pb-5 pt-4">
-        <div className="flex items-center gap-3 rounded-2xl bg-[#f3f8f2] p-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-b from-[#2a9a5d] to-primary text-[15px] font-bold text-white shadow-md shadow-primary/25">
+  const hideBanner = () => {
+    setBannerHidden(true);
+    try {
+      window.localStorage.setItem(DEMO_BANNER_KEY, "1");
+    } catch {
+      /* không lưu được thì chỉ ẩn trong phiên này */
+    }
+  };
+
+  return (
+    <div className="min-h-dvh bg-background lg:grid lg:grid-cols-[256px_minmax(0,1fr)]">
+      {/* ---------- Sidebar (desktop) ---------- */}
+      <aside className="sticky top-0 hidden h-dvh flex-col border-r border-border bg-card lg:flex">
+        <Link href={ROUTES.dashboard} className="mx-5 mb-4 mt-5 w-fit rounded-xl" aria-label="Về trang Tổng quan">
+          <Logo size={44} />
+        </Link>
+        <nav aria-label="Điều hướng chính" className="flex flex-1 flex-col gap-1 overflow-y-auto px-3">
+          {NAV.map((item) => {
+            const active = isActive(pathname, item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "flex min-h-11 items-center gap-3 rounded-xl px-3.5 text-[15px] font-semibold transition-colors duration-150",
+                  active ? "bg-accent text-primary" : "text-foreground/75 hover:bg-muted hover:text-foreground"
+                )}
+              >
+                <item.icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                {item.label}
+                {item.href === ROUTES.favorites && favCount > 0 && (
+                  <span className="ml-auto rounded-full bg-primary px-2 py-0.5 text-[12px] font-bold text-primary-foreground">
+                    {favCount}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="m-3 flex items-center gap-3 rounded-2xl border border-border p-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-[14px] font-bold text-primary-foreground">
             {initialsOf(user.name)}
           </span>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[13.5px] font-bold text-forest">{user.name}</p>
+            <p className="truncate text-[14px] font-bold text-foreground">{user.name}</p>
             <p className="truncate text-[12px] text-muted-foreground">{user.email}</p>
           </div>
           <button
             type="button"
-            onClick={() => {
-              toast("info", "Đã đăng xuất (demo)", "Hẹn gặp lại bạn ở phiên trình diễn sau.");
-              logout();
-            }}
+            onClick={onLogout}
             aria-label="Đăng xuất"
             title="Đăng xuất"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-muted-foreground transition-all duration-200 hover:bg-white hover:text-destructive"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-destructive"
           >
-            <LogOut className="h-4.5 w-4.5" />
+            <LogOut className="h-[18px] w-[18px]" aria-hidden="true" />
           </button>
         </div>
-      </div>
-    </div>
-  );
-
-  return (
-    <div className="flex min-h-dvh bg-background">
-      {/* Sidebar desktop */}
-      <aside className="sticky top-0 hidden h-dvh w-[272px] shrink-0 border-r border-border bg-white lg:block">
-        {sidebarContent}
       </aside>
 
-      {/* Drawer mobile */}
-      <AnimatePresence>
-        {drawerOpen && (
-          <>
-            <motion.div
-              key="drawer-backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.22 }}
-              className="fixed inset-0 z-40 bg-forest/40 backdrop-blur-[2px] lg:hidden"
-              onClick={() => setDrawerOpen(false)}
-            />
-            <motion.aside
-              key="drawer"
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed inset-y-0 left-0 z-50 w-[290px] border-r border-border bg-white shadow-2xl lg:hidden"
-            >
-              <button
-                type="button"
-                onClick={() => setDrawerOpen(false)}
-                aria-label="Đóng menu"
-                className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted"
+      <div className="flex min-w-0 flex-col">
+        {/* ---------- Thanh trên ---------- */}
+        <header className="sticky top-0 z-30 border-b border-border bg-background/95">
+          <div className="flex h-16 items-center gap-2 px-4 sm:px-6 lg:px-8">
+            <Link href={ROUTES.dashboard} className="rounded-xl lg:hidden" aria-label="Về trang Tổng quan">
+              <Logo size={36} withText={false} />
+            </Link>
+            <h1 className="ml-1 truncate text-[17px] font-bold text-foreground lg:ml-0">{title}</h1>
+            <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+              <Link
+                href={ROUTES.favorites}
+                aria-label={`Đã lưu (${favCount})`}
+                className="relative flex h-11 w-11 items-center justify-center rounded-xl text-foreground/75 hover:bg-muted hover:text-foreground lg:hidden"
               >
-                <X className="h-5 w-5" />
-              </button>
-              {sidebarContent}
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Vùng nội dung */}
-      <div className="flex min-w-0 flex-1 flex-col">
-        {/* Topbar */}
-        <header className="sticky top-0 z-30 glass-header border-b border-border/80">
-          <div className="flex h-16 items-center gap-3 px-4 sm:px-6 lg:px-8">
-            <button
-              type="button"
-              onClick={() => setDrawerOpen(true)}
-              aria-label="Mở menu"
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-white text-foreground transition-colors hover:bg-muted lg:hidden"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
-            <div className="lg:hidden">
-              <Logo size={32} />
-            </div>
-            <h1 className="hidden text-[17px] font-bold tracking-tight text-forest lg:block">
-              {PAGE_TITLES[page]}
-            </h1>
-            <div className="ml-auto flex items-center gap-2.5">
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setNotifOpen((o) => !o)}
-                  aria-label="Thông báo"
-                  className={cn(
-                    "relative flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-white text-foreground/70 transition-colors hover:text-primary",
-                    notifOpen && "border-primary/50 text-primary"
-                  )}
-                >
-                  <Bell className="h-[18px] w-[18px]" />
-                  <span className="absolute -right-0.5 -top-0.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-warn text-[10px] font-bold text-white">
-                    3
+                <Heart className="h-5 w-5" aria-hidden="true" />
+                {favCount > 0 && (
+                  <span className="absolute right-1.5 top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-primary px-1 text-[11px] font-bold text-primary-foreground">
+                    {favCount}
                   </span>
-                </button>
-                <AnimatePresence>
-                  {notifOpen && (
-                    <>
-                      <button
-                        type="button"
-                        aria-label="Đóng thông báo"
-                        className="fixed inset-0 z-40 cursor-default"
-                        onClick={() => setNotifOpen(false)}
-                      />
-                    <motion.div
-                      initial={{ opacity: 0, y: -8, scale: 0.97 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -8, scale: 0.97 }}
-                      transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                      className="absolute right-0 top-12 z-50 w-[300px] overflow-hidden rounded-2xl border border-border bg-white shadow-xl"
-                    >
-                      <p className="border-b border-border bg-[#fafcfa] px-4 py-3 text-[13px] font-bold text-forest">
-                        Thông báo (demo)
-                      </p>
-                      <div className="flex flex-col">
-                        {[
-                          { icon: Heart, t: "Có người quan tâm tin của bạn", d: "Chai nhựa PET — Quận 7", time: "5 phút trước" },
-                          { icon: Truck, t: "Yêu cầu thu gom đã được ghép", d: "Người thu gom tại Quận 3", time: "1 giờ trước" },
-                          { icon: Recycle, t: "Lô lon nhôm đã tái chế", d: "8kg — Tân Bình", time: "Hôm qua" },
-                        ].map((n, i) => (
-                          <div key={i} className="flex items-start gap-3 border-b border-border/60 px-4 py-3 transition-colors last:border-0 hover:bg-accent/50">
-                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent text-primary">
-                              <n.icon className="h-4 w-4" />
-                            </span>
-                            <div className="min-w-0">
-                              <p className="text-[13px] font-semibold leading-snug text-foreground">{n.t}</p>
-                              <p className="mt-0.5 text-[12px] text-muted-foreground">{n.d}</p>
-                              <p className="mt-0.5 text-[11px] text-muted-foreground/70">{n.time}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </motion.div>
-                    </>
-                  )}
-                </AnimatePresence>
-              </div>
-              <button
-                type="button"
-                onClick={() => goPage("profile")}
-                aria-label="Hồ sơ cá nhân"
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-b from-[#2a9a5d] to-primary text-[13px] font-bold text-white shadow-md shadow-primary/25"
+                )}
+              </Link>
+              <ThemeToggle />
+              <Link
+                href={ROUTES.profile}
+                aria-label="Hồ sơ của tôi"
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-[13px] font-bold text-primary-foreground"
               >
                 {initialsOf(user.name)}
-              </button>
+              </Link>
             </div>
           </div>
+          {!bannerHidden && (
+            <div className="flex items-center gap-3 border-t border-border bg-accent px-4 py-2 text-[13px] text-accent-foreground sm:px-6 lg:px-8">
+              <p className="flex-1">
+                Bạn đang dùng <strong>bản demo</strong>: dữ liệu là minh họa và chỉ lưu trên trình duyệt này.
+              </p>
+              <button
+                type="button"
+                onClick={hideBanner}
+                aria-label="Ẩn thông báo bản demo"
+                className="-my-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg hover:bg-background/60"
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
+          )}
         </header>
 
-        {/* Nội dung trang */}
-        <main className="relative flex-1 overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`${page}-${route.productId ?? ""}`}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-              className="min-h-full"
-            >
-              <PageRouter page={page} productId={route.productId} />
-            </motion.div>
-          </AnimatePresence>
+        {/* ---------- Nội dung ---------- */}
+        <main key={pathname} className="page-enter flex-1 pb-28 lg:pb-12">
+          {children}
         </main>
       </div>
+
+      {/* ---------- Thanh đáy (điện thoại / máy tính bảng) ---------- */}
+      <nav
+        aria-label="Điều hướng chính"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card pb-[env(safe-area-inset-bottom)] lg:hidden"
+      >
+        <ul className="mx-auto grid max-w-lg grid-cols-5">
+          {MOBILE_NAV.map((item) => {
+            const active = isActive(pathname, item.href);
+            const isSell = item.href === ROUTES.sell;
+            return (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "flex min-h-16 flex-col items-center justify-center gap-1 text-[11.5px] font-semibold",
+                    active ? "text-primary" : "text-muted-foreground"
+                  )}
+                >
+                  {isSell ? (
+                    <span className="flex h-9 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+                      <item.icon className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                  ) : (
+                    <item.icon className="h-[22px] w-[22px]" aria-hidden="true" />
+                  )}
+                  {item.short}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
     </div>
   );
-}
-
-function PageRouter({ page, productId }: { page: AppPage; productId?: string }) {
-  switch (page) {
-    case "dashboard":
-      return <DashboardView />;
-    case "discover":
-      return <DiscoverView />;
-    case "product":
-      return <ProductDetailView productId={productId} />;
-    case "sell":
-      return <SellView />;
-    case "collect":
-      return <CollectView />;
-    case "favorites":
-      return <FavoritesView />;
-    case "profile":
-      return <ProfileView />;
-    default:
-      return <DashboardView />;
-  }
 }

@@ -8,7 +8,7 @@ export type CategoryId =
 
 export type Unit = "kg" | "món" | "lô" | "chai";
 
-export type ProductStatus = "available" | "sold";
+export type ProductStatus = "available" | "sold" | "draft";
 
 export type SellerType = "individual" | "collector" | "scrapyard";
 
@@ -66,33 +66,11 @@ export interface DemoUser {
   memberSince: string;
 }
 
-export type AppPage =
-  | "dashboard"
-  | "discover"
-  | "product"
-  | "sell"
-  | "collect"
-  | "favorites"
-  | "profile";
-
-export type Route =
-  | { screen: "landing" }
-  | { screen: "auth"; mode: "login" | "register" | "forgot" }
-  | { screen: "app"; page: AppPage; productId?: string };
-
 export interface ToastItem {
   id: string;
   kind: "success" | "error" | "info";
   title: string;
   description?: string;
-}
-
-export interface ActivityItem {
-  id: string;
-  type: "listing" | "match" | "collection" | "recycle";
-  title: string;
-  description: string;
-  time: string;
 }
 
 export const AREAS = [

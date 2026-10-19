@@ -8,69 +8,58 @@ interface LogoProps {
   subtitle?: boolean;
 }
 
-/** Logo Green City — vòng tuần hoàn tái chế + mầm lá giữa tâm. */
-export function LogoMark({ size = 40, id }: { size?: number; id?: string }) {
-  const gid = id ?? "gc-grad";
+/** Biểu tượng Green City — vòng tái chế, Chợ Bến Thành trên bàn tay lá (ảnh đã tách nền). */
+export function LogoMark({ size = 40, className }: { size?: number; className?: string }) {
   return (
-    <svg
+    <img
+      src="/logo-mark.webp"
       width={size}
       height={size}
-      viewBox="0 0 48 48"
-      fill="none"
-      role="img"
-      aria-label="Green City logo"
-    >
-      <defs>
-        <linearGradient id={gid} x1="8" y1="4" x2="40" y2="44" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#2FA763" />
-          <stop offset="1" stopColor="#14532D" />
-        </linearGradient>
-      </defs>
-      {/* Vòng tuần hoàn */}
-      <path
-        d="M24 5.5A18.5 18.5 0 0 1 42.5 24"
-        stroke={`url(#${gid})`}
-        strokeWidth="3.4"
-        strokeLinecap="round"
-      />
-      <path
-        d="M42.5 24A18.5 18.5 0 0 1 24 42.5"
-        stroke={`url(#${gid})`}
-        strokeWidth="3.4"
-        strokeLinecap="round"
-        opacity="0.7"
-      />
-      <path
-        d="M24 42.5A18.5 18.5 0 0 1 7.4 33.2"
-        stroke={`url(#${gid})`}
-        strokeWidth="3.4"
-        strokeLinecap="round"
-        opacity="0.5"
-      />
-      <path
-        d="M7.4 33.2A18.5 18.5 0 0 1 5.5 22"
-        stroke={`url(#${gid})`}
-        strokeWidth="3.4"
-        strokeLinecap="round"
-        opacity="0.35"
-      />
-      {/* Mũi tên vòng tuần hoàn */}
-      <path
-        d="M42.5 14.5v9.8h-9.8"
-        stroke={`url(#${gid})`}
-        strokeWidth="3.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      {/* Mầm lá giữa tâm */}
-      <path
-        d="M24 12.5c-8.4 2.7-13.2 8.3-13.2 15.5 0 6.9 4.5 11.7 10.8 11.7-2.5-2.1-3.9-4.8-3.9-8 0-2.5.8-4.6 2.3-6.2-.3 4.2 2.1 6.9 5.9 6.9 4.9 0 8-3.5 8-9 0-4.8-4.1-9.1-9.9-10.9z"
-        fill={`url(#${gid})`}
-      />
-      {/* Điểm nâu đất */}
-      <circle cx="39.6" cy="39" r="2.6" fill="#8B6848" />
-      <circle cx="9.2" cy="10.4" r="1.8" fill="#A7E8B2" />
+      alt="Green City logo"
+      draggable={false}
+      className={cn("shrink-0 select-none object-contain", className)}
+    />
+  );
+}
+
+/** Chiếc lá thay dấu chấm trên chữ "I" — giống wordmark trong logo. */
+function LeafDot({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={className}>
+      <path d="M4 21C4 11 10 4.5 21 3c-.6 11.2-7.3 17.6-17 18z" fill="currentColor" />
+      <path d="M4.5 20.5C9 15 12.5 11 17 7.5" stroke="white" strokeOpacity={0.55} strokeWidth={1.6} strokeLinecap="round" fill="none" />
     </svg>
+  );
+}
+
+/**
+ * Chữ "GREEN CITY" theo style logo: in hoa, nét hình học đậm,
+ * GREEN xanh rừng — CITY xanh mạ, có lá trên chữ I.
+ */
+export function Wordmark({
+  fontSize,
+  variant = "color",
+  className,
+}: {
+  fontSize: number;
+  variant?: "color" | "white";
+  className?: string;
+}) {
+  return (
+    <span
+      className={cn("whitespace-nowrap font-brand font-extrabold leading-none tracking-[-0.01em]", className)}
+      style={{ fontSize }}
+    >
+      <span className={variant === "white" ? "text-white" : "text-brand-green"}>GREEN</span>{" "}
+      <span className={variant === "white" ? "text-[#a3d65c]" : "text-brand-lime"}>
+        C
+        <span className="relative inline-block">
+          I
+          <LeafDot className="absolute -top-[0.36em] left-[0.02em] h-[0.42em] w-[0.42em]" />
+        </span>
+        TY
+      </span>
+    </span>
   );
 }
 
@@ -81,19 +70,26 @@ export function Logo({
   className,
   subtitle = false,
 }: LogoProps) {
-  const textColor = variant === "white" ? "text-white" : "text-forest";
-  const subColor = variant === "white" ? "text-mint/80" : "text-muted-foreground";
+  const subColor = variant === "white" ? "text-white/70" : "text-muted-foreground";
 
   return (
     <span className={cn("inline-flex items-center gap-2.5 select-none", className)}>
-      <LogoMark size={size} />
+      {variant === "white" ? (
+        // Nền tròn trắng giúp biểu tượng xanh nổi rõ trên nền gradient tối
+        <span
+          className="flex shrink-0 items-center justify-center rounded-full bg-white shadow-md"
+          style={{ width: size, height: size }}
+        >
+          <LogoMark size={Math.round(size * 0.84)} />
+        </span>
+      ) : (
+        <LogoMark size={size} />
+      )}
       {withText && (
         <span className="flex flex-col leading-none">
-          <span className={cn("font-extrabold tracking-tight", textColor)} style={{ fontSize: size * 0.46 }}>
-            Green<span className="text-leaf">City</span>
-          </span>
+          <Wordmark fontSize={size * 0.4} variant={variant} className="pt-[0.2em]" />
           {subtitle && (
-            <span className={cn("mt-1 font-medium tracking-wide", subColor)} style={{ fontSize: size * 0.26 }}>
+            <span className={cn("mt-1.5 font-medium tracking-wide", subColor)} style={{ fontSize: size * 0.26 }}>
               Turn Waste Into Value
             </span>
           )}

@@ -1,0 +1,115 @@
+/* ============================================================
+   LOBBY — CSS riêng. Màu dùng thang gc-* trong globals.css.
+   ============================================================ */
+
+/* ---------- Chống nháy nội dung trước intro ----------
+   Class .js được thêm bởi script inline trong <head> (layout.tsx).
+   - Tắt JS: không có .js → mọi thứ hiện bình thường.
+   - JS chạy: ẩn [data-intro] cho tới khi LobbyPage thêm .is-ready (sau khi GSAP đã đặt trạng thái đầu).
+   - JS lỗi giữa chừng: animation dự phòng tự hiện nội dung sau 2.5s. */
+.js .lobby:not(.is-ready) [data-intro] {
+  opacity: 0;
+  animation: lobby-fallback-reveal 0.4s ease-out 2.5s forwards;
+}
+@keyframes lobby-fallback-reveal {
+  to {
+    opacity: 1;
+  }
+}
+/* Điện thoại: nền + vật thể hiện ngay từ khung hình đầu (không chờ JS) → LCP nhanh trên máy yếu */
+@media (max-width: 767.98px) {
+  .js .lobby:not(.is-ready) [data-intro="desktop"] {
+    opacity: 1;
+    animation: none;
+  }
+}
+
+/* Lenis: tắt smooth-scroll gốc của trình duyệt khi Lenis đang chạy */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+/* ---------- Header ---------- */
+.lobby-header {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.lobby-header.is-hidden:not(:focus-within) {
+  transform: translateY(-110%);
+}
+.lobby-header__bg {
+  opacity: 0;
+  transform-origin: top;
+  transition:
+    opacity 0.25s ease,
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  background: rgb(243 249 238 / 0.82);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 0 rgb(24 96 40 / 0.12);
+}
+.lobby-header__bar {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+/* Thu nhỏ: nền co từ 76px → 64px, nội dung nhích lên giữa — chỉ dùng transform */
+.lobby-header.is-scrolled .lobby-header__bg {
+  opacity: 1;
+  transform: scaleY(0.842);
+}
+.lobby-header.is-scrolled .lobby-header__bar {
+  transform: translateY(-6px);
+}
+.lobby-header .lobby-header__logo {
+  transform-origin: left center;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.lobby-header.is-scrolled .lobby-header__logo {
+  transform: scale(0.9);
+}
+
+/* ---------- Hero ---------- */
+.lobby-outline-text {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--color-gc-800);
+  opacity: 0.14;
+}
+
+.lobby-hint-arrow {
+  animation: lobby-hint-bob 1.8s ease-in-out infinite;
+}
+@keyframes lobby-hint-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 0.55;
+  }
+}
+
+/* ---------- Film grain (ảnh tĩnh lặp lại — rẻ hơn nhiều so với SVG feTurbulence) ---------- */
+.lobby-grain {
+  background-image: url("/lobby/grain.png");
+  background-size: 128px 128px;
+  opacity: 0.04; /* 3–6% theo đặc tả */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lobby-hint-arrow {
+    animation: none;
+  }
+  .lobby-header,
+  .lobby-header__bg,
+  .lobby-header__bar,
+  .lobby-header .lobby-header__logo {
+    transition: none;
+  }
+}

@@ -1,4 +1,7 @@
 import type { Area } from "@/types";
+import { distanceMeters } from "@/lib/geo";
+
+export { distanceMeters };
 
 /** Tâm gần đúng của từng quận — dùng khi người dùng không cho lấy vị trí, và để rải dữ liệu mẫu. */
 export const AREA_CENTER: Record<Area, { lat: number; lng: number }> = {
@@ -14,16 +17,6 @@ export const AREA_CENTER: Record<Area, { lat: number; lng: number }> = {
   "Thủ Đức": { lat: 10.8494, lng: 106.7537 },
 };
 
-/** Khoảng cách (mét) giữa hai điểm theo công thức haversine. */
-export function distanceMeters(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
-  const R = 6_371_000;
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const dLat = toRad(b.lat - a.lat);
-  const dLng = toRad(b.lng - a.lng);
-  const h = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(h));
-}
-
 /** Quận gần nhất với một tọa độ (để điền sẵn khi lấy được vị trí). */
 export function nearestArea(p: { lat: number; lng: number }): Area {
   let best: Area = "Quận 1";
@@ -36,4 +29,9 @@ export function nearestArea(p: { lat: number; lng: number }): Area {
     }
   }
   return best;
+}
+
+/** Tọa độ trong khoảng TP.HCM (bỏ qua vị trí GPS sai lệch hoặc ở tỉnh khác). */
+export function inHcmc(p: { lat: number; lng: number }): boolean {
+  return p.lat > 10.35 && p.lat < 11.2 && p.lng > 106.3 && p.lng < 107.05;
 }

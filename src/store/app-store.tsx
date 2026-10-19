@@ -23,6 +23,7 @@ import { swapHydrate, swapInitial, swapReducer, type SwapAction, type SwapState 
 import { collectHydrate, collectInitial, collectReducer, type CollectAction, type CollectState } from "./slices/collect";
 import { partnersInitial, partnersReducer, type PartnersAction, type PartnersState } from "./slices/partners";
 import { binsHydrate, binsInitial, binsReducer, type BinsAction, type BinsState } from "./slices/bins";
+import { litterHydrate, litterInitial, litterReducer, type LitterAction, type LitterState } from "./slices/litter";
 
 export interface AppState {
   /** true sau khi đã đọc localStorage — trước đó chưa biết người dùng đã đăng nhập hay chưa. */
@@ -41,6 +42,7 @@ export interface AppState {
   collect: CollectState;
   partners: PartnersState;
   bins: BinsState;
+  litter: LitterState;
 }
 
 /** Thời điểm và id do nơi gọi tạo ra, để reducer luôn cho cùng kết quả với cùng một action. */
@@ -66,7 +68,8 @@ export type Action =
   | SwapAction
   | CollectAction
   | PartnersAction
-  | BinsAction;
+  | BinsAction
+  | LitterAction;
 
 const initialState: AppState = {
   ready: false,
@@ -82,6 +85,7 @@ const initialState: AppState = {
   collect: collectInitial,
   partners: partnersInitial,
   bins: binsInitial,
+  litter: litterInitial,
 };
 
 /** Người dùng chưa có điểm chào mừng thì cộng một lần (đọc số điểm từ POINT_RULES). */
@@ -110,6 +114,7 @@ export function reducer(state: AppState, action: Action): AppState {
   if (action.type.startsWith("PARTNERS_"))
     return { ...state, partners: partnersReducer(state.partners, action as PartnersAction) };
   if (action.type.startsWith("BINS_")) return { ...state, bins: binsReducer(state.bins, action as BinsAction) };
+  if (action.type.startsWith("LITTER_")) return { ...state, litter: litterReducer(state.litter, action as LitterAction) };
   if (action.type !== "REWARDS_REDEEM" && action.type.startsWith("REWARDS_"))
     return { ...state, rewards: rewardsReducer(state.rewards, action as RewardsAction) };
 
@@ -133,6 +138,7 @@ export function reducer(state: AppState, action: Action): AppState {
             collect: d.collect,
             partners: d.partners,
             bins: d.bins,
+            litter: d.litter,
           }
         : {
             ...state,
@@ -140,6 +146,7 @@ export function reducer(state: AppState, action: Action): AppState {
             swap: swapHydrate(null),
             collect: collectHydrate(null, [], null),
             bins: binsHydrate(null),
+            litter: litterHydrate(null),
           };
       return withWelcome(next, action);
     }
@@ -249,7 +256,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       quotaWarnedRef.current = true;
       toast("error", "Bộ nhớ trình duyệt đã đầy", "Thay đổi mới chỉ giữ trong lần mở này. Xóa bớt tin có ảnh để lưu tiếp.");
     }
-  }, [state.user, state.remember, state.favorites, state.products, state.points, state.rewards, state.swap, state.collect, state.partners, state.bins, toast]);
+  }, [state.user, state.remember, state.favorites, state.products, state.points, state.rewards, state.swap, state.collect, state.partners, state.bins, state.litter, toast]);
 
   const login = useCallback(
     (user: DemoUser, remember = true) => dispatch({ type: "LOGIN", user, remember, ...stamp() }),

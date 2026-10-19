@@ -304,3 +304,35 @@ export interface BinReport {
   points: number;
   pointsEntryId?: string;
 }
+
+/* ------------------------- Báo điểm rác tự phát (A4) ------------------------- */
+
+export type LitterSize = "nho" | "vua" | "lon";
+
+/** cho-xac-minh → da-xac-minh (cộng điểm) hoặc khong-hop-le → da-don (đội vận hành đã dọn) */
+export type LitterStatus = "cho-xac-minh" | "da-xac-minh" | "khong-hop-le" | "da-don";
+
+export interface LitterReport {
+  id: string;
+  userId?: string;
+  userName: string;
+  photos: string[];
+  /** Có khi người báo cho lấy vị trí */
+  lat?: number;
+  lng?: number;
+  locationSource: "gps" | "tay";
+  area: Area;
+  address: string;
+  size: LitterSize;
+  description: string;
+  at: string;
+  status: LitterStatus;
+  /** Điểm dự kiến; 0 nếu trùng báo cáo khác */
+  points: number;
+  duplicateOf?: string;
+  pointsEntryId?: string;
+  verifiedAt?: string;
+  verifier?: string;
+  rejectReason?: string;
+  cleanedAt?: string;
+}

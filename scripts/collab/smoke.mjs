@@ -253,6 +253,20 @@ const setField = (selector, value) =>
     return true;
   })()`);
 
+/** Đưa một ảnh PNG nhỏ vào ô chọn file (giống người dùng chọn ảnh từ máy). */
+const TEST_PNG = path.join(os.tmpdir(), "gc-smoke-anh.png");
+{
+  const sharp = (await import("sharp")).default;
+  await sharp({ create: { width: 96, height: 72, channels: 3, background: { r: 110, g: 150, b: 80 } } }).png().toFile(TEST_PNG);
+}
+const attachPhoto = async (selector) => {
+  const { root } = await send("DOM.getDocument", { depth: -1 });
+  const { nodeId } = await send("DOM.querySelector", { nodeId: root.nodeId, selector });
+  if (!nodeId) return false;
+  await send("DOM.setFileInputFiles", { nodeId, files: [TEST_PNG] });
+  return true;
+};
+
 const results = [];
 const check = (name, ok, detail = "") => results.push({ name, ok: !!ok, detail });
 
@@ -435,6 +449,38 @@ try {
     await sleep(800);
     const balance2 = await evaluate(`(() => { const dt = [...document.querySelectorAll('dt')].find(d => d.textContent.includes('Điểm thưởng')); return dt?.nextElementSibling?.textContent.trim(); })()`);
     check("Luồng A3/A5: số dư = 50 + 5 (bỏ đồ) + 5 (báo đầy)", balance2 === "60", `số dư: ${balance2}`);
+
+    // A4: báo điểm rác (ảnh bắt buộc) → cộng tác viên xác minh → +20 điểm
+    await seed("resident", "light");
+    await goto(BASE + "/bao-diem-rac");
+    await attachPhoto('main input[type="file"]');
+    await sleep(1200);
+    await setField("#litter-area", "Quận 5");
+    await setField("#litter-address", "Đầu hẻm chợ, cạnh cột điện");
+    await clickByText("Vừa", { exact: false });
+    await evaluate(`document.querySelector('main form button[type="submit"]').click()`);
+    await sleep(1500);
+    const sent = await evaluate(`(() => { const t = document.querySelector('main').innerText; return t.includes('Chờ xác minh') && t.includes('+20 điểm'); })()`);
+    await shot("luong-a4-bao-diem-rac.png");
+    check("Luồng A4: gửi báo cáo có ảnh, hiện 'Chờ xác minh · +20 điểm'", sent);
+    await clickByText("Hồ sơ của tôi");
+    await sleep(700);
+    await evaluate(`[...document.querySelectorAll('main label')].find(l => l.textContent.includes('Cộng tác viên'))?.click()`);
+    await sleep(300);
+    await clickByText("Khu cộng tác viên");
+    await sleep(700);
+    await clickByText("Điểm rác", { exact: false });
+    await sleep(500);
+    const verified = await evaluate(`(() => {
+      const li = [...document.querySelectorAll('main li')].find(l => l.textContent.includes('Người Kiểm Thử'));
+      const b = li && [...li.querySelectorAll('button')].find(x => x.textContent.trim() === 'Đúng như báo cáo');
+      b?.click(); return !!b;
+    })()`);
+    await sleep(500);
+    await clickByText("Tổng quan");
+    await sleep(800);
+    const balance3 = await evaluate(`(() => { const dt = [...document.querySelectorAll('dt')].find(d => d.textContent.includes('Điểm thưởng')); return dt?.nextElementSibling?.textContent.trim(); })()`);
+    check("Luồng A4: cộng tác viên xác minh, số dư = 50 + 20", verified && balance3 === "70", `xác minh: ${verified}, số dư: ${balance3}`);
   }
 } catch (err) {
   check("Chạy kiểm tra không lỗi", false, err.message);

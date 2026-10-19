@@ -60,10 +60,14 @@ export interface CollectionRequest {
   isMine?: boolean;
 }
 
+/** Vai trò trong bản demo: người dân, cộng tác viên kiểm tra, doanh nghiệp tái chế, nhóm vận hành. */
+export type UserRole = "resident" | "collaborator" | "business" | "operator";
+
 export interface DemoUser {
   name: string;
   email: string;
   memberSince: string;
+  role: UserRole;
 }
 
 export interface ToastItem {
@@ -85,6 +89,8 @@ export const AREAS = [
   "Tân Bình",
   "Thủ Đức",
 ] as const;
+
+export type Area = (typeof AREAS)[number];
 
 export const MATERIAL_OPTIONS = [
   "Giấy & bìa carton",

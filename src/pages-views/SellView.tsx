@@ -11,6 +11,7 @@ import { ChoiceChip, FieldError, PageContainer, PageIntro, StepHeading, buttonCl
 import { ROUTES } from "@/lib/routes";
 import { AREAS, type CategoryId, type Product, type Unit } from "@/types";
 import { formatPrice } from "@/utils/format";
+import { compressImage } from "@/lib/image";
 import { cn } from "@/lib/utils";
 
 const UNITS: Unit[] = ["kg", "món", "lô", "chai"];
@@ -38,7 +39,7 @@ export function SellView() {
     e.target.value = "";
     if (!file || !file.type.startsWith("image/")) return;
     try {
-      setImage(await toCompressedDataUrl(file));
+      setImage(await compressImage(file));
       clearError("image");
     } catch {
       toast("error", "Không đọc được ảnh", "Vui lòng thử một ảnh khác.");
@@ -393,21 +394,4 @@ export function SellView() {
       </form>
     </PageContainer>
   );
-}
-
-/**
- * Thu nhỏ ảnh về tối đa 1024px và mã hóa JPEG dạng data URL — lưu được vào
- * localStorage và còn hiển thị sau khi tải lại trang (blob: URL thì không).
- */
-async function toCompressedDataUrl(file: File, maxSize = 1024, quality = 0.8): Promise<string> {
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height));
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvas 2D không khả dụng");
-  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  bitmap.close();
-  return canvas.toDataURL("image/jpeg", quality);
 }

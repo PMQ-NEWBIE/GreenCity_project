@@ -12,8 +12,10 @@ import { SubmitButton } from "@/components/greencity/SubmitButton";
 import { ThemeToggle } from "@/components/greencity/ThemeToggle";
 import { LOBBY_ASSETS } from "@/lobby/assets";
 import { NEXT_PARAM, ROUTES } from "@/lib/routes";
+import { roleFromEmail } from "@/lib/access";
+import { ROLE_LABEL } from "@/data/labels";
 import { isEmailFormat } from "@/utils/format";
-import type { DemoUser } from "@/types";
+import type { DemoUser, UserRole } from "@/types";
 
 export type AuthMode = "login" | "register" | "forgot";
 
@@ -40,6 +42,19 @@ function nameFromEmail(email: string) {
     .filter(Boolean)
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
+}
+
+/** Tài khoản demo cho từng vai trò (email quyết định vai trò — xem roleFromEmail). */
+const DEMO_ACCOUNTS: Record<UserRole, { email: string; name: string }> = {
+  resident: { email: "demo@greencity.vn", name: "Demo" },
+  collaborator: { email: "ctv@greencity.vn", name: "Cộng tác viên Hòa" },
+  business: { email: "doanhnghiep@greencity.vn", name: "Tái chế Phương Nam" },
+  operator: { email: "vanhanh@greencity.vn", name: "Tổ vận hành" },
+};
+
+function demoNameFor(email: string): string | null {
+  const hit = Object.values(DEMO_ACCOUNTS).find((a) => a.email === email.trim().toLowerCase());
+  return hit && hit.name !== "Demo" ? hit.name : null;
 }
 
 function memberSinceLabel() {
@@ -103,14 +118,14 @@ export function AuthScreen({ mode, next }: { mode: AuthMode; next: string | null
 
   const clearError = (key: string) => setErrors((er) => (er[key] ? { ...er, [key]: "" } : er));
 
-  const fillDemo = () => {
+  const fillDemo = (role: UserRole = "resident") => {
     if (mode === "register") {
       setName("Trần Minh Quân");
       setEmail("quan.tran@example.vn");
       setPassword("xanh2026");
       setConfirm("xanh2026");
     } else {
-      setEmail("demo@greencity.vn");
+      setEmail(DEMO_ACCOUNTS[role].email);
       setPassword("matkhau123");
     }
     setErrors({});
@@ -142,9 +157,10 @@ export function AuthScreen({ mode, next }: { mode: AuthMode; next: string | null
         return;
       }
       const user: DemoUser = {
-        name: mode === "register" ? name.trim() : nameFromEmail(email),
+        name: mode === "register" ? name.trim() : (demoNameFor(email) ?? nameFromEmail(email)),
         email: email.trim(),
         memberSince: memberSinceLabel(),
+        role: roleFromEmail(email),
       };
       setStatus("success");
       // "Ghi nhớ đăng nhập" chỉ có ở màn đăng nhập; đăng ký luôn ghi nhớ
@@ -276,11 +292,26 @@ export function AuthScreen({ mode, next }: { mode: AuthMode; next: string | null
               {mode !== "forgot" && (
                 <button
                   type="button"
-                  onClick={fillDemo}
+                  onClick={() => fillDemo()}
                   className="rounded-lg py-1 text-[14px] font-medium text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
                 >
                   Chỉ xem thử? Điền sẵn tài khoản demo
                 </button>
+              )}
+              {mode === "login" && (
+                <p className="-mt-3 flex flex-wrap items-center justify-center gap-x-1 text-[13px] text-muted-foreground">
+                  <span>Hoặc thử vai trò:</span>
+                  {(["collaborator", "business", "operator"] as const).map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      onClick={() => fillDemo(r)}
+                      className="min-h-11 rounded-lg px-1.5 font-semibold text-primary underline-offset-4 hover:underline"
+                    >
+                      {ROLE_LABEL[r]}
+                    </button>
+                  ))}
+                </p>
               )}
             </form>
           )}

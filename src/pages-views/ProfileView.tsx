@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { LogOut, MapPin, Package, Pencil, Truck } from "lucide-react";
+import { FlaskConical, LogOut, MapPin, Package, Pencil, Truck } from "lucide-react";
 import { useApp } from "@/store/app-store";
 import { SmartImage } from "@/components/greencity/SmartImage";
 import { EmptyState } from "@/components/greencity/EmptyState";
@@ -10,13 +10,22 @@ import { ThemeToggle } from "@/components/greencity/ThemeToggle";
 import { FieldError, PageContainer, buttonClass, inputClass } from "@/components/greencity/ui";
 import { RequestItem } from "./CollectView";
 import { ROUTES } from "@/lib/routes";
+import { ROLE_LABEL } from "@/data/labels";
+import type { UserRole } from "@/types";
 import { formatHoursAgo, formatPrice, initialsOf, isEmailFormat } from "@/utils/format";
 import { cn } from "@/lib/utils";
 
 type Tab = "listings" | "requests";
 
+const ROLES: { key: UserRole; desc: string }[] = [
+  { key: "resident", desc: "Bán ve chai, gọi thu gom, tích điểm đổi quà." },
+  { key: "collaborator", desc: "Kiểm tra lượt bỏ thùng, xác minh báo cáo điểm rác." },
+  { key: "business", desc: "Xem và đặt giữ lô vật liệu đã kiểm định, xem thống kê." },
+  { key: "operator", desc: "Quản lý đơn thu gom, thùng, điểm thưởng và đối tác." },
+];
+
 export function ProfileView() {
-  const { state, removeProduct, updateUser, logout, toast } = useApp();
+  const { state, removeProduct, updateUser, logout, setRole, toast } = useApp();
   const user = state.user!;
   const [tab, setTab] = useState<Tab>("listings");
   const [editing, setEditing] = useState(false);
@@ -195,8 +204,46 @@ export function ProfileView() {
         )}
       </div>
 
+      {/* Bản demo: đổi vai trò để xem các khu cộng tác viên, doanh nghiệp, vận hành */}
+      <section aria-labelledby="demo-role" className="mt-10 rounded-2xl border border-border bg-card p-5 sm:p-6">
+        <h3 id="demo-role" className="flex items-center gap-2 text-[16px] font-bold text-foreground">
+          <FlaskConical className="h-[18px] w-[18px] text-primary" aria-hidden="true" />
+          Chế độ demo: đổi vai trò
+        </h3>
+        <p className="mt-1 text-[14px] text-muted-foreground">
+          Bản thật mỗi tài khoản có một vai trò cố định. Ở bản demo bạn đổi qua lại để xem từng khu.
+        </p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2" role="radiogroup" aria-labelledby="demo-role">
+          {ROLES.map((r) => (
+            <label
+              key={r.key}
+              className={cn(
+                "flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition-colors",
+                user.role === r.key ? "border-primary bg-accent" : "border-border hover:border-primary/40"
+              )}
+            >
+              <input
+                type="radio"
+                name="demo-role"
+                value={r.key}
+                checked={user.role === r.key}
+                onChange={() => {
+                  setRole(r.key);
+                  toast("success", `Đã chuyển sang vai trò ${ROLE_LABEL[r.key].toLowerCase()}`);
+                }}
+                className="mt-0.5 h-5 w-5 accent-primary"
+              />
+              <span>
+                <span className="block text-[15px] font-bold text-foreground">{ROLE_LABEL[r.key]}</span>
+                <span className="block text-[13px] text-muted-foreground">{r.desc}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </section>
+
       {/* Cài đặt */}
-      <section aria-labelledby="settings" className="mt-10 rounded-2xl border border-border bg-card p-5 sm:p-6">
+      <section aria-labelledby="settings" className="mt-6 rounded-2xl border border-border bg-card p-5 sm:p-6">
         <h3 id="settings" className="text-[16px] font-bold text-foreground">
           Giao diện
         </h3>

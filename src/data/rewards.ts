@@ -1,0 +1,98 @@
+import type { Reward } from "@/types/features";
+
+/**
+ * Quà đổi điểm (dữ liệu minh họa, đối tác hư cấu). `stock` là số phần ban đầu;
+ * số còn lại = stock − số lần đã đổi (tính trong store).
+ * Mỗi partnerName có một gian hàng cùng tên trong src/data/green-shops.ts.
+ * Đường dẫn ảnh viết đầy đủ để `npm run content:missing` quét được.
+ */
+export const REWARDS: Reward[] = [
+  {
+    id: "phan-huu-co-2kg",
+    name: "Túi phân hữu cơ 2kg",
+    category: "phan-bon",
+    partnerName: "Phân hữu cơ Ba Lá",
+    pointsCost: 120,
+    stock: 40,
+    image: "/content/rewards/phan-huu-co-2kg.webp",
+    description: "Phân ủ từ rác bếp và lá cây, đã hoai, không mùi. Đủ bón cho khoảng 10 chậu cây cảnh.",
+    pickupNote: "Đưa mã cho nhân viên tại gian hàng Phân hữu cơ Ba Lá trong giờ mở cửa.",
+  },
+  {
+    id: "phan-trun-que-1kg",
+    name: "Phân trùn quế 1kg",
+    category: "phan-bon",
+    partnerName: "Phân hữu cơ Ba Lá",
+    pointsCost: 80,
+    stock: 30,
+    image: "/content/rewards/phan-trun-que-1kg.webp",
+    description: "Phân trùn quế tơi xốp, dùng trộn đất trồng rau ban công hoặc bón thúc cho cây hoa.",
+    pickupNote: "Đưa mã cho nhân viên tại gian hàng Phân hữu cơ Ba Lá trong giờ mở cửa.",
+  },
+  {
+    id: "tui-vai-di-cho",
+    name: "Túi vải đi chợ",
+    category: "tui-vai",
+    partnerName: "Tiệm Gọn Gàng Xanh",
+    pointsCost: 60,
+    stock: 50,
+    image: "/content/rewards/tui-vai-di-cho.webp",
+    description: "Túi vải bố dày, quai dài, gấp gọn bỏ túi quần. Đựng được khoảng 8kg đồ.",
+    pickupNote: "Đưa mã tại quầy Tiệm Gọn Gàng Xanh.",
+  },
+  {
+    id: "tui-luoi-dung-rau",
+    name: "Bộ 3 túi lưới đựng rau",
+    category: "tui-vai",
+    partnerName: "Tiệm Gọn Gàng Xanh",
+    pointsCost: 50,
+    stock: 35,
+    image: "/content/rewards/tui-luoi-dung-rau.webp",
+    description: "Túi lưới cotton có dây rút, thay túi nilon khi mua rau củ, giặt lại được.",
+    pickupNote: "Đưa mã tại quầy Tiệm Gọn Gàng Xanh.",
+  },
+  {
+    id: "ong-hut-inox",
+    name: "Bộ ống hút inox kèm cọ rửa",
+    category: "do-dung",
+    partnerName: "Tiệm Gọn Gàng Xanh",
+    pointsCost: 40,
+    stock: 60,
+    image: "/content/rewards/ong-hut-inox.webp",
+    description: "2 ống hút thẳng, 2 ống hút cong và 1 cọ rửa, đựng trong túi vải nhỏ.",
+    pickupNote: "Đưa mã tại quầy Tiệm Gọn Gàng Xanh.",
+  },
+  {
+    id: "ly-thuy-tinh-tai-che",
+    name: "Ly thủy tinh tái chế",
+    category: "do-dung",
+    partnerName: "Xưởng Thủy Tinh Tái Sinh",
+    pointsCost: 100,
+    stock: 20,
+    image: "/content/rewards/ly-thuy-tinh-tai-che.webp",
+    description: "Ly thổi từ chai thủy tinh cũ, màu xanh nhạt tự nhiên, dung tích khoảng 350ml.",
+    pickupNote: "Nhận tại Xưởng Thủy Tinh Tái Sinh, đưa mã cho nhân viên.",
+  },
+  {
+    id: "chau-luoi-ho",
+    name: "Chậu cây lưỡi hổ nhỏ",
+    category: "cay-giong",
+    partnerName: "Vườn ươm Cây Nhà Mình",
+    pointsCost: 90,
+    stock: 15,
+    image: "/content/rewards/chau-luoi-ho.webp",
+    description: "Cây lưỡi hổ cao khoảng 25cm trong chậu đất nung, dễ sống, hợp để bàn làm việc.",
+    pickupNote: "Nhận tại Vườn ươm Cây Nhà Mình, nhớ mang túi để xách chậu.",
+  },
+  {
+    id: "dung-cu-lam-vuon-mini",
+    name: "Bộ dụng cụ làm vườn mini",
+    category: "cay-giong",
+    partnerName: "Vườn ươm Cây Nhà Mình",
+    pointsCost: 200,
+    stock: 0,
+    image: "/content/rewards/dung-cu-lam-vuon-mini.webp",
+    description: "Xẻng nhỏ, cào ba răng và bình tưới 1 lít, đủ cho vườn ban công.",
+    pickupNote: "Nhận tại Vườn ươm Cây Nhà Mình.",
+  },
+];

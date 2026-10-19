@@ -83,6 +83,7 @@ export function DiscoverView() {
 
   return (
     <PageContainer>
+      <h2 className="sr-only">Tìm và lọc tin đăng</h2>
       {/* Tìm kiếm */}
       <div className="flex gap-2">
         <div className="relative flex-1">

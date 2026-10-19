@@ -11,18 +11,17 @@ import {
   type ReactNode,
 } from "react";
 import { PRODUCTS, REQUESTS } from "@/data/mock-data";
-import type { CollectionRequest, DemoUser, Product, ToastItem } from "@/types";
+import { ruleById } from "@/data/point-rules";
+import type { CollectionRequest, DemoUser, Product, ToastItem, UserRole } from "@/types";
+import type { PointEntry, Redemption } from "@/types/features";
+import { balanceOf, checkRedeem } from "@/lib/points";
+import { REWARDS } from "@/data/rewards";
+import { loadPersisted, savePersisted, type PersistShape } from "./persist";
+import { pointsInitial, pointsReducer, type PointsAction, type PointsState } from "./slices/points";
+import { rewardsInitial, rewardsReducer, stockLeft, type RewardsAction, type RewardsState } from "./slices/rewards";
+import { swapHydrate, swapInitial, swapReducer, type SwapAction, type SwapState } from "./slices/swap";
 
-const STORAGE_KEY = "greencity-demo-v1";
-
-interface PersistShape {
-  user: DemoUser | null;
-  favorites: string[];
-  myListings: Product[];
-  myRequests: CollectionRequest[];
-}
-
-interface AppState {
+export interface AppState {
   /** true sau khi đã đọc localStorage — trước đó chưa biết người dùng đã đăng nhập hay chưa. */
   ready: boolean;
   user: DemoUser | null;
@@ -34,19 +33,33 @@ interface AppState {
   favorites: string[];
   requests: CollectionRequest[];
   toasts: ToastItem[];
+  points: PointsState;
+  rewards: RewardsState;
+  swap: SwapState;
 }
 
-type Action =
-  | { type: "LOGIN"; user: DemoUser; remember: boolean }
+/** Thời điểm và id do nơi gọi tạo ra, để reducer luôn cho cùng kết quả với cùng một action. */
+interface Stamp {
+  now: string;
+  welcomeId: string;
+}
+
+export type Action =
+  | ({ type: "LOGIN"; user: DemoUser; remember: boolean } & Stamp)
   | { type: "LOGOUT" }
-  | { type: "HYDRATE"; data: PersistShape | null }
+  | ({ type: "HYDRATE"; data: PersistShape | null } & Stamp)
+  | { type: "SET_ROLE"; role: UserRole }
   | { type: "TOGGLE_FAVORITE"; id: string }
   | { type: "ADD_PRODUCT"; product: Product }
   | { type: "REMOVE_PRODUCT"; id: string }
   | { type: "ADD_REQUEST"; request: CollectionRequest }
   | { type: "UPDATE_USER"; name: string; email: string }
   | { type: "PUSH_TOAST"; toast: ToastItem }
-  | { type: "DISMISS_TOAST"; id: string };
+  | { type: "DISMISS_TOAST"; id: string }
+  | { type: "REWARDS_REDEEM"; redemption: Redemption; entry: PointEntry }
+  | PointsAction
+  | RewardsAction
+  | SwapAction;
 
 const initialState: AppState = {
   ready: false,
@@ -57,33 +70,64 @@ const initialState: AppState = {
   favorites: [],
   requests: REQUESTS,
   toasts: [],
+  points: pointsInitial,
+  rewards: rewardsInitial,
+  swap: swapInitial,
 };
 
-function reducer(state: AppState, action: Action): AppState {
+/** Người dùng chưa có điểm chào mừng thì cộng một lần (đọc số điểm từ POINT_RULES). */
+function withWelcome(state: AppState, stamp: Stamp): AppState {
+  const user = state.user;
+  if (!user) return state;
+  const has = state.points.entries.some((e) => e.reason === "welcome" && e.userId === user.email);
+  if (has) return state;
+  const entry: PointEntry = {
+    id: stamp.welcomeId,
+    at: stamp.now,
+    delta: ruleById("welcome").points,
+    reason: "welcome",
+    title: "Điểm chào mừng thành viên mới",
+    status: "confirmed",
+    userId: user.email,
+  };
+  return { ...state, points: pointsReducer(state.points, { type: "POINTS_ADD", entry }) };
+}
+
+export function reducer(state: AppState, action: Action): AppState {
+  if (action.type.startsWith("POINTS_")) return { ...state, points: pointsReducer(state.points, action as PointsAction) };
+  if (action.type.startsWith("SWAP_")) return { ...state, swap: swapReducer(state.swap, action as SwapAction) };
+  if (action.type !== "REWARDS_REDEEM" && action.type.startsWith("REWARDS_"))
+    return { ...state, rewards: rewardsReducer(state.rewards, action as RewardsAction) };
+
   switch (action.type) {
     case "LOGIN":
-      return { ...state, user: action.user, remember: action.remember, signedOut: false };
+      return withWelcome({ ...state, user: action.user, remember: action.remember, signedOut: false }, action);
     case "LOGOUT":
       return { ...state, user: null, signedOut: true };
     case "HYDRATE": {
-      if (!action.data) return { ...state, ready: true };
-      const { user, favorites, myListings, myRequests } = action.data;
-      return {
-        ...state,
-        ready: true,
-        user,
-        favorites: favorites ?? [],
-        products: [...(myListings ?? []), ...PRODUCTS],
-        requests: [...(myRequests ?? []), ...REQUESTS],
-      };
+      const d = action.data;
+      const next: AppState = d
+        ? {
+            ...state,
+            ready: true,
+            user: d.user,
+            favorites: d.favorites,
+            products: [...d.myListings, ...PRODUCTS],
+            requests: [...d.myRequests, ...REQUESTS],
+            points: d.points,
+            rewards: d.rewards,
+            swap: d.swap,
+          }
+        : { ...state, ready: true, swap: swapHydrate(null) };
+      return withWelcome(next, action);
     }
+    case "SET_ROLE":
+      return state.user ? { ...state, user: { ...state.user, role: action.role } } : state;
     case "TOGGLE_FAVORITE": {
       const has = state.favorites.includes(action.id);
       return {
         ...state,
-        favorites: has
-          ? state.favorites.filter((f) => f !== action.id)
-          : [...state.favorites, action.id],
+        favorites: has ? state.favorites.filter((f) => f !== action.id) : [...state.favorites, action.id],
       };
     }
     case "ADD_PRODUCT":
@@ -93,22 +137,51 @@ function reducer(state: AppState, action: Action): AppState {
     case "ADD_REQUEST":
       return { ...state, requests: [action.request, ...state.requests] };
     case "UPDATE_USER":
-      return state.user
-        ? { ...state, user: { ...state.user, name: action.name, email: action.email } }
-        : state;
+      return state.user ? { ...state, user: { ...state.user, name: action.name, email: action.email } } : state;
     case "PUSH_TOAST":
       return { ...state, toasts: [...state.toasts.slice(-2), action.toast] };
     case "DISMISS_TOAST":
       return { ...state, toasts: state.toasts.filter((t) => t.id !== action.id) };
+    case "REWARDS_REDEEM": {
+      // Kiểm tra lại ở đây: hai lần bấm liên tiếp không được làm âm điểm hay âm kho
+      const reward = REWARDS.find((r) => r.id === action.redemption.rewardId);
+      const user = state.user;
+      if (!reward || !user) return state;
+      const mine = state.points.entries.filter((e) => e.userId === user.email);
+      const block = checkRedeem({
+        loggedIn: true,
+        stockLeft: stockLeft(reward, state.rewards.redemptions),
+        balance: balanceOf(mine),
+        cost: reward.pointsCost,
+      });
+      if (block) return state;
+      return {
+        ...state,
+        rewards: { redemptions: [action.redemption, ...state.rewards.redemptions] },
+        points: pointsReducer(state.points, { type: "POINTS_ADD", entry: action.entry }),
+      };
+    }
     default:
       return state;
   }
 }
 
+export function newId(prefix: string): string {
+  return `${prefix}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+}
+
+function stamp(): Stamp {
+  return { now: new Date().toISOString(), welcomeId: newId("pt") };
+}
+
 interface AppContextValue {
   state: AppState;
+  /** Trạng thái mới nhất, kể cả các action vừa gửi mà React chưa kịp vẽ lại. */
+  getState: () => AppState;
+  dispatch: (action: Action) => void;
   login: (user: DemoUser, remember?: boolean) => void;
   logout: () => void;
+  setRole: (role: UserRole) => void;
   toggleFavorite: (id: string) => void;
   addProduct: (product: Product) => void;
   removeProduct: (id: string) => void;
@@ -121,67 +194,71 @@ interface AppContextValue {
 const AppContext = createContext<AppContextValue | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, rawDispatch] = useReducer(reducer, initialState);
+  // Chạy cùng reducer trên ref ngay lúc gửi action → đọc được trạng thái mới đồng bộ
+  // (cần cho redeem: trả kết quả ngay và chặn bấm hai lần).
+  const stateRef = useRef<AppState>(initialState);
   const hydratedRef = useRef(false);
+  const quotaWarnedRef = useRef(false);
+
+  const dispatch = useCallback((action: Action) => {
+    stateRef.current = reducer(stateRef.current, action);
+    rawDispatch(action);
+  }, []);
+  const getState = useCallback(() => stateRef.current, []);
+
+  const toast = useCallback(
+    (kind: ToastItem["kind"], title: string, description?: string) => {
+      const id = newId("t");
+      dispatch({ type: "PUSH_TOAST", toast: { id, kind, title, description } });
+      window.setTimeout(() => dispatch({ type: "DISMISS_TOAST", id }), 4000);
+    },
+    [dispatch]
+  );
 
   // Đọc phiên demo đã lưu
   useEffect(() => {
-    let data: PersistShape | null = null;
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) data = JSON.parse(raw) as PersistShape;
-    } catch {
-      /* dữ liệu hỏng — bắt đầu phiên mới */
-    }
-    dispatch({ type: "HYDRATE", data });
+    dispatch({ type: "HYDRATE", data: loadPersisted(), ...stamp() });
     hydratedRef.current = true;
-  }, []);
+  }, [dispatch]);
 
   // Lưu phiên demo
   useEffect(() => {
     if (!hydratedRef.current) return;
-    try {
-      const payload: PersistShape = {
-        user: state.remember ? state.user : null,
-        favorites: state.favorites,
-        myListings: state.products.filter((p) => p.isMine),
-        myRequests: state.requests.filter((r) => r.isMine),
-      };
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-    } catch {
-      /* bộ nhớ đầy — demo vẫn chạy trong phiên hiện tại */
+    const result = savePersisted(state);
+    if (result === "quota" && !quotaWarnedRef.current) {
+      quotaWarnedRef.current = true;
+      toast("error", "Bộ nhớ trình duyệt đã đầy", "Thay đổi mới chỉ giữ trong lần mở này. Xóa bớt tin có ảnh để lưu tiếp.");
     }
-  }, [state.user, state.remember, state.favorites, state.products, state.requests]);
+  }, [state.user, state.remember, state.favorites, state.products, state.requests, state.points, state.rewards, state.swap, toast]);
 
   const login = useCallback(
-    (user: DemoUser, remember = true) => dispatch({ type: "LOGIN", user, remember }),
-    []
+    (user: DemoUser, remember = true) => dispatch({ type: "LOGIN", user, remember, ...stamp() }),
+    [dispatch]
   );
-  const logout = useCallback(() => dispatch({ type: "LOGOUT" }), []);
-  const toggleFavorite = useCallback((id: string) => dispatch({ type: "TOGGLE_FAVORITE", id }), []);
-  const addProduct = useCallback((product: Product) => dispatch({ type: "ADD_PRODUCT", product }), []);
-  const removeProduct = useCallback((id: string) => dispatch({ type: "REMOVE_PRODUCT", id }), []);
+  const logout = useCallback(() => dispatch({ type: "LOGOUT" }), [dispatch]);
+  const setRole = useCallback((role: UserRole) => dispatch({ type: "SET_ROLE", role }), [dispatch]);
+  const toggleFavorite = useCallback((id: string) => dispatch({ type: "TOGGLE_FAVORITE", id }), [dispatch]);
+  const addProduct = useCallback((product: Product) => dispatch({ type: "ADD_PRODUCT", product }), [dispatch]);
+  const removeProduct = useCallback((id: string) => dispatch({ type: "REMOVE_PRODUCT", id }), [dispatch]);
   const addRequest = useCallback(
     (request: CollectionRequest) => dispatch({ type: "ADD_REQUEST", request }),
-    []
+    [dispatch]
   );
   const updateUser = useCallback(
     (name: string, email: string) => dispatch({ type: "UPDATE_USER", name, email }),
-    []
+    [dispatch]
   );
-  const dismissToast = useCallback((id: string) => dispatch({ type: "DISMISS_TOAST", id }), []);
-
-  const toast = useCallback((kind: ToastItem["kind"], title: string, description?: string) => {
-    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-    dispatch({ type: "PUSH_TOAST", toast: { id, kind, title, description } });
-    window.setTimeout(() => dispatch({ type: "DISMISS_TOAST", id }), 4000);
-  }, []);
+  const dismissToast = useCallback((id: string) => dispatch({ type: "DISMISS_TOAST", id }), [dispatch]);
 
   const value = useMemo<AppContextValue>(
     () => ({
       state,
+      getState,
+      dispatch,
       login,
       logout,
+      setRole,
       toggleFavorite,
       addProduct,
       removeProduct,
@@ -190,7 +267,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       toast,
       dismissToast,
     }),
-    [state, login, logout, toggleFavorite, addProduct, removeProduct, addRequest, updateUser, toast, dismissToast]
+    [state, getState, dispatch, login, logout, setRole, toggleFavorite, addProduct, removeProduct, addRequest, updateUser, toast, dismissToast]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

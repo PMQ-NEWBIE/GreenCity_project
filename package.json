@@ -9,7 +9,12 @@
     "lint": "eslint .",
     "assets:process": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/lobby-assets/process.mjs",
     "assets:verify": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/lobby-assets/verify.mjs",
-    "lobby:smoke": "node scripts/lobby-assets/smoke.mjs"
+    "lobby:smoke": "node scripts/lobby-assets/smoke.mjs",
+    "collab:check": "node scripts/collab/check.mjs",
+    "content:missing": "node scripts/collab/content-missing.mjs",
+    "content:image": "node scripts/collab/content-image.mjs",
+    "features:smoke": "node scripts/collab/smoke.mjs",
+    "test": "node --test scripts/tests/*.test.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

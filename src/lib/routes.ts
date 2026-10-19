@@ -11,6 +11,30 @@ export const ROUTES = {
   collect: "/thu-gom",
   favorites: "/yeu-thich",
   profile: "/ho-so",
+
+  // Tính năng cơ bản (giao diện do Gemini làm)
+  learn: "/kien-thuc",
+  article: (slug: string) => `/kien-thuc/${encodeURIComponent(slug)}`,
+  sortingGuide: "/kien-thuc/so-tay",
+  points: "/diem-thuong",
+  pointRules: "/diem-thuong/quy-tac",
+  rewards: "/doi-qua",
+  shops: "/gian-hang",
+  shop: (slug: string) => `/gian-hang/${encodeURIComponent(slug)}`,
+  swap: "/trao-doi",
+  swapPost: "/trao-doi/dang",
+  swapItem: (id: string) => `/trao-doi/${encodeURIComponent(id)}`,
+
+  // Tính năng nâng cao
+  collectRequest: (id: string) => `/thu-gom/${encodeURIComponent(id)}`,
+  bins: "/thung-thu-gom",
+  litterReport: "/bao-diem-rac",
+  map: "/ban-do",
+  consult: "/tu-van-phan-loai",
+  materials: "/cho-vat-lieu",
+  stats: "/thong-ke",
+  ctv: "/cong-tac-vien",
+  admin: "/quan-tri",
 } as const;
 
 /** Tham số trên URL dùng để quay lại đúng trang sau khi đăng nhập. */

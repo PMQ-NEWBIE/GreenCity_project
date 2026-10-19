@@ -17,6 +17,26 @@ export function formatHoursAgo(hours: number): string {
   return `${days} ngày trước`;
 }
 
+const dateFmt = new Intl.DateTimeFormat("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" });
+const timeFmt = new Intl.DateTimeFormat("vi-VN", { hour: "2-digit", minute: "2-digit", hour12: false });
+
+/** "19/10/2026" */
+export function formatDate(iso: string): string {
+  return dateFmt.format(new Date(iso));
+}
+
+/** "07:30 · 19/10/2026" */
+export function formatDateTime(iso: string): string {
+  const d = new Date(iso);
+  return `${timeFmt.format(d)} · ${dateFmt.format(d)}`;
+}
+
+/** "Vừa xong", "3 giờ trước", "Hôm qua", "5 ngày trước" */
+export function formatRelativeTime(iso: string): string {
+  const hours = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 3_600_000));
+  return formatHoursAgo(hours);
+}
+
 export function greetingByHour(): string {
   const h = new Date().getHours();
   if (h < 11) return "Chào buổi sáng";

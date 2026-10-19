@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Check, Compass, PackagePlus, Truck, type LucideIcon } from "lucide-react";
+import { ArrowRight, Check, Compass, Gift, Megaphone, PackagePlus, Recycle, Repeat2, Truck, type LucideIcon } from "lucide-react";
 import { useApp } from "@/store/app-store";
+import { usePoints } from "@/store/hooks";
 import { ProductCard } from "@/components/greencity/ProductCard";
 import { PageContainer, buttonClass } from "@/components/greencity/ui";
 import { ROUTES } from "@/lib/routes";
@@ -30,8 +31,17 @@ const ACTIONS: { href: string; icon: LucideIcon; title: string; text: string }[]
   },
 ];
 
+/** Việc xanh khác — lối tắt nhỏ dưới 3 việc chính. */
+const MORE: { href: string; icon: LucideIcon; label: string }[] = [
+  { href: ROUTES.bins, icon: Recycle, label: "Tìm thùng gần bạn" },
+  { href: ROUTES.litterReport, icon: Megaphone, label: "Báo điểm rác" },
+  { href: ROUTES.rewards, icon: Gift, label: "Đổi điểm lấy quà" },
+  { href: ROUTES.swap, icon: Repeat2, label: "Trao đổi đồ cũ" },
+];
+
 export function DashboardView() {
   const { state } = useApp();
+  const { balance } = usePoints();
   const user = state.user!;
   const myListings = state.products.filter((p) => p.isMine).length;
   const myRequests = state.requests.filter((r) => r.isMine).length;
@@ -76,6 +86,20 @@ export function DashboardView() {
         ))}
       </div>
 
+      <ul className="mt-3 flex flex-wrap gap-2" aria-label="Việc xanh khác">
+        {MORE.map((m) => (
+          <li key={m.href}>
+            <Link
+              href={m.href}
+              className="flex min-h-11 items-center gap-2 rounded-xl border border-border bg-card px-3.5 text-[14px] font-semibold text-foreground/80 transition-colors duration-150 hover:border-primary/50 hover:text-primary"
+            >
+              <m.icon className="h-4 w-4 text-primary" aria-hidden="true" />
+              {m.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+
       {/* Hướng dẫn bắt đầu — tự ẩn khi làm đủ 3 bước */}
       {doneCount < steps.length && (
         <section aria-labelledby="getting-started" className="mt-6 rounded-2xl border border-border bg-card p-5">
@@ -117,8 +141,9 @@ export function DashboardView() {
       )}
 
       {/* Số liệu của chính người dùng */}
-      <dl className="mt-6 grid grid-cols-3 gap-3">
+      <dl className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
+          { label: "Điểm thưởng", value: balance, href: ROUTES.points },
           { label: "Tin bạn đã đăng", value: myListings, href: ROUTES.profile },
           { label: "Yêu cầu thu gom", value: myRequests, href: ROUTES.collect },
           { label: "Món đã lưu", value: saved, href: ROUTES.favorites },

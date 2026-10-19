@@ -1,5 +1,6 @@
 import type { PointEntry } from "@/types/features";
 import { applyDecision } from "@/lib/points";
+import { pointsSeed } from "@/data/demo-users";
 
 /** Sổ điểm của mọi người dùng trong trình duyệt này (lọc theo userId khi đọc). */
 export interface PointsState {
@@ -10,6 +11,7 @@ export type PointsAction =
   | { type: "POINTS_ADD"; entry: PointEntry }
   | { type: "POINTS_DECIDE"; id: string; decision: "confirmed" | "rejected"; delta?: number; note?: string };
 
+/** Rỗng cho tới khi HYDRATE chạy ở trình duyệt — sổ điểm mẫu có mốc thời gian tính theo lúc mở trang. */
 export const pointsInitial: PointsState = { entries: [] };
 
 export function pointsReducer(state: PointsState, action: PointsAction): PointsState {
@@ -33,9 +35,12 @@ function isEntry(v: unknown): v is PointEntry {
   return typeof e.id === "string" && typeof e.at === "string" && typeof e.delta === "number" && typeof e.reason === "string";
 }
 
+/** Gộp sổ điểm mẫu của người dân mẫu (id cố định) vào dữ liệu đã lưu, không ghi đè mục đã có. */
 export function pointsHydrate(raw: unknown): PointsState {
   const list = (raw as { entries?: unknown } | null)?.entries;
-  return { entries: Array.isArray(list) ? list.filter(isEntry) : [] };
+  const saved = Array.isArray(list) ? list.filter(isEntry) : [];
+  const ids = new Set(saved.map((e) => e.id));
+  return { entries: [...saved, ...pointsSeed().filter((e) => !ids.has(e.id))] };
 }
 
 export function pointsPersist(state: PointsState): unknown {

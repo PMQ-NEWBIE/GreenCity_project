@@ -17,7 +17,7 @@ import type { PointEntry, Redemption } from "@/types/features";
 import { balanceOf, checkRedeem } from "@/lib/points";
 import { REWARDS } from "@/data/rewards";
 import { loadPersisted, savePersisted, type PersistShape } from "./persist";
-import { pointsInitial, pointsReducer, type PointsAction, type PointsState } from "./slices/points";
+import { pointsHydrate, pointsInitial, pointsReducer, type PointsAction, type PointsState } from "./slices/points";
 import { rewardsInitial, rewardsReducer, stockLeft, type RewardsAction, type RewardsState } from "./slices/rewards";
 import { swapHydrate, swapInitial, swapReducer, type SwapAction, type SwapState } from "./slices/swap";
 import { collectHydrate, collectInitial, collectReducer, type CollectAction, type CollectState } from "./slices/collect";
@@ -147,6 +147,7 @@ export function reducer(state: AppState, action: Action): AppState {
             collect: collectHydrate(null, [], null),
             bins: binsHydrate(null),
             litter: litterHydrate(null),
+            points: pointsHydrate(null),
           };
       return withWelcome(next, action);
     }

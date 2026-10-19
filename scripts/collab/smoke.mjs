@@ -481,6 +481,37 @@ try {
     await sleep(800);
     const balance3 = await evaluate(`(() => { const dt = [...document.querySelectorAll('dt')].find(d => d.textContent.includes('Điểm thưởng')); return dt?.nextElementSibling?.textContent.trim(); })()`);
     check("Luồng A4: cộng tác viên xác minh, số dư = 50 + 20", verified && balance3 === "70", `xác minh: ${verified}, số dư: ${balance3}`);
+
+    // A10: vận hành nhận đơn mẫu của chị Lan → lên đường → cân → thanh toán; chỉnh điểm tay
+    await seed("operator", "light");
+    await goto(BASE + "/quan-tri");
+    const opened = await evaluate(`(() => { const a = [...document.querySelectorAll('main li a')].find(x => x.textContent.includes('Chị Lan')); a?.click(); return !!a; })()`);
+    await sleep(1000);
+    await clickByText("Nhận đơn, hẹn giờ");
+    await sleep(400);
+    await clickByText("Đội đã lên đường");
+    await sleep(400);
+    await setField('input[id^="kg-r-mau-1-0"]', "12");
+    await setField('input[id^="kg-r-mau-1-1"]', "4,5");
+    await clickByText("Lưu số cân");
+    await sleep(400);
+    await clickByText("Xác nhận đã thanh toán");
+    await sleep(600);
+    const ops = await evaluate(`(() => { const t = document.querySelector('main').innerText; return { done: t.includes('Hoàn tất'), kg: t.includes('16,5') }; })()`);
+    await shot("luong-a10-van-hanh-don.png");
+    check("Luồng A10: vận hành đi hết đơn mẫu (nhận → đi → cân 16,5kg → thanh toán)", opened && ops.done && ops.kg, JSON.stringify(ops));
+
+    await goto(BASE + "/quan-tri?tab=diem-thuong");
+    await evaluate(`[...document.querySelectorAll('main button')].find(b => b.textContent.includes('lan@vidu.vn'))?.click()`);
+    await sleep(300);
+    await setField("#adj-delta", "10");
+    await setField("#adj-reason", "Bù điểm lượt cân bị nhập thiếu");
+    await clickByText("Chỉnh điểm");
+    await sleep(500);
+    const lan = await evaluate(`[...document.querySelectorAll('main button')].find(b => b.textContent.includes('lan@vidu.vn'))?.textContent`);
+    await shot("luong-a10-diem-thuong.png");
+    // 50 + 62 − 80 + 5 = 37, chỉnh +10 → 47
+    check("Luồng A10: chỉnh tay +10 điểm cho chị Lan (37 → 47)", /47$/.test(lan ?? ""), lan);
   }
 } catch (err) {
   check("Chạy kiểm tra không lỗi", false, err.message);

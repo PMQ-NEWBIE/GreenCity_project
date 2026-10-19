@@ -41,6 +41,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     if (state.ready && !user && !publicPage) router.replace(state.signedOut ? ROUTES.home : loginHref(pathname));
   }, [state.ready, state.signedOut, user, publicPage, pathname, router]);
 
+  // Menu dài (vai trò vận hành): cuộn mục đang mở vào tầm nhìn
+  useEffect(() => {
+    document.querySelector('aside [aria-current="page"]')?.scrollIntoView({ block: "nearest" });
+  }, [pathname, state.ready]);
+
   if (!state.ready || (!user && !publicPage)) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-background" aria-busy="true">

@@ -29,6 +29,8 @@ export interface NavItem {
   /** Nhãn ngắn cho thanh điều hướng đáy trên điện thoại */
   short: string;
   icon: LucideIcon;
+  /** Bỏ trống = mọi vai trò thấy */
+  roles?: UserRole[];
 }
 
 export interface NavGroup {
@@ -38,7 +40,7 @@ export interface NavGroup {
   roles?: UserRole[];
 }
 
-const item = (href: string, label: string, icon: LucideIcon, short = label): NavItem => ({ href, label, short, icon });
+const item = (href: string, label: string, icon: LucideIcon, short = label, roles?: UserRole[]): NavItem => ({ href, label, short, icon, roles });
 
 export const NAV_GROUPS: NavGroup[] = [
   {
@@ -74,12 +76,10 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     title: "Vận hành",
     roles: ["collaborator", "operator"],
-    items: [item(ROUTES.ctv, "Khu cộng tác viên", ClipboardCheck)],
-  },
-  {
-    title: "Quản trị",
-    roles: ["operator"],
-    items: [item(ROUTES.admin, "Quản trị", ShieldCheck)],
+    items: [
+      item(ROUTES.admin, "Quản trị", ShieldCheck, "Quản trị", ["operator"]),
+      item(ROUTES.ctv, "Khu cộng tác viên", ClipboardCheck),
+    ],
   },
   {
     title: "Của tôi",
@@ -90,7 +90,10 @@ export const NAV_GROUPS: NavGroup[] = [
 /** Nhóm menu mà vai trò này được thấy. Khách (chưa đăng nhập) thấy như người dân. */
 export function navFor(role: UserRole | null): NavGroup[] {
   const r = role ?? "resident";
-  return NAV_GROUPS.filter((g) => !g.roles || g.roles.includes(r));
+  return NAV_GROUPS.filter((g) => !g.roles || g.roles.includes(r)).map((g) => ({
+    ...g,
+    items: g.items.filter((i) => !i.roles || i.roles.includes(r)),
+  }));
 }
 
 /** Thanh đáy trên điện thoại: 4 việc chính, ô thứ 5 là "Thêm" (mở toàn bộ menu). */

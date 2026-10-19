@@ -168,6 +168,42 @@
   }
 }
 
+/* Bản đồ xanh (Leaflet): popup và nút điều khiển theo màu theme; nền tối thì làm tối ô bản đồ */
+.gc-map .leaflet-container {
+  font-family: inherit;
+  background: var(--muted);
+}
+.gc-map .leaflet-popup-content-wrapper,
+.gc-map .leaflet-popup-tip {
+  background: var(--card);
+  color: var(--card-foreground);
+}
+.gc-map .leaflet-popup-content {
+  margin: 12px 14px;
+  line-height: 1.45;
+}
+.gc-map .leaflet-popup-content a {
+  color: var(--primary);
+}
+.gc-map .leaflet-container a.leaflet-popup-close-button {
+  color: var(--muted-foreground);
+}
+.gc-map .leaflet-bar a {
+  background: var(--card);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+.gc-map .leaflet-control-attribution {
+  background: color-mix(in oklab, var(--card) 85%, transparent);
+  color: var(--muted-foreground);
+}
+.gc-map .leaflet-control-attribution a {
+  color: var(--primary);
+}
+.dark .gc-map .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.85);
+}
+
 /* Chuyển trang trong app: hiện nhanh, không chờ trang cũ biến mất */
 @keyframes page-enter {
   from {

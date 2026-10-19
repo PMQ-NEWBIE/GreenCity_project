@@ -512,6 +512,18 @@ try {
     await shot("luong-a10-diem-thuong.png");
     // 50 + 62 − 80 + 5 = 37, chỉnh +10 → 47
     check("Luồng A10: chỉnh tay +10 điểm cho chị Lan (37 → 47)", /47$/.test(lan ?? ""), lan);
+
+    // A6: bản đồ có đủ điểm; link ?thung= từ trang thùng mở đúng popup
+    await seed("resident", "light");
+    await goto(BASE + "/ban-do?thung=tc-003", 3000);
+    const map = await evaluate(`({
+      markers: document.querySelectorAll('.gc-map path.leaflet-interactive').length,
+      tiles: [...document.querySelectorAll('.gc-map img.leaflet-tile')].filter(i => i.complete && i.naturalWidth > 0).length,
+      popup: document.querySelector('.gc-map .leaflet-popup')?.innerText ?? '',
+    })`);
+    await shot("luong-a6-ban-do.png");
+    check("Luồng A6: bản đồ vẽ đủ điểm (≥ 30) và tải được ô bản đồ", map.markers >= 30 && map.tiles > 0, `điểm: ${map.markers}, ô bản đồ: ${map.tiles}`);
+    check("Luồng A6: ?thung=tc-003 mở popup của thùng TC-003", map.popup.includes("TC-003"), map.popup.slice(0, 80));
   }
 } catch (err) {
   check("Chạy kiểm tra không lỗi", false, err.message);

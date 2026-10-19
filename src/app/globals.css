@@ -37,6 +37,9 @@
   --color-brand-green: var(--brand-green);
   --color-brand-lime: var(--brand-lime);
 
+  /* Biểu đồ (một chuỗi số liệu) — đã chạy bộ kiểm màu dataviz cho cả nền sáng và tối */
+  --color-chart-1: var(--chart-1);
+
   /* Thang xanh lá Green City — từ xanh sáng (50) tới xanh tối (950).
      Lobby dùng thang này cố định, không đổi theo theme. */
   --color-gc-50: #f3f9ee;
@@ -87,6 +90,7 @@
   --warn: #b45309;
   --brand-green: #186028;
   --brand-lime: #70a820;
+  --chart-1: #15803d;
 }
 
 .dark {
@@ -116,6 +120,7 @@
   --warn: #fbbf24;
   --brand-green: #5cc46b;
   --brand-lime: #a3d65c;
+  --chart-1: #16a34a;
 }
 
 @layer base {

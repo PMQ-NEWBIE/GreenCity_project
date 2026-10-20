@@ -1,42 +1,37 @@
-# Nguồn ảnh nội dung Green City
+# Nhật ký nguồn ảnh nội dung Green City
 
-Tất cả ảnh nội dung được chọn lọc từ Unsplash với giấy phép miễn phí (Unsplash License), cho phép sử dụng cho cả mục đích thương mại và phi thương mại, không yêu cầu ghi công nhưng Green City ghi nhận đầy đủ tác giả để tôn trọng cộng đồng nhiếp ảnh gia.
+Ghi nhận trung thực 100% nguồn gốc, tình trạng và mô tả thực tế của từng ảnh nội dung trong dự án Green City.
 
-| File | Nguồn | Tác giả | Giấy phép | Link gốc | Đã chỉnh |
+## 1. Danh sách ảnh nội dung
+
+| File | Loại | Nguồn | Tác giả | Giấy phép | Ảnh thực tế cho thấy gì |
 |---|---|---|---|---|---|
-| learn/phan-loai-rac-tai-nha.webp | Unsplash | Alfonso Navarro | Unsplash License | https://unsplash.com/photos/qAQjxBcLTzk | cắt 4:3, chỉnh sáng tông xanh dịu |
-| learn/chuan-bi-ve-chai-ban-duoc-gia.webp | Unsplash | Nick Fewings | Unsplash License | https://unsplash.com/photos/2a9iFwtBtrY | cắt 4:3, giữ tâm điểm chai nhựa và lon sạch |
-| learn/u-phan-huu-co-thung-xop.webp | Unsplash | Edward Howell | Unsplash License | https://unsplash.com/photos/Wn1YpW6D8pM | cắt 4:3, chỉnh tông màu đất ấm |
-| learn/u-vo-trai-cay-nuoc-ngam-enzyme.webp | Unsplash | Elena Leya | Unsplash License | https://unsplash.com/photos/L4_C42wX_qQ | cắt 4:3, chỉnh độ tương phản nhẹ |
-| learn/di-cho-it-tui-nilon.webp | Unsplash | Ja Ma | Unsplash License | https://unsplash.com/photos/6qdf8q8d6fM | cắt 4:3, căn giữa giỏ rau củ tươi |
-| learn/pin-bong-den-thuoc-het-han.webp | Unsplash | John Cameron | Unsplash License | https://unsplash.com/photos/Q_gK3s_yV44 | cắt 4:3, chỉnh cân bằng trắng |
-| learn/vong-doi-moi-cho-quan-ao-cu.webp | Unsplash | Sarah Brown | Unsplash License | https://unsplash.com/photos/oa7pqZmmhuA | cắt 4:3, xếp gọn quần áo vải tự nhiên |
-| learn/sua-do-gia-dung-truoc-khi-vut.webp | Unsplash | ThisisEngineering | Unsplash License | https://unsplash.com/photos/saWagH8sS_E | cắt 4:3, làm sáng vùng dụng cụ sửa chữa |
-| rewards/phan-huu-co-2kg.webp | Unsplash | Gabriel Jimenez | Unsplash License | https://unsplash.com/photos/jin4W1HqWbo | cắt 1:1 vuông, chỉnh màu đất tơi xốp |
-| rewards/phan-trun-que-1kg.webp | Unsplash | Markus Spiske | Unsplash License | https://unsplash.com/photos/sFydXGrt5B4 | cắt 1:1 vuông, tôn màu nâu sẫm tự nhiên |
-| rewards/tui-vai-di-cho.webp | Unsplash | Kier in Sight Archives | Unsplash License | https://unsplash.com/photos/qQ1H01Rknz8 | cắt 1:1 vuông, căn giữa túi canvas |
-| rewards/tui-luoi-dung-rau.webp | Unsplash | Laura Mitulla | Unsplash License | https://unsplash.com/photos/7eU0Vp0Vv08 | cắt 1:1 vuông, nổi bật túi lưới bông |
-| rewards/ong-hut-inox.webp | Unsplash | Ready Made | Unsplash License | https://unsplash.com/photos/9lW9p_k3l68 | cắt 1:1 vuông, chỉnh ánh sáng bề mặt inox |
-| rewards/ly-thuy-tinh-tai-che.webp | Unsplash | Devon Janse van Rensburg | Unsplash License | https://unsplash.com/photos/bE1U0k1G1zM | cắt 1:1 vuông, làm trong suốt thành ly |
-| rewards/chau-luoi-ho.webp | Unsplash | Kara Eads | Unsplash License | https://unsplash.com/photos/L7EwHkq1B2s | cắt 1:1 vuông, chậu đất nung cây xanh |
-| rewards/dung-cu-lam-vuon-mini.webp | Unsplash | Neslihan Gunaydin | Unsplash License | https://unsplash.com/photos/XmDdnlnhwtk | cắt 1:1 vuông, dụng cụ xẻng cào mini |
-| shops/phan-huu-co-ba-la.webp | Unsplash | Annie Spratt | Unsplash License | https://unsplash.com/photos/m1t-RJ1iCIU | cắt 4:3, khung cảnh vườn ươm hữu cơ |
-| shops/tiem-gon-gang-xanh.webp | Unsplash | Sarah Chai | Unsplash License | https://unsplash.com/photos/lG_6w7Wd3e4 | cắt 4:3, tiệm bán đồ sinh thái |
-| shops/xuong-thuy-tinh-tai-sinh.webp | Unsplash | Quino Al | Unsplash License | https://unsplash.com/photos/JFeOyfQ5rso | cắt 4:3, góc xưởng thủy tinh thủ công |
-| shops/vuon-uom-cay-nha-minh.webp | Unsplash | Zulian Firmansyah | Unsplash License | https://unsplash.com/photos/a3W6qWqXm64 | cắt 4:3, vườn ươm cây xanh tươi |
-| shops/nong-trai-dat-lanh.webp | Unsplash | Gabriel Jimenez | Unsplash License | https://unsplash.com/photos/bmJAXAz6ads | cắt 4:3, luống rau và đất trồng sạch |
-| shops/dung-cu-xanh-nam-sai-gon.webp | Unsplash | Barn Images | Unsplash License | https://unsplash.com/photos/t5YUoHW6zmA | cắt 4:3, bàn đồ nghề làm vườn gỗ |
-| shops/tiem-xa-bong-sinh-thai.webp | Unsplash | Sora Shimazaki | Unsplash License | https://unsplash.com/photos/8e7gWqQkH11 | cắt 4:3, xà bông thảo mộc thiên nhiên |
-| shops/vuon-pho-xanh-ri.webp | Unsplash | Krzysztof Kowalik | Unsplash License | https://unsplash.com/photos/KiVuBhnvRHg | cắt 4:3, giàn rau xanh trên sân thượng |
-| swap/mau-1.webp | Unsplash | Patrick Tomasso | Unsplash License | https://unsplash.com/photos/Oaqk7qqNh_c | cắt 4:3, chồng sách bìa cứng cũ |
-| swap/mau-2.webp | Unsplash | Sarah Brown | Unsplash License | https://unsplash.com/photos/bbq9w_c4a88 | cắt 4:3, áo quần gấp gọn gàng |
-| swap/mau-3.webp | Unsplash | Castorly Stock | Unsplash License | https://unsplash.com/photos/kP9wK_m6f00 | cắt 4:3, đồ gia dụng nồi chảo sạch |
-| swap/mau-4.webp | Unsplash | Xavi Cabrera | Unsplash License | https://unsplash.com/photos/kn-UmDZQDjM | cắt 4:3, đồ chơi xếp hình trẻ em |
-| swap/s-ao-khoac-jean.webp | Unsplash | Ismael Trevino | Unsplash License | https://unsplash.com/photos/MyBgV2_Pb5I | cắt 4:3, áo khoác jean nam còn tốt |
-| swap/s-sach-giao-khoa-lop-5.webp | Unsplash | Kimberly Farmer | Unsplash License | https://unsplash.com/photos/lUaaKCUANVI | cắt 4:3, bộ sách giáo khoa tập vở |
-| swap/s-noi-com-dien.webp | Unsplash | Anton Darius | Unsplash License | https://unsplash.com/photos/Yg5k_8z_mAA | cắt 4:3, nồi cơm điện và thiết bị gia dụng |
-| swap/s-xe-day-em-be.webp | Unsplash | Christian Bowen | Unsplash License | https://unsplash.com/photos/7VjT2W9q11A | cắt 4:3, xe đẩy trẻ em gấp gọn |
-| swap/s-vay-cong-so.webp | Unsplash | Dom Hill | Unsplash License | https://unsplash.com/photos/0W4Af32CuHs | cắt 4:3, váy đầm công sở trang nhã |
-| swap/s-truyen-tranh.webp | Unsplash | Miika Laaksonen | Unsplash License | https://unsplash.com/photos/b_x5Qv_89s4 | cắt 4:3, thùng truyện tranh giấy cũ |
-| swap/s-bo-chen-bat.webp | Unsplash | Tom Crew | Unsplash License | https://unsplash.com/photos/7k_qW9_s600 | cắt 4:3, bộ chén bát sứ trắng sạch |
-| swap/s-lego-hop.webp | Unsplash | Kelly Sikkema | Unsplash License | https://unsplash.com/photos/gcHFXsdcmJE | cắt 4:3, hộp đồ chơi lắp ráp các khối màu |
+| learn/phan-loai-rac-tai-nha.webp | Tự tạo (AI) | Antigravity (gemini-3.1-flash-image) | – | Tự tạo cho Green City | Góc bếp nhà phố Việt Nam tường gạch bông, dưới bồn rửa có 3 thùng rác nắp màu (xanh lá rác rau củ, xanh dương chai lọ, xám rác còn lại). |
+| learn/chuan-bi-ve-chai-ban-duoc-gia.webp | Tự tạo (AI) | Antigravity (gemini-3.1-flash-image) | – | Tự tạo cho Green City | Sân gạch tàu nhà phố: bao tải dứa đựng chai nhựa bóc nhãn ép dẹp, rổ nhựa đan đựng lon nhôm đạp dẹt, chồng bìa carton gấp phẳng buộc dây xanh. |
+| learn/u-phan-huu-co-thung-xop.webp | Tự tạo (AI) | Antigravity (gemini-3.1-flash-image) | – | Tự tạo cho Green City | Phụ nữ đội nón lá xới đất rác bếp trong thùng xốp trắng trên sân thượng nhìn ra phố xá Sài Gòn, bên cạnh có chậu cây cảnh. |
+| learn/u-vo-trai-cay-nuoc-ngam-enzyme.webp | Tự tạo (AI) | Antigravity (gemini-3.1-flash-image) | – | Tự tạo cho Green City | Bình thủy tinh lớn ngâm vỏ dứa, vỏ cam quýt trong nước enzyme hổ phách, chén gốm đựng đường nâu trên bàn gỗ bếp. |
+| learn/di-cho-it-tui-nilon.webp | Tự tạo (AI) | Antigravity (gemini-3.1-flash-image) | – | Tự tạo cho Green City | Sạp rau chợ truyền thống Việt Nam, mẹt tre đựng rau muống tươi và cà chua, tay người mua mở giỏ cói đan, có hộp nhựa nắp kín. |
+| learn/pin-bong-den-thuoc-het-han.webp | Tự tạo (AI) | Antigravity (gemini-3.1-flash-image) | – | Tự tạo cho Green City | Mặt bàn gỗ mộc với 3 nhóm rác nguy hại riêng biệt: hũ nhựa đựng pin cũ, bóng đèn tháo rời, hộp carton đựng vỉ và lọ thuốc cũ. |
+| learn/vong-doi-moi-cho-quan-ao-cu.webp | Tự tạo (AI) | Antigravity (gemini-3.1-flash-image) | – | Tự tạo cho Green City | Phòng ngủ nhà phố Việt lát gạch bông, phụ nữ ngồi xếp áo quần vào thùng carton, cạnh đó có chồng áo gấp gọn và chồng sách cũ buộc dây. |
+| learn/sua-do-gia-dung-truoc-khi-vut.webp | Tự tạo (AI) | Antigravity (gemini-3.1-flash-image) | – | Tự tạo cho Green City | Thợ sửa đồ điện trong hẻm Sài Gòn tháo cụm mô-tơ quạt bàn nhựa xanh bằng tua vít, bàn có đồng hồ đo điện, mỏ hàn, kìm cắt. |
+| rewards/phan-huu-co-2kg.webp | Tự tạo (AI) | Antigravity (gemini-3.1-flash-image) | – | Tự tạo cho Green City | Túi giấy kraft trơn mở miệng đựng phân hữu cơ nâu sẫm tơi xốp, bên cạnh có muỗng gỗ nhỏ trên mặt bàn gỗ phong cách shop online. |
+| rewards/phan-trun-que-1kg.webp | Tự tạo (AI) | Antigravity (gemini-3.1-flash-image) | – | Tự tạo cho Green City | Túi zip trong suốt đứng thẳng đựng phân trùn quế đen mịn, một ít phân rắc ra bàn kèm vài lá cây nhỏ trang trí. |
+| rewards/tui-vai-di-cho.webp | Tự tạo (AI) | Antigravity (gemini-3.1-flash-image) | – | Tự tạo cho Green City | Túi vải canvas màu mộc đứng thẳng trên bàn gỗ, bên trong ló rau muống và chanh xanh, cạnh đó có túi vải cùng loại gấp phẳng. |
+| products/sat-vun.webp | Tự tạo (AI) | Antigravity (gemini-3.1-flash-image) | – | Tự tạo cho Green City | Đống sắt vụn trong nhà xưởng: ống sắt, vành xe cũ, thanh kim loại, sắt rỉ chất đống trên nền xưởng. |
+
+*(39 ảnh còn lại đang chờ tài nguyên quota tạo ảnh reset để tiếp tục tạo đúng chuẩn bối cảnh Việt Nam, tránh lấy ảnh sai hoặc không đúng quy cách)*
+
+## 2. Prompt rút gọn của các ảnh tự tạo đã hoàn thành
+
+- `learn/phan-loai-rac-tai-nha`: Realistic photo, Ho Chi Minh City townhouse kitchen corner, 3 bins under sink with green, blue, grey plain lids for sorting, patterned tiles, no readable text.
+- `learn/chuan-bi-ve-chai-ban-duoc-gia`: Terracotta tile courtyard, crushed plastic bottles in woven sack, crushed cans in plastic basket, flattened cardboard tied with string, tidy daylight.
+- `learn/u-phan-huu-co-thung-xop`: Townhouse rooftop overlooking Saigon, open white styrofoam box with kitchen compost, gardener in conical hat turning soil with trowel, potted plant.
+- `learn/u-vo-trai-cay-nuoc-ngam-enzyme`: Wide-mouth glass jar on wooden kitchen table with fermenting pineapple and citrus peel eco-enzyme liquid, bowl of brown sugar beside.
+- `learn/di-cho-it-tui-nilon`: Traditional Vietnamese wet market stall, fresh morning glory and tomatoes in bamboo baskets, shopper holding woven straw bag, reusable container on stall.
+- `learn/pin-bong-den-thuoc-het-han`: Wooden table, 3 distinct groups: clear plastic jar with used batteries, old light bulbs, unprinted cardboard box with blister medicine packs.
+- `learn/vong-doi-moi-cho-quan-ao-cu`: Townhouse bedroom with encaustic cement tiles, woman packing clothes into donation cardboard box, folded clothes stack, tied old books bundle.
+- `learn/sua-do-gia-dung-truoc-khi-vut`: Electronics repair workbench in Saigon alley, hands disassembling plastic fan motor with screwdriver, multimeter, soldering iron.
+- `rewards/phan-huu-co-2kg`: Product shot on light wooden table, unprinted kraft paper bag filled with loose brown compost, small wooden scoop beside, bright soft studio light.
+- `rewards/phan-trun-que-1kg`: Product shot on wood table, standing transparent ziploc pouch filled with fine black vermicompost, sprinkled granules with tiny leaves.
+- `rewards/tui-vai-di-cho`: Product shot on wood table, unbleached canvas tote standing with fresh greens and limes peeking out, folded canvas tote lying beside.
+- `products/sat-vun`: Scrap metal pile in Vietnamese workshop, rusty pipes, old iron frames, bicycle rims, scrap metal pieces on concrete floor, natural daylight, no readable text.

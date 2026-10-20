@@ -4,7 +4,7 @@ import type { Category, Product } from "@/types";
 export const IMAGES = {
   paper: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/ce3ae40f7fb9.jpg",
   plastic: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/095bde95f3a7.jpg",
-  metal: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/f7ed1a62ed2d.jpg",
+  metal: "/content/products/sat-vun.webp",
   glass: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/d6e3fdb6c72a.jpg",
   electronic: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/597b72687514.jpg",
   furniture: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/117c9484c202.jpg",

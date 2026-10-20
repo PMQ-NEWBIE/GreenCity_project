@@ -58,3 +58,11 @@ server.log
 /assets-src/content/
 /assets-src/features/_check/
 /assets-src/ink/_check/
+
+# Tài liệu làm việc với AI (prompt, báo cáo, sổ trao đổi Claude ↔ Gemini) và ảnh chụp kiểm tra:
+# chỉ để trên máy, không đưa lên repo
+/docs/prompt-*.md
+/docs/antigravity-image-prompt.md
+/docs/boost_*.md
+/docs/collab/
+/assets-src/lobby/_check/

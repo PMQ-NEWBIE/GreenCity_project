@@ -113,3 +113,17 @@ html.lenis body {
     transition: none;
   }
 }
+
+/* Lớp lá hero: mặc định (trước khi JS đo) hạ xuống để phần lá cao tối đa ~32% khung.
+   Ảnh cao 108vw/3.2, lá chiếm 57% dưới → lá cao ≈ 19.6vw. heroFit.ts ghi đè bằng style.bottom. */
+.lobby-hero-fog {
+  bottom: min(0px, calc(32svh - 19.6vw));
+}
+
+/* ---------- Ink Headings ---------- */
+@media (max-width: 767.98px) {
+  .lobby [data-ink-plant]:not([data-lite]) {
+    display: none;
+  }
+}
+

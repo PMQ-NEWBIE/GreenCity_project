@@ -57,3 +57,4 @@ server.log
 # Ảnh thô do Gemini tạo và ảnh chụp kiểm tra (tạo lại được)
 /assets-src/content/
 /assets-src/features/_check/
+/assets-src/ink/_check/

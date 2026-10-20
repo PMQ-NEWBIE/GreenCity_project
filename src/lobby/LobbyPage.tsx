@@ -3,7 +3,6 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 import { useGSAP } from "@gsap/react";
 import "lenis/dist/lenis.css";
 import "./lobby.css";
@@ -11,8 +10,10 @@ import { LOBBY_MEDIA, LOBBY_MOTION } from "./config";
 import { startSmoothScroll } from "./animations/smoothScroll";
 import { playIntro, playReducedIntro } from "./animations/intro";
 import { createHeroMobileParallax, createHeroPin } from "./animations/heroScroll";
+import { startHeroFit } from "./animations/heroFit";
 import { startMagnetic, startMouseParallax } from "./animations/pointer";
-import { revealFeatures, startHeaderBehavior } from "./animations/sections";
+import { revealFeatures, revealInkHeadings, startHeaderBehavior } from "./animations/sections";
+import { startInkSway } from "./animations/ink";
 import { LobbyHeader } from "./sections/LobbyHeader";
 import { LobbyHero } from "./sections/LobbyHero";
 import { LobbyFeatures } from "./sections/LobbyFeatures";
@@ -20,7 +21,7 @@ import { LobbyCta } from "./sections/LobbyCta";
 import { LobbyFooter } from "./sections/LobbyFooter";
 
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(useGSAP, ScrollTrigger, SplitText);
+  gsap.registerPlugin(useGSAP, ScrollTrigger);
 }
 
 export function LobbyPage() {
@@ -32,6 +33,8 @@ export function LobbyPage() {
       if (!root) return;
 
       startHeaderBehavior(root);
+      // Đo trước intro: lá / xe đạp đã đúng chỗ ngay khung hình đầu tiên hiện ra
+      const stopHeroFit = startHeroFit(root);
 
       // Intro chỉ chạy một lần; mouse parallax đợi intro xong để không tranh thuộc tính x/y
       let introDone = false;
@@ -70,17 +73,25 @@ export function LobbyPage() {
           if (c.mobile) createHeroMobileParallax(root);
           else createHeroPin(root, c.desktop ? LOBBY_MOTION.pin.desktopDistance : LOBBY_MOTION.pin.tabletDistance);
           revealFeatures(root, !c.mobile);
+          revealInkHeadings(root, !!c.mobile);
 
           if (!(c.desktop && c.finePointer)) return;
           let stopMouse: (() => void) | undefined;
+          let stopSway: (() => void) | undefined;
           let disposed = false;
+          const heroTitle = root.querySelector<HTMLElement>("[data-ink-variant=hero]");
+
           whenIntroDone(() => {
-            if (!disposed) stopMouse = startMouseParallax(root);
+            if (!disposed) {
+              stopMouse = startMouseParallax(root);
+              if (heroTitle) stopSway = startInkSway(heroTitle);
+            }
           });
           const stopMagnetic = startMagnetic(root);
           return () => {
             disposed = true;
             stopMouse?.();
+            stopSway?.();
             stopMagnetic();
           };
         }
@@ -92,6 +103,7 @@ export function LobbyPage() {
       return () => {
         mmLayout.revert();
         mmIntro.revert();
+        stopHeroFit();
       };
     },
     { scope: rootRef }

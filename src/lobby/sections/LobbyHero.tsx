@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowDown, ArrowRight } from "lucide-react";
 import { LOBBY_ASSETS } from "../assets";
 import { ROUTES } from "@/lib/routes";
+import { InkHeading } from "../ink/InkHeading";
 
 /**
  * Hero gồm 5 lớp (xa → gần). Mỗi lớp có 2 tầng:
@@ -45,14 +46,14 @@ export function LobbyHero() {
       {/* Lớp 3 — tiêu đề, slogan, nút chính */}
       <div data-layer="title" className="absolute inset-0 z-20">
         <div data-mouse="title" className="mx-auto h-full max-w-7xl px-5 pt-28 sm:px-6 md:pt-[17svh] lg:px-10">
-          <h1
+          <InkHeading
+            as="h1"
+            inkId="hero"
+            variant="hero"
             id="hero-title"
-            data-split-title
             data-intro
-            className="max-w-[13ch] text-[clamp(2.25rem,6.4vw,6.6rem)] font-extrabold leading-[1.02] tracking-[-0.03em] text-gc-900"
-          >
-            Đồ cũ nhà bạn chưa phải là rác.
-          </h1>
+            className="max-w-[13ch] text-[clamp(2.25rem,min(6.4vw,11svh),6.6rem)] font-extrabold leading-[1.02] tracking-[-0.03em] text-gc-900"
+          />
 
           <p className="mt-5 max-w-[30rem] text-[clamp(1rem,1.35vw,1.2rem)] leading-relaxed text-gc-800 md:mt-7">
             <span data-slogan-line data-intro className="block">
@@ -99,8 +100,10 @@ export function LobbyHero() {
         </div>
       </div>
 
-      {/* Lớp 5 — tán lá / sương phía trước (ẩn trên điện thoại) */}
-      <div data-layer="fog" className="pointer-events-none absolute -inset-x-[4%] bottom-0 z-40 hidden h-[30svh] md:block">
+      {/* Lớp 5 — tán lá / sương phía trước (ẩn trên điện thoại). Cao 108vw / 3.2 = đúng tỉ lệ ảnh để lá không bị cắt ngang
+          (không dùng aspect-ratio: con h-full của nó sẽ cao 0);
+          độ hạ xuống dưới mép màn hình do heroFit.ts tính để lá không bao giờ che slogan và nút */}
+      <div data-layer="fog" className="lobby-hero-fog pointer-events-none absolute -inset-x-[4%] z-40 hidden h-[33.75vw] md:block">
         <div data-mouse="fog" data-intro className="relative h-full w-full">
           <Image
             src={LOBBY_ASSETS.foreground.src}

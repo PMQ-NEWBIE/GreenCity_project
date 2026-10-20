@@ -8,7 +8,7 @@ const beVietnam = Be_Vietnam_Pro({
   // Tiếng Việt chỉ cần latin + vietnamese (latin-ext thừa). Mỗi weight × bộ ký tự là một file
   // được preload — giữ ít để không tranh băng thông với CSS trên mạng chậm.
   subsets: ["latin", "vietnamese"],
-  weight: ["400", "600", "700", "800"],
+  weight: ["400", "500", "600", "700", "800"],
   display: "swap",
 });
 

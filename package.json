@@ -13,7 +13,11 @@
     "collab:check": "node scripts/collab/check.mjs",
     "content:missing": "node scripts/collab/content-missing.mjs",
     "content:image": "node scripts/collab/content-image.mjs",
+    "content:sheet": "node scripts/collab/content-sheet.mjs",
     "features:smoke": "node scripts/collab/smoke.mjs",
+    "ink:build": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/ink-headings/build.mjs",
+    "ink:sprites": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/ink-headings/sprites.mjs",
+    "ink:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/ink-headings/check.mjs",
     "test": "node --test scripts/tests/*.test.mjs"
   },
   "dependencies": {
@@ -39,6 +43,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "^16.1.1",
+    "opentype.js": "^2.0.0",
     "sharp": "^0.35.5",
     "tailwindcss": "^4",
     "typescript": "^5"

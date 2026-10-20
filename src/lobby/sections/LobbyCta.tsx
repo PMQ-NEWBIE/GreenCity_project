@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { LOBBY_ASSETS } from "../assets";
 import { ROUTES } from "@/lib/routes";
+import { InkHeading } from "../ink/InkHeading";
 
 export function LobbyCta() {
   return (
@@ -20,9 +21,13 @@ export function LobbyCta() {
       <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-gc-950/92 via-gc-900/80 to-gc-900/50" />
 
       <div className="relative mx-auto max-w-6xl">
-        <h2 id="cta-title" className="max-w-[18ch] text-[clamp(2rem,4.6vw,4rem)] font-extrabold leading-[1.05] tracking-[-0.02em] text-white">
-          Nhà bạn đang có gì cần dọn?
-        </h2>
+        <InkHeading
+          as="h2"
+          inkId="cta"
+          variant="chalk"
+          id="cta-title"
+          className="max-w-[18ch] text-[clamp(2rem,4.6vw,4rem)] font-extrabold leading-[1.05] tracking-[-0.02em] text-white"
+        />
         <p className="mt-5 max-w-xl text-[17px] leading-relaxed text-gc-100">
           Tạo tài khoản miễn phí, chưa tới một phút. Đã có tài khoản thì đăng nhập để tiếp tục.
         </p>

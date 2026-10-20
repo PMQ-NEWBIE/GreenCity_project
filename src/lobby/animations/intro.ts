@@ -1,9 +1,9 @@
 import gsap from "gsap";
-import { SplitText } from "gsap/SplitText";
 import { LOBBY_MOTION } from "../config";
+import { setInkInitial, buildInkTimeline } from "./ink";
 
 /**
- * Intro khi tải trang (~1.9s): nền zoom + hiện → chữ viền → tiêu đề từng ký tự →
+ * Intro khi tải trang (~1.9s): nền zoom + hiện → chữ viền → tiêu đề nét bút và lá hoa →
  * vật thể + sương → slogan từng dòng → nút CTA, header, gợi ý cuộn.
  *
  * Trạng thái đầu được gsap.set() TRƯỚC khi thêm .is-ready (CSS đang ẩn [data-intro]),
@@ -15,10 +15,7 @@ import { LOBBY_MOTION } from "../config";
 export function playIntro(root: HTMLElement, { lite = false }: { lite?: boolean } = {}): gsap.core.Timeline {
   const I = LOBBY_MOTION.intro;
   const q = gsap.utils.selector(root);
-  const title = root.querySelector<HTMLElement>("[data-split-title]");
-
-  // aria: "auto" → giữ nguyên câu cho trình đọc màn hình (aria-label), ẩn các ký tự đã tách
-  const split = title ? SplitText.create(title, { type: "words,chars", aria: "auto" }) : null;
+  const title = root.querySelector<HTMLElement>("[data-ink-variant=hero]");
 
   const sky = q("[data-mouse=sky]");
   const outline = q("[data-mouse=outline]");
@@ -34,17 +31,17 @@ export function playIntro(root: HTMLElement, { lite = false }: { lite?: boolean 
     gsap.set(subject, { autoAlpha: 0, y: I.subject.fromY });
   }
   gsap.set([outline, fog, header], { autoAlpha: 0 });
-  if (split) gsap.set(split.chars, { autoAlpha: 0, yPercent: I.title.fromYPercent });
+  if (title) setInkInitial(title);
   gsap.set(slogan, { autoAlpha: 0, y: 18 });
   gsap.set(finale, { autoAlpha: 0, y: 16 });
   root.classList.add("is-ready");
 
-  const titleEnd = I.title.at + I.title.duration + (split ? (split.chars.length - 1) * I.title.stagger : 0);
+  const ink = title ? buildInkTimeline(title, { lite }) : null;
+  const writtenOffset = ink ? (ink.labels.written ?? ink.duration()) : I.title.duration;
+  const titleEnd = I.title.at + writtenOffset;
 
   const tl = gsap.timeline({
     defaults: { ease: "power3.out" },
-    // Gộp lại DOM gốc sau intro: tiêu đề trở về một khối chữ bình thường
-    onComplete: () => split?.revert(),
   });
 
   if (!lite) {
@@ -55,22 +52,28 @@ export function playIntro(root: HTMLElement, { lite = false }: { lite?: boolean 
     );
   }
   tl.to(outline, { autoAlpha: 1, duration: I.outline.duration }, I.outline.at)
-    .to(fog, { autoAlpha: 1, duration: I.fog.duration }, I.fog.at)
-    .to(slogan, { autoAlpha: 1, y: 0, duration: I.slogan.duration, stagger: I.slogan.stagger }, titleEnd - I.slogan.overlap);
+    .to(fog, { autoAlpha: 1, duration: I.fog.duration }, I.fog.at);
 
-  if (split) {
-    tl.to(
-      split.chars,
-      { autoAlpha: 1, yPercent: 0, duration: I.title.duration, stagger: I.title.stagger, ease: I.title.ease },
-      I.title.at
-    );
+  if (ink) {
+    tl.add(ink, I.title.at);
   }
 
-  tl.to(finale, { autoAlpha: 1, y: 0, duration: I.finale.duration, stagger: 0.08 }, `>-${I.finale.overlap}`).to(
+  const sloganStart = titleEnd - I.slogan.overlap;
+  tl.to(
+    slogan,
+    { autoAlpha: 1, y: 0, duration: I.slogan.duration, stagger: I.slogan.stagger },
+    sloganStart
+  );
+
+  const sloganDuration = I.slogan.duration + (slogan.length > 1 ? (slogan.length - 1) * I.slogan.stagger : 0);
+  const finaleAt = sloganStart + sloganDuration - I.finale.overlap;
+
+  tl.to(finale, { autoAlpha: 1, y: 0, duration: I.finale.duration, stagger: 0.08 }, finaleAt).to(
     header,
     { autoAlpha: 1, duration: I.finale.duration },
     "<"
   );
+
   return tl;
 }
 

@@ -40,7 +40,7 @@ function topicAction(topic: ArticleTopic) {
       };
     case "tai-su-dung":
       return {
-        title: "Khu trao đổi đồ cũ",
+        title: "Cho tặng, đổi đồ cũ",
         desc: "Tặng miễn phí hoặc đổi lấy món đồ khác cùng những người dân lân cận tại TP.HCM.",
         btn: "Khám phá khu trao đổi",
         href: ROUTES.swap,

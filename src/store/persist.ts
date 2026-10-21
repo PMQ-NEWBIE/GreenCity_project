@@ -32,6 +32,7 @@ export interface PersistShape {
   orders: OrdersState;
   demands: DemandsState;
   mode: AppMode;
+  demoSeeded: string[];
 }
 
 const ROLES: UserRole[] = ["resident", "partner", "collaborator", "business", "operator"];
@@ -70,6 +71,7 @@ function parse(raw: Record<string, unknown>): PersistShape {
     orders: ordersHydrate(raw.orders),
     demands: demandsHydrate(raw.demands),
     mode: raw.mode === "buy" ? "buy" : "sell",
+    demoSeeded: arr<string>(raw.demoSeeded).filter((e) => typeof e === "string"),
   };
 }
 
@@ -104,6 +106,7 @@ export function savePersisted(state: AppState): "ok" | "quota" | "error" {
     orders: ordersPersist(state.orders),
     demands: demandsPersist(state.demands),
     mode: state.mode,
+    demoSeeded: state.demoSeeded,
   };
   try {
     window.localStorage.setItem(KEY_V2, JSON.stringify(payload));

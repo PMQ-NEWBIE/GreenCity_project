@@ -18,7 +18,7 @@ export function FavoritesView() {
 
   return (
     <PageContainer>
-      <PageIntro title="Đã lưu">
+      <PageIntro title="Món đã lưu">
         {favorites.length > 0
           ? `Bạn đang theo dõi ${favorites.length} món. Bấm lại hình trái tim để bỏ lưu.`
           : undefined}

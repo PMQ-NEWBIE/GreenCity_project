@@ -90,7 +90,7 @@ export function ProductDetailView({ productId }: { productId: string }) {
         className={cn(buttonClass.ghost, "-ml-3 text-muted-foreground hover:text-foreground")}
       >
         <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-        {product.isMine ? "Tin đăng của tôi" : "Danh sách tin"}
+        {product.isMine ? "Món tôi đang bán" : "Danh sách tin"}
       </Link>
 
       <div className="mt-3 grid gap-8 lg:grid-cols-[1.1fr_1fr]">

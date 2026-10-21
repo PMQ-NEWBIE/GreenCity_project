@@ -13,8 +13,8 @@ import { cn } from "@/lib/utils";
 
 /** Lối tắt phụ của người bán: đồ không đáng đăng bán thì gọi thu gom hoặc bỏ thùng. */
 const MORE: { href: string; icon: LucideIcon; label: string }[] = [
-  { href: ROUTES.collect, icon: Truck, label: "Gọi thu gom tận nhà" },
-  { href: ROUTES.bins, icon: Recycle, label: "Tìm thùng gần bạn" },
+  { href: ROUTES.collect, icon: Truck, label: "Gọi người tới lấy" },
+  { href: ROUTES.bins, icon: Recycle, label: "Điểm bỏ đồ gần nhà" },
   { href: ROUTES.consult, icon: ScanSearch, label: "Hỏi cách phân loại" },
 ];
 
@@ -36,7 +36,7 @@ export function SellerHomeView() {
   const steps = [
     { done: mine.length > 0, label: "Đăng tin bán món đầu tiên", href: ROUTES.sell },
     { done: incoming.some((o) => o.status !== "pending"), label: "Nhận hoặc từ chối một đơn đến", href: ROUTES.sellerOrders },
-    { done: myRequests.length > 0, label: "Gọi thu gom cho đồ không đáng đăng bán", href: ROUTES.collect },
+    { done: myRequests.length > 0, label: "Gọi người tới lấy đồ không đáng đăng bán", href: ROUTES.collect },
   ];
   const doneCount = steps.filter((s) => s.done).length;
 
@@ -51,7 +51,7 @@ export function SellerHomeView() {
         </div>
         <Link href={ROUTES.sell} className={buttonClass.primary}>
           <PackagePlus className="h-[18px] w-[18px]" aria-hidden="true" />
-          Đăng tin bán
+          Đăng bán
         </Link>
       </div>
 

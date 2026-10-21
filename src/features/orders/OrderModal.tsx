@@ -18,7 +18,7 @@ const QTY_HINT: Record<Product["unit"], string> = {
   "lô": "Ví dụ: cả lô",
 };
 
-/** Người mua đặt một tin: bao nhiêu, khi nào tới lấy, ghi chú. Người bán nhận hoặc từ chối ở khu "Đơn đến". */
+/** Người mua đặt một tin: bao nhiêu, khi nào tới lấy, ghi chú. Người bán nhận hoặc từ chối ở mục "Đơn khách đặt mua". */
 export function OrderModal({ product, open, onClose }: { product: Product; open: boolean; onClose: () => void }) {
   const { toast } = useApp();
   const { place } = useOrders();

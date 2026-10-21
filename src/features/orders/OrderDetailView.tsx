@@ -105,7 +105,7 @@ export function OrderDetailView({ id }: { id: string }) {
     <PageContainer className="max-w-5xl">
       <Link href={listHref} className={cn(buttonClass.ghost, "-ml-3 text-muted-foreground hover:text-foreground")}>
         <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-        {side === "seller" ? "Đơn đến" : resident ? "Đơn mua của tôi" : "Đơn thu mua"}
+        {side === "seller" ? "Đơn khách đặt mua" : resident ? "Đơn tôi đặt mua" : "Đơn tôi đã đặt"}
       </Link>
 
       <div className="mt-2 flex flex-wrap items-start justify-between gap-3">

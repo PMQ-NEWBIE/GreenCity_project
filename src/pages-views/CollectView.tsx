@@ -73,7 +73,7 @@ export function CollectView() {
 
   return (
     <PageContainer>
-      <PageIntro title="Gọi thu gom tận nhà">
+      <PageIntro title="Gọi người tới lấy tận nhà">
         Cho biết bạn có ve chai gì và lúc nào có nhà. Vựa hoặc người thu mua ve chai gần nhất sẽ nhận đơn, tới cân tại
         chỗ và trả tiền cho bạn.
       </PageIntro>

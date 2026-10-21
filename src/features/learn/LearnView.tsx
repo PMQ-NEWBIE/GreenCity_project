@@ -76,7 +76,7 @@ export function LearnView() {
 
   return (
     <PageContainer>
-      <PageIntro title="Kiến thức môi trường">
+      <PageIntro title="Hướng dẫn phân loại rác">
         Những hướng dẫn thực tế, dễ áp dụng giúp bạn và gia đình phân loại rác đúng cách, ủ phân tại nhà và giảm bớt đồ nhựa dùng một lần.
       </PageIntro>
 

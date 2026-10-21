@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LogIn, LogOut } from "lucide-react";
 import { useApp } from "@/store/app-store";
+import { useDemoStarter } from "@/store/use-demo-starter";
 import { useOrders, useOrderDemo } from "@/store/use-orders";
 import { Logo } from "@/components/greencity/Logo";
 import { ThemeToggle } from "@/components/greencity/ThemeToggle";
@@ -31,6 +32,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [moreOpen, setMoreOpen] = useState(false);
   const { incoming, bought } = useOrders();
   useOrderDemo();
+  useDemoStarter();
 
   const user = state.user;
   const publicPage = isPublicPath(pathname);

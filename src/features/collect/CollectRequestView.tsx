@@ -32,7 +32,7 @@ export function CollectRequestView({ id }: { id: string }) {
   const back = isOwner
     ? { href: ROUTES.collect, label: "Yêu cầu của bạn" }
     : isBuyer
-      ? { href: ROUTES.partnerPickups, label: "Yêu cầu tới lấy" }
+      ? { href: ROUTES.partnerPickups, label: "Người dân gọi tới lấy" }
       : { href: `${ROUTES.admin}?tab=don-thu-gom`, label: "Giám sát thu gom" };
 
   if (!r || (!isOwner && !isOps && !buyerCanAct)) {

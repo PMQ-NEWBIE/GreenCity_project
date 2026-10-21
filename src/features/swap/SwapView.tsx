@@ -92,7 +92,7 @@ export function SwapView() {
   return (
     <PageContainer>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <PageIntro title="Khu trao đổi đồ cũ">
+        <PageIntro title="Cho tặng, đổi đồ cũ">
           Nơi người dân chia sẻ, tặng miễn phí hoặc đổi lấy món đồ khác bạn đang cần. Hoàn toàn không sử dụng tiền mặt.
         </PageIntro>
         <Link

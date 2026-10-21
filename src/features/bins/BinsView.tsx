@@ -51,7 +51,7 @@ export function BinsView() {
   return (
     <PageContainer>
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <PageIntro title="Thùng thu gom gần bạn">
+        <PageIntro title="Điểm bỏ đồ gần nhà">
           Bỏ ve chai, quần áo cũ, rác hữu cơ vào đúng thùng rồi ghi nhận ở đây. Cộng tác viên kiểm tra thùng xong, điểm vào
           tài khoản của bạn.
         </PageIntro>

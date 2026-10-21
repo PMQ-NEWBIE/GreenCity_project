@@ -113,10 +113,10 @@ export function ProfileView() {
       {/* Lối tắt tới hoạt động — mỗi thứ nằm ở chế độ của nó */}
       <nav aria-label="Hoạt động của bạn" className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
-          { href: ROUTES.myListings, icon: Package, label: "Tin đăng của tôi", value: myListings },
-          { href: ROUTES.sellerOrders, icon: Inbox, label: "Đơn đến", value: incoming.length },
-          { href: ROUTES.buyerOrders, icon: ShoppingBag, label: "Đơn mua", value: bought.length },
-          { href: ROUTES.collect, icon: Truck, label: "Yêu cầu thu gom", value: myRequests.length },
+          { href: ROUTES.myListings, icon: Package, label: "Món tôi đang bán", value: myListings },
+          { href: ROUTES.sellerOrders, icon: Inbox, label: "Đơn khách đặt", value: incoming.length },
+          { href: ROUTES.buyerOrders, icon: ShoppingBag, label: "Đơn tôi đặt", value: bought.length },
+          { href: ROUTES.collect, icon: Truck, label: "Gọi người tới lấy", value: myRequests.length },
         ].map((l) => (
           <Link key={l.href} href={l.href} className="rounded-2xl border border-border bg-card p-4 hover:border-primary/50">
             <l.icon className="h-5 w-5 text-primary" aria-hidden="true" />

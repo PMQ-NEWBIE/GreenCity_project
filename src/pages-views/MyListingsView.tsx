@@ -37,10 +37,10 @@ export function MyListingsView() {
   return (
     <PageContainer className="max-w-4xl">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <PageIntro title="Tin đăng của tôi">Món bạn đang bán, bản nháp và món đã bán xong.</PageIntro>
+        <PageIntro title="Món tôi đang bán">Món bạn đang bán, bản nháp và món đã bán xong.</PageIntro>
         <Link href={ROUTES.sell} className={buttonClass.primary}>
           <PackagePlus className="h-[18px] w-[18px]" aria-hidden="true" />
-          Đăng tin mới
+          Đăng bán món mới
         </Link>
       </div>
 

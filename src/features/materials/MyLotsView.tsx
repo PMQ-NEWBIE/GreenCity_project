@@ -7,7 +7,7 @@ import { LotManage } from "./LotManage";
 export function MyLotsView() {
   return (
     <PageContainer>
-      <PageIntro title="Lô bán cho doanh nghiệp">
+      <PageIntro title="Lô hàng của tôi">
         Gom đủ một loại (từ 50kg) thì đăng lô kèm độ sạch, độ ẩm. Doanh nghiệp đặt giữ 48 giờ rồi cho xe tới lấy; lấy xong thì chốt đã bán.
       </PageIntro>
       <div className="mt-6">

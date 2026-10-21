@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { OrderDetailView } from "@/features/orders/OrderDetailView";
 
-export const metadata: Metadata = { title: "Chi tiết đơn thu mua" };
+export const metadata: Metadata = { title: "Chi tiết đơn đã đặt" };
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

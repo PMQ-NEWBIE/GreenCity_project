@@ -123,7 +123,7 @@ export function SellView() {
   return (
     <PageContainer className="max-w-5xl">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <PageIntro title="Đăng tin bán">
+        <PageIntro title="Đăng bán ve chai, đồ cũ">
           Điền 4 bước dưới đây, mất khoảng một phút. Tin càng rõ ràng, người mua càng dễ trả giá.
         </PageIntro>
         <button type="button" onClick={fillDemo} className={buttonClass.ghost}>

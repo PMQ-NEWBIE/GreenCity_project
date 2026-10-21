@@ -104,7 +104,7 @@ export function LitterReportView() {
 
   return (
     <PageContainer>
-      <PageIntro title="Báo điểm rác tự phát">
+      <PageIntro title="Báo chỗ đổ rác bừa">
         Thấy rác đổ bừa ở góc đường, chân cầu, bãi đất trống? Chụp ảnh và gửi vị trí. Ban điều hành xác minh, cho người tới
         dọn, và bạn được +{rule.points} điểm.
       </PageIntro>

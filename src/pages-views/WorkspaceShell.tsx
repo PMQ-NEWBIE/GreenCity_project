@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Lock, LogOut } from "lucide-react";
 import { useApp } from "@/store/app-store";
+import { useDemoStarter } from "@/store/use-demo-starter";
 import { useOrders, useOrderDemo } from "@/store/use-orders";
 import { useDemandDemo } from "@/store/use-demands";
 import { useCollect } from "@/store/hooks";
@@ -34,6 +35,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   const { requests } = useCollect();
   useOrderDemo();
   useDemandDemo();
+  useDemoStarter();
   const router = useRouter();
   const pathname = usePathname();
   const [accountOpen, setAccountOpen] = useState(false);

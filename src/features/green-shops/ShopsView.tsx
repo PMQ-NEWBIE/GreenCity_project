@@ -50,7 +50,7 @@ export function ShopsView() {
   return (
     <PageContainer>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <PageIntro title="Gian hàng doanh nghiệp xanh">
+        <PageIntro title="Cửa hàng sản phẩm xanh">
           Khám phá các cơ sở sản xuất phân bón hữu cơ, tiệm đồ dùng sinh thái và vườn ươm cây xanh uy tín tại TP.HCM.
         </PageIntro>
         <Link

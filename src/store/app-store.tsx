@@ -55,6 +55,8 @@ export interface AppState {
   orders: OrdersState;
   demands: DemandsState;
   mode: AppMode;
+  /** Email đã được gắn hoạt động khởi đầu của bản demo (data/demo-starter.ts) — mỗi email một lần */
+  demoSeeded: string[];
 }
 
 /** Thời điểm và id do nơi gọi tạo ra, để reducer luôn cho cùng kết quả với cùng một action. */
@@ -69,6 +71,7 @@ export type Action =
   | ({ type: "HYDRATE"; data: PersistShape | null } & Stamp)
   | { type: "SET_ROLE"; role: UserRole }
   | { type: "SET_MODE"; mode: AppMode }
+  | { type: "DEMO_SEEDED"; email: string }
   | { type: "TOGGLE_FAVORITE"; id: string }
   | { type: "ADD_PRODUCT"; product: Product }
   | { type: "REMOVE_PRODUCT"; id: string }
@@ -109,6 +112,7 @@ const initialState: AppState = {
   orders: ordersInitial,
   demands: demandsInitial,
   mode: "sell",
+  demoSeeded: [],
 };
 
 /** Người dùng chưa có điểm chào mừng thì cộng một lần (đọc số điểm từ POINT_RULES). */
@@ -172,6 +176,7 @@ export function reducer(state: AppState, action: Action): AppState {
             orders: d.orders,
             demands: d.demands,
             mode: d.mode,
+            demoSeeded: d.demoSeeded,
           }
         : {
             ...state,
@@ -192,6 +197,8 @@ export function reducer(state: AppState, action: Action): AppState {
       return state.user ? { ...state, user: { ...state.user, role: action.role } } : state;
     case "SET_MODE":
       return { ...state, mode: action.mode };
+    case "DEMO_SEEDED":
+      return state.demoSeeded.includes(action.email) ? state : { ...state, demoSeeded: [...state.demoSeeded, action.email] };
     case "TOGGLE_FAVORITE": {
       const has = state.favorites.includes(action.id);
       return {
@@ -299,7 +306,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       quotaWarnedRef.current = true;
       toast("error", "Bộ nhớ trình duyệt đã đầy", "Thay đổi mới chỉ giữ trong lần mở này. Xóa bớt tin có ảnh để lưu tiếp.");
     }
-  }, [state.user, state.remember, state.favorites, state.products, state.points, state.rewards, state.swap, state.collect, state.partners, state.bins, state.litter, state.lots, state.consults, state.orders, state.demands, state.mode, toast]);
+  }, [state.user, state.remember, state.favorites, state.products, state.points, state.rewards, state.swap, state.collect, state.partners, state.bins, state.litter, state.lots, state.consults, state.orders, state.demands, state.mode, state.demoSeeded, toast]);
 
   const login = useCallback(
     (user: DemoUser, remember = true) => dispatch({ type: "LOGIN", user, remember, ...stamp() }),

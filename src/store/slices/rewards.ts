@@ -8,12 +8,17 @@ export interface RewardsState {
   redemptions: Redemption[];
 }
 
-export type RewardsAction = { type: "REWARDS_SET_STATUS"; id: string; status: Redemption["status"] };
+export type RewardsAction =
+  | { type: "REWARDS_SET_STATUS"; id: string; status: Redemption["status"] }
+  /** Bản demo: phần quà người dân khác đã đổi (để cộng tác viên có quà chờ trao) */
+  | { type: "REWARDS_ADD"; redemption: Redemption };
 
 export const rewardsInitial: RewardsState = { redemptions: [] };
 
 export function rewardsReducer(state: RewardsState, action: RewardsAction): RewardsState {
   switch (action.type) {
+    case "REWARDS_ADD":
+      return state.redemptions.some((r) => r.id === action.redemption.id) ? state : { redemptions: [action.redemption, ...state.redemptions] };
     case "REWARDS_SET_STATUS":
       return { redemptions: state.redemptions.map((r) => (r.id === action.id ? { ...r, status: action.status } : r)) };
     default:

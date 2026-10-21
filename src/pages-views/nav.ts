@@ -58,33 +58,33 @@ const item = (href: string, label: string, icon: LucideIcon, extra: Partial<NavI
 /* ------------------------------ Người dân ------------------------------ */
 
 const SELL_ITEMS: NavItem[] = [
-  item(ROUTES.sellerHome, "Tổng quan bán", LayoutDashboard, { short: "Tổng quan", exact: true }),
-  item(ROUTES.sellerOrders, "Đơn đến", Inbox, { badge: "incoming" }),
-  item(ROUTES.myListings, "Tin đăng của tôi", Package, { short: "Tin của tôi" }),
-  item(ROUTES.sell, "Đăng tin bán", PackagePlus, { short: "Đăng tin" }),
-  item(ROUTES.collect, "Gọi thu gom", Truck, { short: "Thu gom" }),
-  item(ROUTES.bins, "Thùng thu gom", Recycle),
+  item(ROUTES.sellerHome, "Tổng quan bán hàng", LayoutDashboard, { short: "Tổng quan", exact: true }),
+  item(ROUTES.sellerOrders, "Đơn khách đặt mua", Inbox, { short: "Đơn khách", badge: "incoming" }),
+  item(ROUTES.myListings, "Món tôi đang bán", Package, { short: "Đang bán" }),
+  item(ROUTES.sell, "Đăng bán ve chai, đồ cũ", PackagePlus, { short: "Đăng bán" }),
+  item(ROUTES.collect, "Gọi người tới lấy", Truck, { short: "Gọi tới lấy" }),
+  item(ROUTES.bins, "Điểm bỏ đồ gần nhà", Recycle, { short: "Điểm bỏ đồ" }),
 ];
 
 const BUY_ITEMS: NavItem[] = [
-  item(ROUTES.discover, "Đồ thanh lý quanh đây", Compass, { short: "Khám phá" }),
-  item(ROUTES.buyerOrders, "Đơn mua của tôi", ShoppingBag, { short: "Đơn mua", badge: "bought" }),
-  item(ROUTES.favorites, "Đã lưu", Heart, { badge: "favorites" }),
-  item(ROUTES.shops, "Gian hàng xanh", Store, { short: "Gian hàng" }),
+  item(ROUTES.discover, "Mua đồ cũ quanh đây", Compass, { short: "Mua đồ cũ" }),
+  item(ROUTES.buyerOrders, "Đơn tôi đặt mua", ShoppingBag, { short: "Đơn đã đặt", badge: "bought" }),
+  item(ROUTES.favorites, "Món đã lưu", Heart, { short: "Đã lưu", badge: "favorites" }),
+  item(ROUTES.shops, "Cửa hàng sản phẩm xanh", Store, { short: "Hàng xanh" }),
 ];
 
 /** Dùng chung cho cả hai chế độ — đặt dưới, chữ nhỏ hơn việc chính. */
 const SHARED_ITEMS: NavItem[] = [
-  item(ROUTES.points, "Điểm & đổi quà", Coins, { also: [ROUTES.rewards] }),
-  item(ROUTES.swap, "Trao đổi đồ", Repeat2),
-  item(ROUTES.map, "Bản đồ xanh", MapIcon),
-  item(ROUTES.litterReport, "Báo điểm rác", Megaphone),
-  item(ROUTES.learn, "Kiến thức", BookOpen, { also: [ROUTES.consult] }),
+  item(ROUTES.points, "Điểm thưởng & đổi quà", Coins, { short: "Điểm thưởng", also: [ROUTES.rewards] }),
+  item(ROUTES.swap, "Cho tặng, đổi đồ cũ", Repeat2, { short: "Đổi đồ" }),
+  item(ROUTES.map, "Bản đồ điểm thu gom", MapIcon, { short: "Bản đồ" }),
+  item(ROUTES.litterReport, "Báo chỗ đổ rác bừa", Megaphone, { short: "Báo rác" }),
+  item(ROUTES.learn, "Hướng dẫn phân loại rác", BookOpen, { short: "Hướng dẫn", also: [ROUTES.consult] }),
 ];
 
 export function residentNav(mode: AppMode): NavGroup[] {
   return [
-    mode === "sell" ? { title: "Kênh bán", items: SELL_ITEMS } : { title: "Mua hàng", items: BUY_ITEMS },
+    mode === "sell" ? { title: "Bán đồ", items: SELL_ITEMS } : { title: "Mua đồ cũ", items: BUY_ITEMS },
     { title: "Sống xanh", items: SHARED_ITEMS },
   ];
 }
@@ -126,8 +126,8 @@ export const WORKSPACE_SHORT: Record<Exclude<UserRole, "resident">, string> = {
 const sellToBusiness = (lots: string, demands: string): NavGroup => ({
   title: "Bán cho doanh nghiệp",
   items: [
-    item(lots, "Lô của tôi", Boxes, { short: "Lô hàng" }),
-    item(demands, "Doanh nghiệp cần mua", Building2, { short: "Cần mua" }),
+    item(lots, "Lô hàng của tôi", Boxes, { short: "Lô hàng" }),
+    item(demands, "Doanh nghiệp cần mua", Building2, { short: "DN cần mua" }),
   ],
 });
 
@@ -141,11 +141,11 @@ const sellToBusiness = (lots: string, demands: string): NavGroup => ({
 const WORKSPACE_NAV: Record<Exclude<UserRole, "resident">, NavGroup[]> = {
   partner: [
     {
-      title: "Mua của người dân",
+      title: "Mua ve chai của người dân",
       items: [
-        item(ROUTES.partner, "Tin bán phế liệu", Scale, { short: "Tin bán", exact: true, also: ["/doi-tac/tin"] }),
-        item(ROUTES.partnerPickups, "Yêu cầu tới lấy", Truck, { short: "Tới lấy", badge: "pickups" }),
-        item(ROUTES.partnerOrders, "Đơn thu mua", ShoppingBag, { short: "Đơn thu mua", badge: "bought" }),
+        item(ROUTES.partner, "Ve chai đang rao bán", Scale, { short: "Rao bán", exact: true, also: ["/doi-tac/tin"] }),
+        item(ROUTES.partnerPickups, "Nhà dân gọi tới lấy", Truck, { short: "Gọi tới lấy", badge: "pickups" }),
+        item(ROUTES.partnerOrders, "Đơn tôi đã đặt", ShoppingBag, { short: "Đơn đã đặt", badge: "bought" }),
       ],
     },
     sellToBusiness(ROUTES.partnerLots, ROUTES.partnerDemands),
@@ -154,8 +154,8 @@ const WORKSPACE_NAV: Record<Exclude<UserRole, "resident">, NavGroup[]> = {
     {
       title: "Điểm thu gom",
       items: [
-        item(ROUTES.ctv, "Việc ở điểm", ClipboardCheck, { short: "Việc", exact: true }),
-        item(ROUTES.ctvGifts, "Trao quà", Gift),
+        item(ROUTES.ctv, "Duyệt bỏ đồ, thùng đầy", ClipboardCheck, { short: "Duyệt", exact: true }),
+        item(ROUTES.ctvGifts, "Trao quà đổi điểm", Gift, { short: "Trao quà" }),
       ],
     },
     sellToBusiness(ROUTES.ctvLots, ROUTES.ctvDemands),
@@ -164,9 +164,9 @@ const WORKSPACE_NAV: Record<Exclude<UserRole, "resident">, NavGroup[]> = {
     {
       title: "Thu mua",
       items: [
-        item(ROUTES.materials, "Chợ lô vật liệu", Boxes, { short: "Chợ lô", exact: true }),
-        item(ROUTES.businessDemands, "Nhu cầu thu mua", Megaphone, { short: "Nhu cầu" }),
-        item(ROUTES.stats, "Thống kê", ChartColumn),
+        item(ROUTES.materials, "Mua lô phế liệu", Boxes, { short: "Mua lô", exact: true }),
+        item(ROUTES.businessDemands, "Đăng nhu cầu cần mua", Megaphone, { short: "Cần mua" }),
+        item(ROUTES.stats, "Thống kê môi trường", ChartColumn, { short: "Thống kê" }),
       ],
     },
   ],
@@ -175,14 +175,14 @@ const WORKSPACE_NAV: Record<Exclude<UserRole, "resident">, NavGroup[]> = {
       title: "Quản trị",
       items: [
         item(ROUTES.admin, "Bảng điều hành", ShieldCheck, { short: "Điều hành", exact: true }),
-        item(ROUTES.ctv, "Điểm thu gom", ClipboardCheck, { short: "Điểm gom", exact: true }),
+        item(ROUTES.ctv, "Theo dõi điểm thu gom", ClipboardCheck, { short: "Điểm gom", exact: true }),
       ],
     },
     {
       title: "Theo dõi",
       items: [
-        item(ROUTES.opsMaterials, "Lô vật liệu", Boxes, { short: "Lô" }),
-        item(ROUTES.opsStats, "Thống kê", ChartColumn),
+        item(ROUTES.opsMaterials, "Theo dõi lô bán", Boxes, { short: "Lô bán" }),
+        item(ROUTES.opsStats, "Thống kê môi trường", ChartColumn, { short: "Thống kê" }),
       ],
     },
   ],
@@ -196,47 +196,47 @@ export function workspaceNav(role: UserRole): NavGroup[] {
 
 /** Tiêu đề trên thanh trên cùng. Đường dẫn dài đứng trước để khớp đúng trang con. */
 export const PAGE_TITLES: { prefix: string; title: string }[] = [
-  { prefix: ROUTES.sellerOrders, title: "Đơn đến" },
-  { prefix: ROUTES.myListings, title: "Tin đăng của tôi" },
-  { prefix: ROUTES.sellerHome, title: "Tổng quan bán" },
-  { prefix: ROUTES.buyerOrders, title: "Đơn mua của tôi" },
+  { prefix: ROUTES.sellerOrders, title: "Đơn khách đặt mua" },
+  { prefix: ROUTES.myListings, title: "Món tôi đang bán" },
+  { prefix: ROUTES.sellerHome, title: "Tổng quan bán hàng" },
+  { prefix: ROUTES.buyerOrders, title: "Đơn tôi đặt mua" },
   { prefix: "/don", title: "Chi tiết đơn" },
-  { prefix: ROUTES.discover, title: "Đồ thanh lý" },
+  { prefix: ROUTES.discover, title: "Mua đồ cũ" },
   { prefix: "/san-pham", title: "Chi tiết tin đăng" },
-  { prefix: ROUTES.sell, title: "Đăng tin bán" },
-  { prefix: ROUTES.collect, title: "Gọi thu gom" },
-  { prefix: ROUTES.favorites, title: "Đã lưu" },
+  { prefix: ROUTES.sell, title: "Đăng bán" },
+  { prefix: ROUTES.collect, title: "Gọi người tới lấy" },
+  { prefix: ROUTES.favorites, title: "Món đã lưu" },
   { prefix: ROUTES.profile, title: "Hồ sơ của tôi" },
   { prefix: ROUTES.sortingGuide, title: "Sổ tay phân loại" },
-  { prefix: ROUTES.learn, title: "Kiến thức" },
+  { prefix: ROUTES.learn, title: "Hướng dẫn phân loại" },
   { prefix: ROUTES.pointRules, title: "Quy tắc tính điểm" },
   { prefix: ROUTES.points, title: "Điểm của tôi" },
   { prefix: ROUTES.rewards, title: "Đổi quà" },
-  { prefix: ROUTES.shops, title: "Gian hàng xanh" },
-  { prefix: ROUTES.swapPost, title: "Đăng đồ trao đổi" },
-  { prefix: ROUTES.swap, title: "Trao đổi đồ" },
-  { prefix: ROUTES.bins, title: "Thùng thu gom" },
-  { prefix: ROUTES.litterReport, title: "Báo điểm rác" },
-  { prefix: ROUTES.map, title: "Bản đồ xanh" },
+  { prefix: ROUTES.shops, title: "Cửa hàng xanh" },
+  { prefix: ROUTES.swapPost, title: "Đăng đồ cho tặng, đổi" },
+  { prefix: ROUTES.swap, title: "Cho tặng, đổi đồ" },
+  { prefix: ROUTES.bins, title: "Điểm bỏ đồ gần nhà" },
+  { prefix: ROUTES.litterReport, title: "Báo chỗ đổ rác bừa" },
+  { prefix: ROUTES.map, title: "Bản đồ điểm thu gom" },
   { prefix: ROUTES.consult, title: "Hỏi cách phân loại" },
   // Khu làm việc
-  { prefix: ROUTES.partnerOrders, title: "Đơn thu mua" },
-  { prefix: ROUTES.partnerLots, title: "Lô bán cho doanh nghiệp" },
+  { prefix: ROUTES.partnerOrders, title: "Đơn tôi đã đặt" },
+  { prefix: ROUTES.partnerLots, title: "Lô hàng của tôi" },
   { prefix: ROUTES.partnerDemands, title: "Doanh nghiệp cần mua" },
-  { prefix: ROUTES.ctvGifts, title: "Trao quà" },
-  { prefix: ROUTES.ctvLots, title: "Lô bán cho doanh nghiệp" },
+  { prefix: ROUTES.ctvGifts, title: "Trao quà đổi điểm" },
+  { prefix: ROUTES.ctvLots, title: "Lô hàng của tôi" },
   { prefix: ROUTES.ctvDemands, title: "Doanh nghiệp cần mua" },
-  { prefix: ROUTES.businessDemands, title: "Nhu cầu thu mua" },
-  { prefix: ROUTES.partnerPickups, title: "Yêu cầu tới lấy" },
-  { prefix: "/doi-tac/tin", title: "Chi tiết tin phế liệu" },
-  { prefix: ROUTES.partner, title: "Tin bán phế liệu" },
-  { prefix: "/van-hanh/thu-gom", title: "Chi tiết đơn thu gom" },
-  { prefix: ROUTES.opsMaterials, title: "Lô vật liệu" },
-  { prefix: ROUTES.opsStats, title: "Thống kê" },
+  { prefix: ROUTES.businessDemands, title: "Đăng nhu cầu cần mua" },
+  { prefix: ROUTES.partnerPickups, title: "Người dân gọi tới lấy" },
+  { prefix: "/doi-tac/tin", title: "Chi tiết tin ve chai" },
+  { prefix: ROUTES.partner, title: "Ve chai đang rao bán" },
+  { prefix: "/van-hanh/thu-gom", title: "Chi tiết yêu cầu tới lấy" },
+  { prefix: ROUTES.opsMaterials, title: "Theo dõi lô bán" },
+  { prefix: ROUTES.opsStats, title: "Thống kê môi trường" },
   { prefix: ROUTES.admin, title: "Bảng điều hành" },
-  { prefix: ROUTES.ctv, title: "Điểm thu gom" },
-  { prefix: ROUTES.stats, title: "Thống kê" },
-  { prefix: ROUTES.materials, title: "Chợ lô vật liệu" },
+  { prefix: ROUTES.ctv, title: "Duyệt bỏ đồ, thùng đầy" },
+  { prefix: ROUTES.stats, title: "Thống kê môi trường" },
+  { prefix: ROUTES.materials, title: "Mua lô phế liệu" },
 ];
 
 export function isActive(pathname: string, item: Pick<NavItem, "href" | "also" | "exact">) {

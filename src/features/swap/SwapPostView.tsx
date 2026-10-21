@@ -115,7 +115,7 @@ export function SwapPostView() {
   return (
     <PageContainer className="max-w-5xl">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <PageIntro title="Đăng đồ trao đổi">
+        <PageIntro title="Đăng đồ cho tặng, đổi">
           Điền 4 bước dưới đây để chia sẻ đồ dùng cũ còn tốt. Tặng miễn phí hoặc đổi lấy món khác, hoàn toàn không dùng tiền.
         </PageIntro>
         <button

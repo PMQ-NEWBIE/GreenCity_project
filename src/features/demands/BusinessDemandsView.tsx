@@ -22,7 +22,7 @@ export function BusinessDemandsView() {
   return (
     <PageContainer>
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <PageIntro title="Nhu cầu thu mua">
+        <PageIntro title="Đăng nhu cầu cần mua">
           Cần một loại hàng đều đặn (rác hữu cơ làm phân, chai PET, bìa carton…)? Đăng nhu cầu, vựa và điểm thu gom sẽ chào hàng cho bạn chọn.
         </PageIntro>
         {!adding && (

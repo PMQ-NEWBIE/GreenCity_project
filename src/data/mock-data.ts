@@ -287,4 +287,18 @@ export const PRODUCTS: Product[] = [
     status: "available",
     seller: sellerIndividual3,
   },
+  {
+    id: "p11",
+    name: "Xác laptop, bàn phím, bo mạch hỏng",
+    categoryId: "ewaste",
+    price: 15000,
+    unit: "kg",
+    area: "Quận 10",
+    description:
+      "Dọn phòng làm việc được một thùng đồ điện tử hư: 3 xác laptop, mấy bàn phím, bo mạch cũ. Không sửa được nữa, cân ký bán hết. Khoảng 8kg.",
+    image: IMAGES.electronic,
+    postedHoursAgo: 9,
+    status: "available",
+    seller: sellerIndividual2,
+  },
 ];

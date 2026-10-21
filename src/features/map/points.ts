@@ -8,10 +8,10 @@ import { ROUTES } from "@/lib/routes";
 export type MapLayer = "thung" | "vua" | "vuon" | "gian-hang" | "diem-rac";
 
 export const LAYER_LABEL: Record<MapLayer, string> = {
-  thung: "Thùng thu gom",
+  thung: "Điểm bỏ đồ",
   vua: "Điểm tái chế, vựa",
   vuon: "Vườn cộng đồng",
-  "gian-hang": "Gian hàng xanh",
+  "gian-hang": "Cửa hàng xanh",
   "diem-rac": "Điểm rác đã báo",
 };
 

@@ -31,7 +31,7 @@ export function MaterialsView() {
   if (user?.role === "operator") {
     return (
       <PageContainer>
-        <PageIntro title="Lô vật liệu">Mọi lô vựa và điểm thu gom đang bán cho doanh nghiệp. Người đăng lô tự chốt bán; ở đây chỉ theo dõi.</PageIntro>
+        <PageIntro title="Theo dõi lô bán">Mọi lô vựa và điểm thu gom đang bán cho doanh nghiệp. Người đăng lô tự chốt bán; ở đây chỉ theo dõi.</PageIntro>
         <div className="mt-6">
           <LotManage scope="all" />
         </div>
@@ -41,7 +41,7 @@ export function MaterialsView() {
 
   return (
     <PageContainer>
-      <PageIntro title="Chợ lô vật liệu">
+      <PageIntro title="Mua lô phế liệu">
         Lô do vựa và điểm thu gom gom đủ số lượng, có ghi độ sạch, độ ẩm. Giữ lô 48 giờ để sắp xếp xe, tới lấy hàng xong thì bấm đã lấy.
       </PageIntro>
       <div className="mt-6">

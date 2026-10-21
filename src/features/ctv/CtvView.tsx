@@ -20,7 +20,7 @@ export function CtvView() {
 
   return (
     <PageContainer>
-      <PageIntro title="Việc ở điểm thu gom">
+      <PageIntro title="Duyệt bỏ đồ, thùng đầy">
         Kiểm tra đồ người dân bỏ vào thùng và xác nhận thùng đầy. Mỗi lượt bạn duyệt, điểm thưởng của người dân được ghi nhận ngay.
       </PageIntro>
       <div className="mt-6">

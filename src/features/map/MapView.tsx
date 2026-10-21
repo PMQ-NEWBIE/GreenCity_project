@@ -108,7 +108,7 @@ export function MapView() {
   return (
     <PageContainer className="max-w-7xl">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <PageIntro title="Bản đồ xanh">
+        <PageIntro title="Bản đồ điểm thu gom">
           Thùng thu gom, điểm tái chế, vườn cộng đồng và gian hàng xanh quanh bạn. Bấm một điểm để xem chi tiết.
         </PageIntro>
         <button type="button" onClick={locate} disabled={geo === "loading"} className={buttonClass.secondary}>

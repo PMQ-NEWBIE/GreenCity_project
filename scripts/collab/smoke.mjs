@@ -106,7 +106,7 @@ const EMAIL = {
 };
 
 /** Dữ liệu demo đặt vào localStorage trước mỗi lần mở trang. role = null → khách. */
-function seedScript(role, theme) {
+function seedScript(role, theme, starter = false) {
   const payload = {
     v: 2,
     user: role ? { name: "Người Kiểm Thử", email: EMAIL[role], memberSince: "Tháng 10/2026", role } : null,
@@ -121,6 +121,7 @@ function seedScript(role, theme) {
     localStorage.setItem("greencity-demo-v2", ${JSON.stringify(JSON.stringify(payload))});
     localStorage.setItem("theme", "${theme}");
     localStorage.setItem("greencity-demo-banner-hidden", "1");
+    ${starter ? 'localStorage.removeItem("greencity-no-starter");' : 'localStorage.setItem("greencity-no-starter", "1");'}
   } catch (e) {}`;
 }
 
@@ -211,9 +212,9 @@ const viewport = async (v) => {
 };
 
 let seedId = null;
-const seed = async (role, theme) => {
+const seed = async (role, theme, starter = false) => {
   if (seedId) await send("Page.removeScriptToEvaluateOnNewDocument", { identifier: seedId });
-  seedId = (await send("Page.addScriptToEvaluateOnNewDocument", { source: seedScript(role, theme) })).identifier;
+  seedId = (await send("Page.addScriptToEvaluateOnNewDocument", { source: seedScript(role, theme, starter) })).identifier;
 };
 
 const goto = async (url, wait = 1400) => {
@@ -282,13 +283,21 @@ const switchRole = async (label) => {
   await sleep(700);
   const scope = staff ? '[role="dialog"] label' : "main label";
   await evaluate(`[...document.querySelectorAll(${JSON.stringify(scope)})].find(l => l.textContent.includes(${JSON.stringify(label)}))?.click()`);
-  await sleep(900);
-  if (!staff && label === "Người dân") await clickByText("Tổng quan bán", { within: "aside" });
+  // Chờ trang tự chuyển xong sang khu của vai trò mới (bấm menu giữa chừng sẽ bị lần chuyển trang đó đè mất)
+  await sleep(600);
+  let prev = "";
+  for (let i = 0; i < 20; i++) {
+    await sleep(300);
+    const path = await evaluate("location.pathname");
+    if (path === prev) break;
+    prev = path;
+  }
+  if (!staff && label === "Người dân") await clickByText("Tổng quan bán hàng", { within: "aside" });
 };
 
 /** Số dư điểm ở Tổng quan bán (chế độ bán của người dân). */
 const readBalance = async () => {
-  await clickByText("Tổng quan bán", { within: "aside" });
+  await clickByText("Tổng quan bán hàng", { within: "aside" });
   await sleep(800);
   return evaluate(`(() => { const a = [...document.querySelectorAll('main a')].find(x => /điểm thưởng$/.test(x.textContent.trim())); return a?.textContent.trim().split(" ")[0]; })()`);
 };
@@ -395,7 +404,7 @@ try {
     if (code && SIDE !== "gemini") {
       // Trả thưởng tại điểm thu gom: cộng tác viên nhập mã người dân đọc
       await switchRole("Cộng tác viên");
-      await clickByText("Trao quà", { within: "aside" });
+      await clickByText("Trao quà đổi điểm", { within: "aside" });
       await sleep(700);
       await setField("#gift-code", code.slice(3));
       await clickByText("Kiểm tra mã", { within: "main" });
@@ -625,7 +634,7 @@ try {
     await evaluate(`document.querySelector('[role="dialog"] form button[type="submit"]').click()`);
     await sleep(500);
     check("Vựa: chào hàng vào nhu cầu doanh nghiệp, hiện 'Chờ doanh nghiệp trả lời'", await evaluate(`document.querySelector('main').innerText.includes('Chờ doanh nghiệp trả lời')`));
-    await clickByText("Lô của tôi", { within: "aside" });
+    await clickByText("Lô hàng của tôi", { within: "aside" });
     await sleep(600);
     await clickByText("Đăng lô mới", { within: "main" });
     await sleep(300);
@@ -687,7 +696,7 @@ try {
     const orderPage = await evaluate(`({ path: location.pathname, pending: !!document.querySelector('main')?.innerText.includes('Chờ người bán xác nhận') })`);
     await shot("luong-don-mua.png");
     check("Đơn mua bán: đặt tin mẫu → mở trang đơn, chờ người bán xác nhận", orderPage.path.startsWith("/don/") && orderPage.pending, JSON.stringify(orderPage));
-    await clickByText("Đơn mua của tôi", { exact: false, within: "aside" });
+    await clickByText("Đơn tôi đặt mua", { exact: false, within: "aside" });
     await sleep(700);
     const listed = await evaluate(`document.querySelector('main')?.innerText.includes('Khoảng 5 kg')`);
     check("Đơn mua bán: đơn vừa đặt nằm trong Đơn mua của tôi", listed);
@@ -695,15 +704,15 @@ try {
     // Phía người bán: đăng tin → người mua mô phỏng (bản demo) đặt sau ~15 giây → nhận đơn → giao xong → tin thành "Đã bán"
     await clickByText("Tôi bán", { within: "aside" });
     await sleep(700);
-    const sellMenu = await evaluate(`[...document.querySelectorAll('aside a')].some(a => a.textContent.trim() === 'Đơn đến') && ![...document.querySelectorAll('aside a')].some(a => a.textContent.trim() === 'Đơn mua của tôi')`);
+    const sellMenu = await evaluate(`[...document.querySelectorAll('aside a')].some(a => a.textContent.trim().startsWith('Đơn khách đặt mua')) && ![...document.querySelectorAll('aside a')].some(a => a.textContent.trim().startsWith('Đơn tôi đặt mua'))`);
     check("Công tắc 'Tôi bán' đổi sang menu người bán (không còn mục mua)", sellMenu);
-    await clickByText("Đăng tin bán", { within: "aside" });
+    await clickByText("Đăng bán ve chai, đồ cũ", { within: "aside" });
     await sleep(700);
     await clickByText("Điền thử dữ liệu mẫu", { within: "main" });
     await sleep(300);
     await evaluate(`document.querySelector('main form button[type="submit"]').click()`);
     await sleep(1500);
-    await clickByText("Đơn đến", { exact: false, within: "aside" });
+    await clickByText("Đơn khách đặt mua", { exact: false, within: "aside" });
     let incoming = false;
     for (let i = 0; i < 12 && !incoming; i++) {
       await sleep(2000);
@@ -718,7 +727,7 @@ try {
     await clickByText("Đã giao xong", { within: "main" });
     await sleep(500);
     const sellerDone = await evaluate(`document.querySelector('main')?.innerText.includes('Giao dịch đã xong')`);
-    await clickByText("Tin đăng của tôi", { exact: false, within: "aside" });
+    await clickByText("Món tôi đang bán", { exact: false, within: "aside" });
     await sleep(700);
     const listingSold = await evaluate(`[...document.querySelectorAll('main li')].some(l => l.innerText.includes('Đã bán'))`);
     await shot("luong-don-ban.png");
@@ -741,9 +750,25 @@ try {
     const partnerOrder = await evaluate(`({ path: location.pathname, pending: !!document.querySelector('main')?.innerText.includes('Chờ người bán xác nhận') })`);
     await shot("luong-doi-tac-thu-mua.png");
     check("Người thu mua: đặt lô phế liệu → trang đơn trong khu người thu mua", partnerOrder.path.startsWith("/doi-tac/don/") && partnerOrder.pending, JSON.stringify(partnerOrder));
-    await clickByText("Đơn thu mua", { exact: false, within: "aside" });
+    await clickByText("Đơn tôi đã đặt", { exact: false, within: "aside" });
     await sleep(700);
     check("Người thu mua: đơn vừa đặt nằm trong Đơn thu mua", await evaluate(`document.querySelector('main')?.innerText.includes('Cả kiện 20 kg')`));
+
+    // Hoạt động khởi đầu của bản demo: tài khoản vào lần đầu thấy web "đang chạy", không trống trơn.
+    // (Mỗi lần tải trang, seed ghi lại dữ liệu trống nên chỉ đọc ngay sau khi vào — bộ khởi đầu chạy lại mỗi lần.)
+    await seed("resident", "light", true);
+    await goto(BASE + "/ban-hang", 2500);
+    const residentLive = await evaluate(`(() => { const t = document.querySelector("main").innerText; return { cho: /Cần bạn xác nhận \\(1\\)/.test(t), nguoiMua: t.includes("Anh Tư Hòa") }; })()`);
+    check("Bản demo: người dân vào lần đầu đã có đơn chờ xác nhận từ người thu mua", residentLive.cho && residentLive.nguoiMua, JSON.stringify(residentLive));
+    await seed("partner", "light", true);
+    await goto(BASE + "/doi-tac/don", 2500);
+    check("Bản demo: người thu mua vào lần đầu đã có đơn đang làm", await evaluate(`document.querySelectorAll('main a[href^="/doi-tac/don/"]').length >= 1 && document.querySelector("main").innerText.includes("Chai nhựa PET")`));
+    await seed("collaborator", "light", true);
+    await goto(BASE + "/cong-tac-vien/trao-qua", 2500);
+    check("Bản demo: cộng tác viên vào lần đầu đã có quà chờ trao", await evaluate(`document.querySelector("main").innerText.includes("GC-7KQ2-MD4P")`));
+    await seed("business", "light", true);
+    await goto(BASE + "/doanh-nghiep/nhu-cau", 2500);
+    check("Bản demo: doanh nghiệp vào lần đầu đã có nhu cầu kèm lời chào hàng", await evaluate(`document.querySelector("main").innerText.includes("Lời chào hàng (2)")`));
   }
 } catch (err) {
   check("Chạy kiểm tra không lỗi", false, err.message);

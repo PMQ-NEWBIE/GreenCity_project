@@ -25,7 +25,7 @@ export function PickupBoardView() {
 
   return (
     <PageContainer className="max-w-4xl">
-      <PageIntro title="Yêu cầu tới lấy">
+      <PageIntro title="Người dân gọi tới lấy">
         Người dân có ve chai muốn bán nhưng không đăng giá, chỉ cần người tới cân. Nhận đơn hợp tuyến của bạn, tới đúng hẹn, cân trước mặt chủ nhà rồi trả tiền.
       </PageIntro>
 

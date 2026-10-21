@@ -16,7 +16,7 @@ export const POINT_REASON_LABEL: Record<PointReason, string> = {
   welcome: "Điểm chào mừng",
   home_pickup: "Thu gom tận nhà",
   bin_dropoff: "Bỏ đồ vào thùng",
-  litter_report: "Báo điểm rác",
+  litter_report: "Báo chỗ đổ rác bừa",
   bin_full_report: "Báo thùng đầy",
   redeem: "Đổi quà",
   admin_adjust: "Điều chỉnh",

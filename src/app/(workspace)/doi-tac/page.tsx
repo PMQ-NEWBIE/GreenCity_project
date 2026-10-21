@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { DiscoverView } from "@/pages-views/DiscoverView";
 
-export const metadata: Metadata = { title: "Tin bán phế liệu" };
+export const metadata: Metadata = { title: "Ve chai đang rao bán" };
 
 /** Đối tác thu mua chỉ thấy tin phế liệu (giấy, nhựa, kim loại, thủy tinh, điện tử hỏng). */
 export default function Page() {

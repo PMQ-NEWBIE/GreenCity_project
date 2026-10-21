@@ -25,30 +25,30 @@ type Copy = { title: string; lead: string; empty: string; emptyText: string; cta
 
 const COPY: Record<OrderSide, Copy> = {
   seller: {
-    title: "Đơn đến",
+    title: "Đơn khách đặt mua",
     lead: "Người mua đặt vào tin của bạn. Nhận đơn để hẹn giờ giao, hoặc từ chối nếu không bán được.",
     empty: "Chưa có đơn nào",
     emptyText: "Khi có người đặt mua món bạn đăng, đơn sẽ hiện ở đây.",
-    cta: "Đăng tin bán",
+    cta: "Đăng bán ve chai, đồ cũ",
     href: ROUTES.sell,
   },
   buyer: {
-    title: "Đơn mua của tôi",
+    title: "Đơn tôi đặt mua",
     lead: "Các món bạn đã đặt. Người bán xác nhận xong là có thể hẹn tới lấy hàng.",
     empty: "Bạn chưa đặt mua món nào",
     emptyText: "Tìm bàn ghế, đồ điện, đồ dùng cũ còn tốt quanh bạn rồi bấm \"Đặt mua\".",
-    cta: "Khám phá tin đăng",
+    cta: "Xem đồ cũ đang bán",
     href: ROUTES.discover,
   },
 };
 
 /** Đối tác thu mua chỉ có phía mua: đơn thu mua phế liệu */
 const PARTNER_COPY: Copy = {
-  title: "Đơn thu mua",
+  title: "Đơn tôi đã đặt",
   lead: "Các lô phế liệu bạn đã đặt. Người dân xác nhận xong là hẹn tới cân và lấy hàng.",
   empty: "Bạn chưa đặt thu mua lô nào",
   emptyText: "Xem giấy, nhựa, kim loại, chai lọ người dân đang bán quanh đây rồi bấm \"Đặt mua\".",
-  cta: "Xem phế liệu quanh đây",
+  cta: "Xem ve chai đang rao bán",
   href: ROUTES.partner,
 };
 

@@ -51,9 +51,11 @@ export function LotManage({ scope = "mine" }: { scope?: "mine" | "all" }) {
       )}
       {lots.length > 0 && (
         <div className="mt-5 overflow-x-auto rounded-2xl border border-border bg-card">
-          <table className="w-full min-w-[720px] text-[14px]">
+          {/* Điện thoại: dòng bảng hiện thành thẻ xếp dọc — min-width chỉ áp từ md, vì Chrome điện thoại vẫn
+              giãn cả trang theo min-width của bảng dù bảng nằm trong khung cuộn ngang */}
+          <table className="w-full text-[14px] max-md:block md:min-w-[720px]">
             <caption className="sr-only">Danh sách lô vật liệu</caption>
-            <thead>
+            <thead className="max-md:hidden">
               <tr className="border-b border-border text-left text-[12px] uppercase tracking-wide text-muted-foreground">
                 <th scope="col" className="px-4 py-3 font-semibold">
                   Lô
@@ -69,13 +71,13 @@ export function LotManage({ scope = "mine" }: { scope?: "mine" | "all" }) {
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="max-md:block">
               {lots.map((l) => (
                 <tr
                   key={l.id}
-                  className="border-b border-border/60 last:border-0 align-top"
+                  className="border-b border-border/60 align-top last:border-0 max-md:block max-md:py-2"
                 >
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 max-md:block max-md:pb-1">
                     <span className="font-mono font-bold text-foreground">
                       {l.code}
                     </span>
@@ -92,13 +94,13 @@ export function LotManage({ scope = "mine" }: { scope?: "mine" | "all" }) {
                       {l.warehouse}
                     </span>
                   </td>
-                  <td className="px-4 py-3 tabular-nums text-foreground">
+                  <td className="px-4 py-3 tabular-nums text-foreground max-md:block max-md:py-1">
                     {l.weightKg.toLocaleString("vi-VN")}kg
                     <span className="block text-[12px] text-muted-foreground">
                       {formatPrice(l.pricePerKg)}/kg
                     </span>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 max-md:block max-md:py-1">
                     <span
                       className={cn(
                         "rounded-full px-2.5 py-1 text-[12px] font-bold",
@@ -124,9 +126,9 @@ export function LotManage({ scope = "mine" }: { scope?: "mine" | "all" }) {
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3 text-right max-md:block max-md:pt-1 max-md:text-left">
                     {mine && l.status === "dang-giu" && (
-                      <div className="flex flex-wrap justify-end gap-2">
+                      <div className="flex flex-wrap justify-end gap-2 max-md:justify-start">
                         <button
                           type="button"
                           onClick={() => {

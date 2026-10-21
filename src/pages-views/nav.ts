@@ -114,6 +114,14 @@ export const WORKSPACE_LABEL: Record<Exclude<UserRole, "resident">, string> = {
   business: "Khu doanh nghiệp",
 };
 
+/** Nhãn khu rút gọn cho thanh trên điện thoại (nhãn đầy đủ chiếm chỗ, tiêu đề trang bị cắt) */
+export const WORKSPACE_SHORT: Record<Exclude<UserRole, "resident">, string> = {
+  partner: "Thu mua",
+  operator: "Điều hành",
+  collaborator: "Điểm gom",
+  business: "Doanh nghiệp",
+};
+
 /** Bán cho doanh nghiệp: vựa và điểm thu gom dùng chung hai mục này */
 const sellToBusiness = (lots: string, demands: string): NavGroup => ({
   title: "Bán cho doanh nghiệp",

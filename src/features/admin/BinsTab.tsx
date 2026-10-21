@@ -50,9 +50,10 @@ export function BinsTab() {
       </div>
 
       <div className="mt-4 overflow-x-auto rounded-2xl border border-border bg-card">
-        <table className="w-full min-w-[760px] text-[14px]">
+        {/* Điện thoại: mỗi thùng hiện thành thẻ xếp dọc (xem ghi chú cùng loại ở materials/LotManage.tsx) */}
+        <table className="w-full text-[14px] max-md:block md:min-w-[760px]">
           <caption className="sr-only">Danh sách thùng thu gom</caption>
-          <thead>
+          <thead className="max-md:hidden">
             <tr className="border-b border-border text-left text-[12px] uppercase tracking-wide text-muted-foreground">
               <th scope="col" className="px-4 py-3 font-semibold">Thùng</th>
               <th scope="col" className="px-4 py-3 font-semibold">Chỗ đặt</th>
@@ -61,19 +62,22 @@ export function BinsTab() {
               <th scope="col" className="px-4 py-3 font-semibold"><span className="sr-only">Sửa</span></th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="max-md:block">
             {list.map((b) => (
-              <tr key={b.id} className="border-b border-border/60 last:border-0">
-                <td className="px-4 py-3">
+              <tr key={b.id} className="border-b border-border/60 last:border-0 max-md:relative max-md:block max-md:py-2">
+                <td className="px-4 py-3 max-md:block max-md:pb-1">
                   <span className="font-mono font-bold text-foreground">{b.code}</span>
                   <span className={cn(badgeBase, BIN_TYPE_BADGE[b.type], "ml-2")}>{BIN_TYPE_LABEL[b.type]}</span>
                 </td>
-                <td className="px-4 py-3 text-foreground">
+                <td className="px-4 py-3 text-foreground max-md:block max-md:py-1">
                   {b.name}
                   <span className="block text-[12px] text-muted-foreground">{b.area} · đổ {formatRelativeTime(b.lastEmptiedAt).toLowerCase()}</span>
                 </td>
-                <td className="px-4 py-3 text-foreground/85">{b.collaborator}</td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 text-foreground/85 max-md:block max-md:py-1">
+                  <span className="md:sr-only">Cộng tác viên: </span>
+                  {b.collaborator}
+                </td>
+                <td className="px-4 py-3 max-md:block max-md:py-1">
                   <label htmlFor={`lvl-${b.id}`} className="sr-only">
                     Tình trạng thùng {b.code}
                   </label>
@@ -85,7 +89,7 @@ export function BinsTab() {
                     ))}
                   </select>
                 </td>
-                <td className="px-2 py-3 text-right">
+                <td className="px-2 py-3 text-right max-md:absolute max-md:right-1 max-md:top-1">
                   <button type="button" onClick={() => setEditing(b)} aria-label={`Sửa thùng ${b.code}`} className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground">
                     <Pencil className="h-4 w-4" aria-hidden="true" />
                   </button>

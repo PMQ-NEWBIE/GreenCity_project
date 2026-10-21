@@ -125,7 +125,7 @@ try {
   await shot("desktop-1440.png");
   check("Desktop: có đủ 5 lớp hero", (await evaluate(`document.querySelectorAll('[data-layer]').length`)) === 5);
   check("Desktop: nút 'Bán ve chai ngay' không bị lớp nào che", await evaluate(ctaUncovered));
-  check("Desktop: không có thanh cuộn ngang", await evaluate(`document.documentElement.scrollWidth <= innerWidth`));
+  check("Desktop: không có thanh cuộn ngang", await evaluate(`document.documentElement.scrollWidth <= 1440`));
   const titleOk = await evaluate(`(() => { const h = document.querySelector('#hero-title'); return h && getComputedStyle(h).opacity === '1' && h.getBoundingClientRect().height > 40; })()`);
   check("Desktop: tiêu đề hiển thị sau intro", titleOk);
 
@@ -153,7 +153,8 @@ try {
   await goto(`${BASE}/`, 3500);
   await shot("mobile-390.png");
   check("Mobile: nút 'Bán ve chai ngay' không bị che", await evaluate(ctaUncovered));
-  check("Mobile: không có thanh cuộn ngang", await evaluate(`document.documentElement.scrollWidth <= innerWidth`));
+  // So với 390 (độ rộng giả lập): innerWidth của điện thoại giả lập giãn theo nội dung quá rộng
+  check("Mobile: không có thanh cuộn ngang", await evaluate(`document.documentElement.scrollWidth <= 390`));
   const subjectOverlap = await evaluate(`(() => {
     const cta = document.querySelector('[data-hero-cta]').getBoundingClientRect();
     const img = document.querySelector('[data-layer="subject"] img');

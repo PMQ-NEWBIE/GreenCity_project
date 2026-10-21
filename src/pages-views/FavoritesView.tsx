@@ -7,10 +7,14 @@ import { ProductCard } from "@/components/greencity/ProductCard";
 import { EmptyState } from "@/components/greencity/EmptyState";
 import { PageContainer, PageIntro, buttonClass } from "@/components/greencity/ui";
 import { ROUTES } from "@/lib/routes";
+import { marketFor, marketOf } from "@/lib/market";
 
 export function FavoritesView() {
   const { state } = useApp();
-  const favorites = state.products.filter((p) => p.status !== "draft" && state.favorites.includes(p.id));
+  const market = marketFor(state.user?.role);
+  const favorites = state.products.filter(
+    (p) => p.status !== "draft" && state.favorites.includes(p.id) && (!market || marketOf(p.categoryId) === market)
+  );
 
   return (
     <PageContainer>

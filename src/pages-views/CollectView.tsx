@@ -66,7 +66,7 @@ export function CollectView() {
         note: note.trim(),
       });
       setStatus("success");
-      toast("success", "Đã gửi yêu cầu", "Đội thu gom gần bạn sẽ nhận đơn và hẹn giờ.");
+      toast("success", "Đã gửi yêu cầu", "Người thu mua ve chai quanh bạn sẽ nhận đơn và hẹn giờ.");
       router.push(ROUTES.collectRequest(request.id));
     }, 500);
   };
@@ -74,8 +74,8 @@ export function CollectView() {
   return (
     <PageContainer>
       <PageIntro title="Gọi thu gom tận nhà">
-        Cho chúng tôi biết bạn cần dọn gì và lúc nào có nhà. Đội thu gom gần nhất sẽ nhận đơn, tới cân tại chỗ và trả
-        tiền cho bạn.
+        Cho biết bạn có ve chai gì và lúc nào có nhà. Vựa hoặc người thu mua ve chai gần nhất sẽ nhận đơn, tới cân tại
+        chỗ và trả tiền cho bạn.
       </PageIntro>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
@@ -252,7 +252,7 @@ export function CollectView() {
             </h3>
             <ol className="mt-3 flex flex-col gap-2.5 text-[14px] leading-relaxed text-foreground/85">
               <li>
-                <strong>1.</strong> Đội thu gom phụ trách khu của bạn nhận đơn và hẹn giờ.
+                <strong>1.</strong> Người thu mua ve chai quanh khu bạn nhận đơn và hẹn giờ.
               </li>
               <li>
                 <strong>2.</strong> Tới nơi, người mua cân từng loại ngay trước mặt bạn.

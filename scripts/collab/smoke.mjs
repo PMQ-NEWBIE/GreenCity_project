@@ -312,13 +312,14 @@ const check = (name, ok, detail = "") => results.push({ name, ok: !!ok, detail }
 
 /* ------------------------------ Kiểm từng trang ------------------------------ */
 
-const PAGE_CHECKS = `(() => {
+/** width: độ rộng khung đang giả lập — so độ rộng trang với số này (innerWidth của điện thoại giả lập giãn theo nội dung quá rộng) */
+const pageChecks = (width) => `(() => {
   const main = document.querySelector('main');
   const text = document.body.innerText;
   const imgs = [...document.querySelectorAll('main img')].filter(i => i.getClientRects().length > 0);
   return {
     pathname: location.pathname,
-    hScroll: document.documentElement.scrollWidth > innerWidth + 1,
+    hScroll: document.documentElement.scrollWidth > ${width} + 1,
     h2: main ? main.querySelectorAll('h2').length : -1,
     stub: text.includes('Đang xây dựng'),
     noAccess: text.includes('Trang này dành cho'),
@@ -343,7 +344,7 @@ try {
         const res = await fetch(BASE + pg.path, { redirect: "manual" });
         await goto(BASE + pg.path);
         await scrollThrough();
-        const r = await evaluate(PAGE_CHECKS);
+        const r = await evaluate(pageChecks(v.width));
         await shot(`${pg.name}-${v.label}-${theme}.png`);
 
         const problems = [];
@@ -510,7 +511,7 @@ try {
     await shot("luong-a4-bao-diem-rac.png");
     check("Luồng A4: gửi báo cáo có ảnh, hiện 'Chờ xác minh · +20 điểm'", sent);
     // Xác minh điểm rác giờ là việc của ban điều hành (tab Báo cáo)
-    await switchRole("Nhóm vận hành");
+    await switchRole("Ban điều hành");
     await clickByText("Báo cáo", { exact: false, within: "main" });
     await sleep(500);
     const verified = await evaluate(`(() => {
@@ -650,7 +651,7 @@ try {
     await sleep(1500);
     check("Luồng A8: gõ 'chai nhua' có gợi ý 'Chai nhựa'; gửi câu hỏi thì hiện 'Chờ tư vấn'", suggested && (await evaluate(`document.querySelector('main').innerText.includes('Chờ tư vấn')`)), `gợi ý: ${suggested}`);
     // Trả lời câu hỏi phân loại giờ là việc của ban điều hành (tab Báo cáo)
-    await switchRole("Nhóm vận hành");
+    await switchRole("Ban điều hành");
     await clickByText("Báo cáo", { exact: false, within: "main" });
     await sleep(500);
     const answered = await evaluate(`(() => {

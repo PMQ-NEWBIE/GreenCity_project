@@ -102,5 +102,5 @@ export const ROLE_LABEL: Record<UserRole, string> = {
   partner: "Người thu mua",
   collaborator: "Cộng tác viên",
   business: "Doanh nghiệp tái chế",
-  operator: "Nhóm vận hành",
+  operator: "Ban điều hành",
 };

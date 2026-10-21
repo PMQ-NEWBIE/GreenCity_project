@@ -53,7 +53,7 @@ export const ROUTES = {
   partnerPickup: (id: string) => `/doi-tac/thu-gom/${encodeURIComponent(id)}`,
   partnerLots: "/doi-tac/lo",
   partnerDemands: "/doi-tac/nhu-cau",
-  /** Nhóm vận hành */
+  /** Ban điều hành */
   admin: "/van-hanh",
   opsPickup: (id: string) => `/van-hanh/thu-gom/${encodeURIComponent(id)}`,
   opsMaterials: "/van-hanh/vat-lieu",

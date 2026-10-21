@@ -97,7 +97,7 @@ export function LitterReportView() {
     window.setTimeout(() => {
       const r = submit({ photos, ...coords, area: area as Area, address: address.trim(), size: size as LitterSize, description: description.trim() });
       setStatus("success");
-      toast("success", "Đã gửi báo cáo", r.points > 0 ? `+${r.points} điểm khi cộng tác viên xác minh.` : "Báo cáo trùng nên không tính điểm, nhưng vẫn giúp đội ưu tiên.");
+      toast("success", "Đã gửi báo cáo", r.points > 0 ? `+${r.points} điểm khi ban điều hành xác minh.` : "Báo cáo trùng nên không tính điểm, nhưng vẫn giúp đội ưu tiên.");
       window.setTimeout(reset, 900);
     }, 500);
   };
@@ -105,8 +105,8 @@ export function LitterReportView() {
   return (
     <PageContainer>
       <PageIntro title="Báo điểm rác tự phát">
-        Thấy rác đổ bừa ở góc đường, chân cầu, bãi đất trống? Chụp ảnh và gửi vị trí. Cộng tác viên tới xác minh, đội vận
-        hành sẽ dọn, và bạn được +{rule.points} điểm.
+        Thấy rác đổ bừa ở góc đường, chân cầu, bãi đất trống? Chụp ảnh và gửi vị trí. Ban điều hành xác minh, cho người tới
+        dọn, và bạn được +{rule.points} điểm.
       </PageIntro>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
@@ -277,13 +277,13 @@ export function LitterReportView() {
             </h3>
             <ol className="mt-3 flex flex-col gap-2.5 text-[14px] leading-relaxed text-foreground/85">
               <li>
-                <strong>1.</strong> Cộng tác viên khu vực tới xem tận nơi.
+                <strong>1.</strong> Ban điều hành xem ảnh và vị trí bạn gửi.
               </li>
               <li>
                 <strong>2.</strong> Đúng như ảnh thì báo cáo được xác minh và bạn được +{rule.points} điểm.
               </li>
               <li>
-                <strong>3.</strong> Đội vận hành tới dọn, điểm rác hiện trên{" "}
+                <strong>3.</strong> Ban điều hành cho người tới dọn, điểm rác hiện trên{" "}
                 <Link href={ROUTES.map} className="font-semibold text-primary hover:underline">
                   bản đồ xanh
                 </Link>{" "}

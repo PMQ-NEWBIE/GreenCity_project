@@ -97,7 +97,7 @@ export function useMaterials() {
         ...input,
         id: newId("lo"),
         code: `LO-${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}-${seq}`,
-        inspector: user?.name ?? "Nhóm vận hành",
+        inspector: user?.name ?? "Ban điều hành",
         sellerId: user?.email,
         sellerName: user?.name,
         sellerKind: user?.role === "collaborator" ? "diem-thu-gom" : "vua",

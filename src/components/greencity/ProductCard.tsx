@@ -23,7 +23,11 @@ export function ProductCard({ product }: { product: Product }) {
 
   const onFavorite = () => {
     toggleFavorite(product.id);
-    toast("success", liked ? "Đã bỏ khỏi Yêu thích" : "Đã lưu vào Yêu thích", product.name);
+    toast(
+      "success",
+      liked ? "Đã bỏ khỏi Yêu thích" : "Đã lưu vào Yêu thích",
+      product.name,
+    );
   };
 
   return (
@@ -31,7 +35,7 @@ export function ProductCard({ product }: { product: Product }) {
       className={cn(
         "group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-[border-color,box-shadow] duration-200",
         "hover:border-primary/40 hover:shadow-md focus-within:border-primary/40",
-        sold && "opacity-80"
+        sold && "opacity-80",
       )}
     >
       <div className="relative aspect-[4/3]">
@@ -40,14 +44,20 @@ export function ProductCard({ product }: { product: Product }) {
           alt=""
           className="h-full w-full"
           sizes="(max-width: 640px) 100vw, (max-width: 1280px) 33vw, 300px"
-          imgClassName={cn("transition-transform duration-300", !sold && "group-hover:scale-[1.03]", sold && "grayscale-[40%]")}
+          imgClassName={cn(
+            "transition-transform duration-300",
+            !sold && "group-hover:scale-[1.03]",
+            sold && "grayscale-[40%]",
+          )}
         />
         <span
           className={cn(
             "absolute left-3 top-3 rounded-full px-2.5 py-1 text-[12px] font-semibold backdrop-blur-xs",
-            product.status === "available" && "bg-card/95 text-primary shadow-xs",
+            product.status === "available" &&
+              "bg-card/95 text-primary shadow-xs",
             product.status === "sold" && "bg-black/75 text-white",
-            product.status === "draft" && "border border-brown-border bg-brown-soft text-brown-text dark:text-beige"
+            product.status === "draft" &&
+              "border border-brown-border bg-brown-soft text-brown-text dark:text-beige",
           )}
         >
           {STATUS_LABEL[product.status]}
@@ -64,7 +74,9 @@ export function ProductCard({ product }: { product: Product }) {
             {product.name}
           </Link>
         </h3>
-        <p className="text-[16px] font-bold text-primary sm:text-[17px]">{formatPrice(product.price, product.unit)}</p>
+        <p className="text-[16px] font-bold text-primary sm:text-[17px]">
+          {formatPrice(product.price, product.unit)}
+        </p>
         <div className="mt-auto flex items-center justify-between gap-2 pt-1 text-[12px] text-muted-foreground sm:text-[13px]">
           <span className="flex min-w-0 items-center gap-1">
             <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
@@ -78,26 +90,39 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
       </div>
 
-      {/* Nút tim nằm trên lớp link (z-10) để bấm riêng được */}
-      <button
-        type="button"
-        onClick={onFavorite}
-        aria-label={liked ? `Bỏ yêu thích ${product.name}` : `Lưu ${product.name} vào Yêu thích`}
-        aria-pressed={liked}
-        className={cn(
-          "absolute right-2 top-2 z-10 flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-150",
-          liked ? "text-primary-foreground" : "text-foreground/70 hover:text-primary"
-        )}
-      >
-        <span
+      {/* Nút tim nằm trên lớp link (z-10) để bấm riêng được. Chỉ người dân có trang "Đã lưu" (chế độ mua) */}
+      {state.user?.role !== "partner" && (
+        <button
+          type="button"
+          onClick={onFavorite}
+          aria-label={
+            liked
+              ? `Bỏ yêu thích ${product.name}`
+              : `Lưu ${product.name} vào Yêu thích`
+          }
+          aria-pressed={liked}
           className={cn(
-            "flex h-9 w-9 items-center justify-center rounded-full border shadow-sm",
-            liked ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card"
+            "absolute right-2 top-2 z-10 flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-150",
+            liked
+              ? "text-primary-foreground"
+              : "text-foreground/70 hover:text-primary",
           )}
         >
-          <Heart className={cn("h-[17px] w-[17px]", liked && "fill-current")} aria-hidden="true" />
-        </span>
-      </button>
+          <span
+            className={cn(
+              "flex h-9 w-9 items-center justify-center rounded-full border shadow-sm",
+              liked
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-card",
+            )}
+          >
+            <Heart
+              className={cn("h-[17px] w-[17px]", liked && "fill-current")}
+              aria-hidden="true"
+            />
+          </span>
+        </button>
+      )}
     </article>
   );
 }

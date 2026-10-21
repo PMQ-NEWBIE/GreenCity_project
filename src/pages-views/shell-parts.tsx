@@ -118,7 +118,7 @@ export function BottomNav({
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative flex min-h-16 flex-col items-center justify-center gap-1 text-[11.5px] font-semibold",
+                  "relative flex min-h-16 flex-col items-center justify-center gap-1 rounded-xl text-[11.5px] font-semibold focus-visible:outline-offset-[-4px]",
                   active ? "text-primary" : "text-muted-foreground"
                 )}
               >
@@ -145,7 +145,7 @@ export function BottomNav({
             onClick={onMore}
             aria-haspopup="dialog"
             className={cn(
-              "flex min-h-16 w-full flex-col items-center justify-center gap-1 text-[11.5px] font-semibold",
+              "flex min-h-16 w-full flex-col items-center justify-center gap-1 rounded-xl text-[11.5px] font-semibold focus-visible:outline-offset-[-4px]",
               !inBar ? "text-primary" : "text-muted-foreground"
             )}
           >
@@ -207,11 +207,11 @@ export function DemoBanner() {
 }
 
 const ROLE_DESC: Record<UserRole, string> = {
-  resident: "Bán ve chai, mua bán đồ thanh lý, gọi thu gom, tích điểm.",
-  partner: "Người ve chai, vựa phế liệu: xem tin phế liệu quanh đây và đặt thu mua.",
-  collaborator: "Kiểm tra lượt bỏ thùng, xác minh báo cáo điểm rác.",
-  business: "Xem và đặt giữ lô vật liệu đã kiểm định, xem thống kê.",
-  operator: "Điều hành đơn thu gom, thùng, điểm thưởng và đối tác.",
+  resident: "Bán ve chai, mua bán đồ thanh lý, gọi người tới lấy, bỏ thùng tích điểm.",
+  partner: "Vựa, người ve chai dạo: mua tin phế liệu, nhận yêu cầu tới lấy, gom lô bán cho doanh nghiệp.",
+  collaborator: "Trực điểm thu gom: duyệt lượt bỏ đồ, trao quà đổi điểm, bán lô cho doanh nghiệp.",
+  business: "Mua lô vật liệu, đăng nhu cầu thu mua (rác hữu cơ, nhựa, giấy…), xem thống kê.",
+  operator: "Quản trị và theo dõi: xác minh điểm rác, trả lời câu hỏi phân loại, điểm thưởng, thùng.",
 };
 
 /** Bản demo: đổi vai trò để xem từng khu. Bản thật mỗi tài khoản có một vai trò cố định. */

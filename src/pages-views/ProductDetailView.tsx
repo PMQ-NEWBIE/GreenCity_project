@@ -67,7 +67,8 @@ export function ProductDetailView({ productId }: { productId: string }) {
   // Tin phế liệu chỉ người thu mua đặt được, đồ thanh lý chỉ người dân đặt được
   const buyable = canBuy(role, product);
   const ordersHere = product.isMine ? incoming.filter((o) => o.productId === product.id) : [];
-  const related = state.products
+  // Chỉ gợi ý tin cùng loại khi người xem mua được ở chợ này — người dân mở link tin phế liệu thì không gợi ý thêm phế liệu
+  const related = !buyable && !myOrder ? [] : state.products
     .filter((p) => p.categoryId === product.categoryId && p.id !== product.id && p.status === "available")
     .slice(0, 4);
 
@@ -177,10 +178,13 @@ export function ProductDetailView({ productId }: { productId: string }) {
                   <MessageCircle className="h-[18px] w-[18px]" aria-hidden="true" />
                   Hỏi người bán
                 </button>
-                <button type="button" onClick={onFavorite} aria-pressed={liked} className={cn(buttonClass.secondary, liked && "border-primary/50 text-primary")}>
-                  <Heart className={cn("h-[18px] w-[18px]", liked && "fill-current")} aria-hidden="true" />
-                  {liked ? "Đã lưu" : "Lưu lại"}
-                </button>
+                {/* Chỉ người dân có trang "Đã lưu" */}
+                {role !== "partner" && (
+                  <button type="button" onClick={onFavorite} aria-pressed={liked} className={cn(buttonClass.secondary, liked && "border-primary/50 text-primary")}>
+                    <Heart className={cn("h-[18px] w-[18px]", liked && "fill-current")} aria-hidden="true" />
+                    {liked ? "Đã lưu" : "Lưu lại"}
+                  </button>
+                )}
               </>
             )}
           </div>

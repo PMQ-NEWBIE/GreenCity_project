@@ -20,7 +20,7 @@ import { ROLE_LABEL } from "@/data/labels";
 import type { UserRole } from "@/types";
 import { initialsOf } from "@/utils/format";
 import { cn } from "@/lib/utils";
-import { WORKSPACE_LABEL, titleFor, workspaceNav } from "./nav";
+import { WORKSPACE_LABEL, WORKSPACE_SHORT, titleFor, workspaceNav } from "./nav";
 import { BottomNav, DemoBanner, DemoRolePicker, NavGroups, ShellLoading, type BadgeCounts } from "./shell-parts";
 
 /**
@@ -99,7 +99,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
       <div className="flex min-w-0 flex-col">
         <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur-md">
           <div className="flex h-16 items-center gap-3 px-4 sm:px-6 lg:px-8">
-            <span className="shrink-0 rounded-lg bg-gc-950 dark:bg-surface dark:border dark:border-border dark:text-foreground px-2 py-1 text-[11.5px] font-bold uppercase tracking-wide text-gc-100 lg:hidden">{area}</span>
+            <span className="shrink-0 rounded-lg bg-gc-950 dark:bg-surface dark:border dark:border-border dark:text-foreground px-2 py-1 text-[11.5px] font-bold uppercase tracking-wide text-gc-100 lg:hidden" title={area}>{WORKSPACE_SHORT[role]}</span>
             <h1 className="truncate text-[17px] font-bold text-foreground">{titleFor(pathname)}</h1>
             <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
               <ThemeToggle />

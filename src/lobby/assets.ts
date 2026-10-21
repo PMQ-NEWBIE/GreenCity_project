@@ -104,7 +104,7 @@ export const LOBBY_ASSETS = {
  * false: điện thoại ghép bầu trời + xe đạp tách nền, có dải sương và bóng đổ để xe đứng trên mặt đất
  * (ảnh bầu trời chụp từ trên mái nhà nên xe đặt thẳng lên đó trông như đang bay).
  */
-export const MOBILE_HERO_READY = false;
+export const MOBILE_HERO_READY = true;
 
 /** Hạt nhiễu film grain (ô 128px lặp lại) — đã tạo sẵn, không cần thay. */
 export const GRAIN_TILE = "/lobby/grain.png";

@@ -1,8 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import { ChevronRight, Clock, MapPin, Weight } from "lucide-react";
 import type { PickupRequest, PickupStatus } from "@/types/features";
 import { PICKUP_STATUS_LABEL } from "@/data/pickup";
-import { ROUTES } from "@/lib/routes";
+import { useLinks } from "@/store/use-links";
 import { formatRelativeTime } from "@/utils/format";
 import { cn } from "@/lib/utils";
 
@@ -23,12 +25,16 @@ export function PickupBadge({ status, className }: { status: PickupStatus; class
   );
 }
 
-/** Một yêu cầu trong danh sách — bấm cả thẻ để xem chi tiết. */
+/**
+ * Một yêu cầu trong danh sách — bấm cả thẻ để xem chi tiết (đường dẫn theo khu của người xem).
+ * showOwner: hiện tên người gửi (danh sách của người mua, ban điều hành).
+ */
 export function RequestItem({ request: r, showOwner = false }: { request: PickupRequest; showOwner?: boolean }) {
+  const links = useLinks();
   return (
     <li>
       <Link
-        href={ROUTES.collectRequest(r.id)}
+        href={links.pickup(r.id)}
         className="group flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-[border-color,box-shadow] duration-150 hover:border-primary/40 hover:shadow-md"
       >
         <div className="min-w-0 flex-1">

@@ -23,6 +23,7 @@ const PUBLIC_DIR = path.join(ROOT, "public");
 /** Cách đặt ảnh thô vào khung đích cho từng key */
 const PLACEMENT = {
   sky: { mode: "cover", position: "centre" },
+  skyNight: { mode: "cover", position: "centre" },
   mobileHero: { mode: "cover", position: "south" }, // giữ phần đáy: xe đạp và vỉa hè
   subject: { mode: "subject" }, // tách nền, cắt sát, đặt giữa-dưới, bánh xe chạm mép dưới
   foreground: { mode: "foreground" }, // tách nền, bám đáy, ép 40% phía trên trong suốt

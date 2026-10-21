@@ -1,6 +1,6 @@
-import { BadgeCheck, Droplets, MapPin } from "lucide-react";
+import { BadgeCheck, Droplets, Leaf, MapPin, Store } from "lucide-react";
 import { SmartImage } from "@/components/greencity/SmartImage";
-import { LOT_GRADE_HINT, LOT_STATUS_LABEL } from "@/data/lots";
+import { LOT_GRADE_HINT, LOT_SELLER_KIND_LABEL, LOT_STATUS_LABEL } from "@/data/lots";
 import { lotValue } from "@/lib/materials";
 import type { LotGrade, MaterialLot } from "@/types/features";
 import { formatPrice, formatRelativeTime } from "@/utils/format";
@@ -8,9 +8,9 @@ import { cn } from "@/lib/utils";
 
 /** Nền đặc vì nhãn nằm đè lên ảnh. */
 export const GRADE_BADGE: Record<LotGrade, string> = {
-  A: "bg-primary text-primary-foreground",
-  B: "bg-card text-warn shadow-sm",
-  C: "bg-card text-muted-foreground shadow-sm",
+  A: "bg-primary text-primary-foreground shadow-sm",
+  B: "border border-brown-border bg-brown-soft text-brown-text dark:text-beige shadow-sm",
+  C: "border border-border bg-card text-muted-foreground shadow-sm",
 };
 
 export const LOT_STATUS_BADGE: Record<MaterialLot["status"], string> = {
@@ -24,7 +24,15 @@ export function LotCard({ lot, action }: { lot: MaterialLot; action?: React.Reac
   return (
     <li className={cn("flex flex-col overflow-hidden rounded-2xl border border-border bg-card", lot.status === "da-ban" && "opacity-75")}>
       <div className="relative">
-        <SmartImage src={lot.image} alt="" className="aspect-[16/9] w-full" sizes="(max-width: 1024px) 100vw, 400px" />
+        {lot.image ? (
+          <SmartImage src={lot.image} alt="" className="aspect-[16/9] w-full" sizes="(max-width: 1024px) 100vw, 400px" />
+        ) : (
+          // Loại hàng chưa có ảnh chụp thật (rác hữu cơ) — để ô trơn có biểu tượng, không gắn ảnh sai
+          <div className="flex aspect-[16/9] w-full flex-col items-center justify-center gap-2 bg-accent text-accent-foreground">
+            <Leaf className="h-9 w-9" aria-hidden="true" />
+            <span className="text-[14px] font-semibold">{lot.material}</span>
+          </div>
+        )}
         <span className={cn("absolute left-3 top-3 rounded-full px-2.5 py-1 text-[12px] font-bold", GRADE_BADGE[lot.grade])} title={LOT_GRADE_HINT[lot.grade]}>
           Hạng {lot.grade}
         </span>
@@ -61,6 +69,13 @@ export function LotCard({ lot, action }: { lot: MaterialLot; action?: React.Reac
           <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
           {lot.warehouse}, {lot.area}
         </p>
+        {lot.sellerName && (
+          <p className="mt-1 flex items-center gap-1.5 text-[13px] text-muted-foreground">
+            <Store className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            {lot.sellerKind ? `${LOT_SELLER_KIND_LABEL[lot.sellerKind]}: ` : ""}
+            {lot.sellerName}
+          </p>
+        )}
         <p className="mt-1 text-[12px] text-muted-foreground">
           Kiểm định {formatRelativeTime(lot.inspectedAt).toLowerCase()} bởi {lot.inspector}
         </p>

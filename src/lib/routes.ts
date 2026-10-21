@@ -4,13 +4,23 @@ export const ROUTES = {
   login: "/dang-nhap",
   register: "/dang-ky",
   forgot: "/quen-mat-khau",
+  /** Điểm vào sau đăng nhập: tự chuyển tới trang chủ đúng vai trò / chế độ (xem homeFor) */
   dashboard: "/tong-quan",
-  discover: "/kham-pha",
   product: (id: string) => `/san-pham/${encodeURIComponent(id)}`,
+  order: (id: string) => `/don/${encodeURIComponent(id)}`,
+  profile: "/ho-so",
+
+  // Người dân — chế độ bán
+  sellerHome: "/ban-hang",
+  sellerOrders: "/ban-hang/don",
+  myListings: "/ban-hang/tin",
   sell: "/dang-tin",
   collect: "/thu-gom",
+
+  // Người dân — chế độ mua
+  discover: "/kham-pha",
+  buyerOrders: "/don-mua",
   favorites: "/yeu-thich",
-  profile: "/ho-so",
 
   // Tính năng cơ bản (giao diện do Gemini làm)
   learn: "/kien-thuc",
@@ -31,10 +41,32 @@ export const ROUTES = {
   litterReport: "/bao-diem-rac",
   map: "/ban-do",
   consult: "/tu-van-phan-loai",
-  materials: "/cho-vat-lieu",
-  stats: "/thong-ke",
+
+  // Khu làm việc riêng (khung trang riêng, không có menu mua bán của người dân)
+  /** Đối tác thu mua phế liệu (người ve chai, vựa) */
+  partner: "/doi-tac",
+  partnerListing: (id: string) => `/doi-tac/tin/${encodeURIComponent(id)}`,
+  partnerOrders: "/doi-tac/don",
+  partnerOrder: (id: string) => `/doi-tac/don/${encodeURIComponent(id)}`,
+  /** Yêu cầu "gọi người tới lấy" của người dân — người mua tự nhận */
+  partnerPickups: "/doi-tac/thu-gom",
+  partnerPickup: (id: string) => `/doi-tac/thu-gom/${encodeURIComponent(id)}`,
+  partnerLots: "/doi-tac/lo",
+  partnerDemands: "/doi-tac/nhu-cau",
+  /** Nhóm vận hành */
+  admin: "/van-hanh",
+  opsPickup: (id: string) => `/van-hanh/thu-gom/${encodeURIComponent(id)}`,
+  opsMaterials: "/van-hanh/vat-lieu",
+  opsStats: "/van-hanh/thong-ke",
+  /** Cộng tác viên — người trực điểm thu gom */
   ctv: "/cong-tac-vien",
-  admin: "/quan-tri",
+  ctvGifts: "/cong-tac-vien/trao-qua",
+  ctvLots: "/cong-tac-vien/lo",
+  ctvDemands: "/cong-tac-vien/nhu-cau",
+  /** Doanh nghiệp tái chế */
+  materials: "/doanh-nghiep",
+  stats: "/doanh-nghiep/thong-ke",
+  businessDemands: "/doanh-nghiep/nhu-cau",
 } as const;
 
 /** Tham số trên URL dùng để quay lại đúng trang sau khi đăng nhập. */

@@ -26,6 +26,15 @@ export const LOBBY_ASSETS = {
     transparent: false,
     maxKB: 300,
   },
+  /** Lớp 1 (chế độ tối) — thành phố Sài Gòn về đêm rực rỡ ánh đèn */
+  skyNight: {
+    src: "/lobby/hero-layer-1-sky-night.webp",
+    width: 2560,
+    height: 1440,
+    alt: "Quang cảnh khu phố Sài Gòn về đêm rực rỡ ánh đèn",
+    transparent: false,
+    maxKB: 300,
+  },
   /** Lớp 4 — vật thể chính đã tách nền: xe đạp ve chai chở đầy giấy, chai, lon */
   subject: {
     src: "/lobby/hero-layer-4-subject.webp",
@@ -105,6 +114,16 @@ export const LOBBY_ASSETS = {
  * (ảnh bầu trời chụp từ trên mái nhà nên xe đặt thẳng lên đó trông như đang bay).
  */
 export const MOBILE_HERO_READY = true;
+
+/**
+ * Ảnh hero dọc tách 2 lớp (npm run assets:split-mobile-hero) để xe đạp chạy đi được khi đổi sang tối trên điện thoại:
+ * nền không có xe + lớp xe (kèm bóng) trong suốt cùng khung 1080×1920. Chồng lên nhau nhìn y như mobileHero.
+ */
+export const MOBILE_HERO_LAYERS = {
+  empty: "/lobby/hero-mobile-empty.webp",
+  bike: "/lobby/hero-mobile-bike.webp",
+} as const;
+
 
 /** Hạt nhiễu film grain (ô 128px lặp lại) — đã tạo sẵn, không cần thay. */
 export const GRAIN_TILE = "/lobby/grain.png";

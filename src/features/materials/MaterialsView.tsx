@@ -19,17 +19,30 @@ import { ReserveModal } from "./ReserveModal";
 
 const selectCls = cn(inputClass(), "select-chevron cursor-pointer appearance-none");
 
-/** I.5 — chợ lô vật liệu đã kiểm định, dành cho doanh nghiệp tái chế. */
+/**
+ * Chợ lô vật liệu cho doanh nghiệp xử lý / tái chế: lô do vựa và điểm thu gom đăng (giấy, nhựa, kim loại,
+ * thủy tinh, rác hữu cơ làm phân). Ban điều hành mở cùng trang này để theo dõi mọi lô.
+ */
 export function MaterialsView() {
   const user = useCurrentUser();
   const { lots, myHolds } = useMaterials();
-  const isOps = user?.role === "operator";
   const openLots = lots.filter((l) => l.status === "san-sang").length;
+
+  if (user?.role === "operator") {
+    return (
+      <PageContainer>
+        <PageIntro title="Lô vật liệu">Mọi lô vựa và điểm thu gom đang bán cho doanh nghiệp. Người đăng lô tự chốt bán; ở đây chỉ theo dõi.</PageIntro>
+        <div className="mt-6">
+          <LotManage scope="all" />
+        </div>
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>
-      <PageIntro title="Chợ vật liệu tái chế">
-        Lô phế liệu đã gom đủ số lượng và được kiểm định độ sạch, độ ẩm. Giữ lô 48 giờ để sắp xếp xe, rồi tới kho lấy hàng.
+      <PageIntro title="Chợ lô vật liệu">
+        Lô do vựa và điểm thu gom gom đủ số lượng, có ghi độ sạch, độ ẩm. Giữ lô 48 giờ để sắp xếp xe, tới lấy hàng xong thì bấm đã lấy.
       </PageIntro>
       <div className="mt-6">
         <UrlTabs
@@ -37,7 +50,6 @@ export function MaterialsView() {
           tabs={[
             { key: "dang-ban", label: "Lô đang bán", count: openLots, content: <Market /> },
             { key: "dang-giu", label: "Lô tôi đang giữ", count: myHolds.length, content: <MyHolds /> },
-            ...(isOps ? [{ key: "quan-ly", label: "Quản lý lô", content: <LotManage /> }] : []),
           ]}
         />
       </div>
@@ -158,7 +170,7 @@ function Market() {
 }
 
 function MyHolds() {
-  const { myHolds, release } = useMaterials();
+  const { myHolds, release, markSold } = useMaterials();
   const toast = useToast();
   if (myHolds.length === 0)
     return <EmptyState icon={Clock} title="Bạn chưa giữ lô nào" description="Ở tab Lô đang bán, bấm Giữ lô 48 giờ để giữ riêng một lô cho doanh nghiệp của bạn." />;
@@ -174,6 +186,16 @@ function MyHolds() {
               <p className="rounded-xl bg-warn/10 px-3 py-2 text-[13px] text-foreground">
                 Còn <strong>{timeLeft(l.reservation!.expiresAt, now)}</strong> · hẹn lấy {formatDateTime(l.reservation!.pickupAt)}
               </p>
+              <button
+                type="button"
+                onClick={() => {
+                  markSold(l.id);
+                  toast("success", `Đã lấy hàng lô ${l.code}`);
+                }}
+                className={buttonClass.primary}
+              >
+                Đã lấy hàng
+              </button>
               <button
                 type="button"
                 onClick={() => {

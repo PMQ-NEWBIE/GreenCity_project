@@ -27,7 +27,7 @@ export const SAMPLE_IMAGES: { url: string; label: string }[] = [
   { url: IMAGES.glassBottles, label: "Chai thủy tinh" },
   { url: IMAGES.newspaper, label: "Giấy báo" },
   { url: IMAGES.fan, label: "Quạt cũ" },
-  { url: IMAGES.woodenTable, label: "Bàn gỗ" },
+  { url: IMAGES.woodenTable, label: "Ghế gỗ" },
   { url: IMAGES.electronic, label: "Đồ điện tử" },
   { url: IMAGES.furniture, label: "Đồ gia dụng" },
 ];
@@ -35,6 +35,7 @@ export const SAMPLE_IMAGES: { url: string; label: string }[] = [
 export const CATEGORIES: Category[] = [
   {
     id: "paper",
+    market: "scrap",
     name: "Giấy & Bìa carton",
     shortName: "Giấy",
     description: "Giấy vụn, báo cũ, thùng carton sạch, đã phân loại sẵn.",
@@ -44,6 +45,7 @@ export const CATEGORIES: Category[] = [
   },
   {
     id: "plastic",
+    market: "scrap",
     name: "Nhựa tái chế",
     shortName: "Nhựa",
     description: "Chai PET, bình nhựa, nhựa HDPE đã qua sử dụng.",
@@ -53,6 +55,7 @@ export const CATEGORIES: Category[] = [
   },
   {
     id: "metal",
+    market: "scrap",
     name: "Kim loại & Sắt vụn",
     shortName: "Kim loại",
     description: "Sắt vụn, lon nhôm, đồng, nhôm, inox phế liệu.",
@@ -62,6 +65,7 @@ export const CATEGORIES: Category[] = [
   },
   {
     id: "glass",
+    market: "scrap",
     name: "Chai lọ thủy tinh",
     shortName: "Thủy tinh",
     description: "Chai bia, lọ thủy tinh, đồ nguyên vẹn còn tái sử dụng.",
@@ -70,19 +74,31 @@ export const CATEGORIES: Category[] = [
     icon: "wine",
   },
   {
+    id: "ewaste",
+    market: "scrap",
+    name: "Điện tử hỏng & xác máy",
+    shortName: "Điện tử hỏng",
+    description: "Đồ điện, điện tử hư không sửa được: xác tivi, máy giặt, bo mạch, dây điện.",
+    priceHint: "5.000 – 30.000đ/kg",
+    image: IMAGES.oldPC,
+    icon: "laptop",
+  },
+  {
     id: "electronic",
-    name: "Đồ điện tử cũ",
-    shortName: "Đồ điện tử",
-    description: "Điện thoại, laptop, quạt, tivi cũ còn linh kiện tái sử dụng.",
+    market: "secondhand",
+    name: "Đồ điện còn dùng",
+    shortName: "Đồ điện",
+    description: "Quạt, nồi cơm, tivi, máy tính cũ vẫn chạy tốt, dùng tiếp được.",
     priceHint: "50.000 – 500.000đ/món",
     image: IMAGES.electronic,
     icon: "laptop",
   },
   {
     id: "furniture",
-    name: "Đồ gia dụng thanh lý",
-    shortName: "Gia dụng",
-    description: "Bàn ghế, tủ, đồ nội thất cũ còn sử dụng được.",
+    market: "secondhand",
+    name: "Nội thất & gia dụng",
+    shortName: "Nội thất",
+    description: "Bàn ghế, tủ kệ, đồ dùng trong nhà cũ còn sử dụng được.",
     priceHint: "100.000 – 300.000đ/món",
     image: IMAGES.furniture,
     icon: "armchair",
@@ -97,21 +113,21 @@ const sellerIndividual1 = {
   joined: "03/2025",
   initials: "L",
 };
-const sellerCollector1 = {
-  name: "Anh Tư Hòa",
-  type: "collector" as const,
+const sellerIndividual3 = {
+  name: "Chị Hạnh",
+  type: "individual" as const,
   rating: 4.9,
-  deals: 120,
+  deals: 21,
   joined: "11/2024",
-  initials: "T",
+  initials: "H",
 };
-const sellerScrapyard = {
-  name: "Vựa phế liệu Minh Đức",
-  type: "scrapyard" as const,
+const sellerIndividual4 = {
+  name: "Anh Dũng",
+  type: "individual" as const,
   rating: 4.7,
-  deals: 856,
+  deals: 12,
   joined: "06/2024",
-  initials: "M",
+  initials: "D",
 };
 const sellerIndividual2 = {
   name: "Anh Khoa",
@@ -121,13 +137,13 @@ const sellerIndividual2 = {
   joined: "01/2025",
   initials: "K",
 };
-const sellerCollector2 = {
-  name: "Cô Sáu Út",
-  type: "collector" as const,
+const sellerIndividual5 = {
+  name: "Cô Ba",
+  type: "individual" as const,
   rating: 4.9,
-  deals: 96,
+  deals: 30,
   joined: "08/2024",
-  initials: "U",
+  initials: "B",
 };
 
 export const PRODUCTS: Product[] = [
@@ -157,7 +173,7 @@ export const PRODUCTS: Product[] = [
     image: IMAGES.petBottles,
     postedHoursAgo: 5,
     status: "available",
-    seller: sellerCollector1,
+    seller: sellerIndividual3,
   },
   {
     id: "p3",
@@ -171,7 +187,7 @@ export const PRODUCTS: Product[] = [
     image: IMAGES.aluminum,
     postedHoursAgo: 8,
     status: "available",
-    seller: sellerScrapyard,
+    seller: sellerIndividual4,
   },
   {
     id: "p4",
@@ -185,7 +201,7 @@ export const PRODUCTS: Product[] = [
     image: IMAGES.metal,
     postedHoursAgo: 14,
     status: "available",
-    seller: sellerScrapyard,
+    seller: sellerIndividual4,
   },
   {
     id: "p5",
@@ -210,7 +226,7 @@ export const PRODUCTS: Product[] = [
     area: "Quận 3",
     description:
       "Bàn gỗ tự nhiên kích thước 1m2 x 60cm, chân chắc, mặt có vài vết xước nhẹ. Đang thanh lý vì chuyển nhà. Ai thích mộc mạc có thể đánh vecni lại như mới. Tự vận chuyển tại chỗ.",
-    image: IMAGES.woodenTable,
+    image: IMAGES.woodenChair,
     postedHoursAgo: 26,
     status: "available",
     seller: sellerIndividual1,
@@ -227,7 +243,7 @@ export const PRODUCTS: Product[] = [
     image: IMAGES.newspaper,
     postedHoursAgo: 32,
     status: "available",
-    seller: sellerCollector2,
+    seller: sellerIndividual5,
   },
   {
     id: "p8",
@@ -259,16 +275,16 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: "p10",
-    name: "Ghế gỗ thanh lý — còn mới 80%",
+    name: "Ghế băng gỗ thanh lý — còn chắc",
     categoryId: "furniture",
     price: 180000,
     unit: "món",
     area: "Bình Thạnh",
     description:
-      "Bộ 4 ghế gỗ thanh lý do chuyển phòng. Gỗ còn chắc, khung vững, không mối mọt. Ai mua cả bộ mình tặng kèm nệm ngồi. Có thể ghé xem trực tiếp buổi tối.",
-    image: IMAGES.woodenChair,
+      "Ghế băng gỗ dài ngồi được 2–3 người, thanh lý do chuyển phòng. Gỗ còn chắc, chân vững, không mối mọt. Đặt hiên nhà hay quán nước đều hợp. Có thể ghé xem trực tiếp buổi tối.",
+    image: IMAGES.woodenTable,
     postedHoursAgo: 70,
     status: "available",
-    seller: sellerCollector1,
+    seller: sellerIndividual3,
   },
 ];

@@ -36,8 +36,8 @@ export function SubmitButton({
       disabled={off}
       aria-busy={busy}
       className={cn(
-        "flex h-[52px] w-full items-center justify-center gap-2 rounded-2xl bg-primary px-5 text-[15px] font-semibold text-primary-foreground",
-        "transition-[background-color,transform] duration-150 hover:bg-primary/90 active:scale-[0.99]",
+        "flex h-[52px] w-full items-center justify-center gap-2 rounded-2xl bg-primary px-5 text-[15px] font-semibold text-primary-foreground shadow-sm",
+        "transition-all duration-150 hover:bg-primary-hover active:bg-primary-active active:scale-[0.99]",
         busy && "cursor-wait",
         disabled && !busy && !success && "cursor-not-allowed opacity-60",
         className

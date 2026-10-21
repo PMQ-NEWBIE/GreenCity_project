@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Clock, Heart, MapPin } from "lucide-react";
 import type { Product, ProductStatus } from "@/types";
 import { useApp } from "@/store/app-store";
-import { ROUTES } from "@/lib/routes";
+import { useLinks } from "@/store/use-links";
 import { formatHoursAgo, formatPrice } from "@/utils/format";
 import { SmartImage } from "./SmartImage";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,7 @@ const STATUS_LABEL: Record<ProductStatus, string> = {
 
 export function ProductCard({ product }: { product: Product }) {
   const { state, toggleFavorite, toast } = useApp();
+  const links = useLinks();
   const liked = state.favorites.includes(product.id);
   const sold = product.status === "sold";
 
@@ -43,10 +44,10 @@ export function ProductCard({ product }: { product: Product }) {
         />
         <span
           className={cn(
-            "absolute left-3 top-3 rounded-full px-2.5 py-1 text-[12px] font-semibold",
-            product.status === "available" && "bg-card text-primary",
-            product.status === "sold" && "bg-black/70 text-white",
-            product.status === "draft" && "bg-earth text-white"
+            "absolute left-3 top-3 rounded-full px-2.5 py-1 text-[12px] font-semibold backdrop-blur-xs",
+            product.status === "available" && "bg-card/95 text-primary shadow-xs",
+            product.status === "sold" && "bg-black/75 text-white",
+            product.status === "draft" && "border border-brown-border bg-brown-soft text-brown-text dark:text-beige"
           )}
         >
           {STATUS_LABEL[product.status]}
@@ -57,7 +58,7 @@ export function ProductCard({ product }: { product: Product }) {
         <h3 className="line-clamp-2 text-[14px] font-semibold leading-snug text-foreground sm:text-[15px]">
           {/* Link phủ cả thẻ (after:inset-0) — một vùng bấm lớn, vẫn là thẻ <a> thật */}
           <Link
-            href={ROUTES.product(product.id)}
+            href={links.product(product.id)}
             className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
           >
             {product.name}
@@ -85,13 +86,13 @@ export function ProductCard({ product }: { product: Product }) {
         aria-pressed={liked}
         className={cn(
           "absolute right-2 top-2 z-10 flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-150",
-          liked ? "text-white" : "text-foreground/70 hover:text-primary"
+          liked ? "text-primary-foreground" : "text-foreground/70 hover:text-primary"
         )}
       >
         <span
           className={cn(
             "flex h-9 w-9 items-center justify-center rounded-full border shadow-sm",
-            liked ? "border-primary bg-primary" : "border-border bg-card"
+            liked ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card"
           )}
         >
           <Heart className={cn("h-[17px] w-[17px]", liked && "fill-current")} aria-hidden="true" />

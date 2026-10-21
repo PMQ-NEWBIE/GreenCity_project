@@ -166,6 +166,19 @@ try {
     const portrait = !!document.querySelector('[data-layer="sky"] source');
     return { portrait, src: img?.currentSrc ?? "", ok: !!img && img.complete && img.naturalWidth > 0 };
   })()`);
+  if (backdrop.portrait) {
+    // Ảnh hero dọc hiện tại: đỉnh xe (giỏ, nón) ở ~44% chiều cao ảnh. Tính chỗ ảnh thật sự được vẽ theo object-fit.
+    const gap = await evaluate(`(() => {
+      const img = document.querySelector('[data-layer="sky"] img');
+      const r = img.getBoundingClientRect();
+      const fit = getComputedStyle(img).objectFit;
+      const scale = (fit === "contain" ? Math.min : Math.max)(r.width / 1080, r.height / 1920);
+      const drawnH = 1920 * scale;
+      const bikeTop = r.bottom - drawnH + 0.44 * drawnH;
+      return Math.round(bikeTop - document.querySelector('[data-hero-cta]').getBoundingClientRect().bottom);
+    })()`);
+    check("Mobile: xe đạp trong ảnh hero dọc nằm dưới nút CTA", gap >= 8, `cách nút ${gap}px`);
+  }
   check(
     backdrop.portrait ? "Mobile: tải đúng ảnh hero dọc (hero-mobile)" : "Mobile: ảnh nền tải được",
     backdrop.ok && (!backdrop.portrait || backdrop.src.includes("hero-mobile")),
@@ -178,6 +191,113 @@ try {
   await shot("login-1440.png");
   const panel = await evaluate(`(() => { const i = document.querySelector('img[src*="auth-panel"], img[srcset*="auth-panel"]'); return i ? i.complete && i.naturalWidth > 0 : false; })()`);
   check("Đăng nhập: ảnh panel bên trái tải được", panel);
+
+  // ---------- Giao diện tối & hiệu ứng chuyển đổi bầu trời ----------
+  // Đổi bằng nút trên header như người dùng thật. Trên lobby: bầu trời mờ dần sang đêm (750ms),
+  // chữ / nút giữ nguyên chỗ, xe đạp CHẠY RA KHỎI KHUNG rồi ẩn (ban đêm không có xe — yêu cầu của người dùng),
+  // đổi về sáng thì xe chạy vào lại đúng chỗ. Áp dụng cả điện thoại.
+  const rideState = `(() => {
+    const r = [...document.querySelectorAll("[data-ride]")].find((e) => e.offsetWidth > 0);
+    if (!r) return null;
+    const cs = getComputedStyle(r);
+    return { x: Math.round(new DOMMatrix(cs.transform).m41), shown: cs.visibility !== "hidden" && Number(cs.opacity) > 0.5 };
+  })()`;
+  const skyState = `(() => {
+    const day = document.querySelector(".lobby-sky-day");
+    const night = document.querySelector(".lobby-sky-night");
+    const subject = document.querySelector('[data-layer="subject"] img');
+    const mobileImg = document.querySelector('.lobby-hero-portrait');
+    return {
+      dayOpacity: day ? parseFloat(getComputedStyle(day).opacity) : null,
+      nightOpacity: night ? parseFloat(getComputedStyle(night).opacity) : null,
+      nightLoaded: night ? !!night.querySelector("img")?.complete && night.querySelector("img")?.naturalWidth > 0 : false,
+      subjectLoaded: subject ? !!subject.complete && subject.naturalWidth > 0 && subject.offsetWidth > 0 : false,
+      mobileLoaded: mobileImg ? !!mobileImg.complete && mobileImg.naturalWidth > 0 && mobileImg.offsetHeight > 0 : false,
+      mobileOpacity: mobileImg ? parseFloat(getComputedStyle(mobileImg).opacity) : null,
+    };
+  })()`;
+  const switchTheme = async (label) => {
+    await evaluate(`document.querySelector('[aria-haspopup="menu"][aria-label^="Chuyển đổi giao diện"]')?.click()`);
+    await sleep(400);
+    await evaluate(`(() => {
+      window.__gaps = [];
+      let last = performance.now();
+      const stopAt = last + 1200;
+      const tick = (t) => { window.__gaps.push(t - last); last = t; if (t < stopAt) requestAnimationFrame(tick); };
+      requestAnimationFrame(tick);
+      [...document.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent.includes(${JSON.stringify(label)}))?.click();
+      return true;
+    })()`);
+  };
+  const isDarkNow = () => evaluate(`document.documentElement.classList.contains("dark")`);
+
+  for (const vp of [
+    { name: "Desktop", w: 1440, h: 900, mobile: false, shotDark: "desktop-1440-dark.png", shotBack: "desktop-1440-light-back.png" },
+    { name: "Mobile", w: 390, h: 844, mobile: true, shotDark: "mobile-390-dark.png", shotBack: "mobile-390-light-back.png" },
+  ]) {
+    await viewport(vp.w, vp.h, vp.mobile);
+    await goto(`${BASE}/`, 3500);
+    if (await isDarkNow()) {
+      await switchTheme("Sáng");
+      await sleep(1500);
+    }
+
+    // Chuyển Sáng → Tối: giữa chừng xe đang chạy sang trái, xong thì ẩn
+    await switchTheme("Tối");
+    await sleep(750);
+    const rideMid = await evaluate(rideState);
+    await sleep(1400);
+    const rideEnd = await evaluate(rideState);
+    const darkSky = await evaluate(skyState);
+    check(`${vp.name} tối: xe đạp đang chạy ra khỏi khung giữa lúc chuyển`, !!rideMid && rideMid.shown && rideMid.x < -30, JSON.stringify(rideMid));
+    check(`${vp.name} tối: chuyển xong thì xe đạp ẩn (ban đêm không có xe)`, !!rideEnd && !rideEnd.shown, JSON.stringify(rideEnd));
+    const gaps = await evaluate(`window.__gaps.map(Math.round)`);
+    const worstGap = Math.max(0, ...gaps);
+    check(`${vp.name} tối: nút đổi giao diện chuyển sang tối`, await isDarkNow());
+    check(`${vp.name} tối: chuyển giao diện không giật (khung hình chậm nhất ≤ 120ms)`, worstGap <= 120, `chậm nhất ${worstGap}ms, ${gaps.length} khung hình`);
+
+    if (!vp.mobile) {
+      check("Desktop tối: bầu trời đêm hiển thị (opacity > 0.9)", darkSky.nightOpacity > 0.9, `nightOpacity = ${darkSky.nightOpacity}`);
+      check("Desktop tối: bầu trời ngày ẩn đi (opacity < 0.1)", darkSky.dayOpacity < 0.1, `dayOpacity = ${darkSky.dayOpacity}`);
+      check("Desktop tối: ảnh bầu trời đêm tải thành công", darkSky.nightLoaded);
+      const outline = await evaluate(`document.querySelector(".lobby-outline-text")?.textContent.trim()`);
+      check("Desktop: chữ viền nền là GREEN CITY", outline === "GREEN CITY", outline);
+    } else {
+      check("Mobile tối: bầu trời đêm hiển thị (opacity > 0.9)", darkSky.nightOpacity > 0.9 && darkSky.nightLoaded, `nightOpacity = ${darkSky.nightOpacity}`);
+    }
+    await shot(vp.shotDark);
+
+    // Chuyển Tối → Sáng trở lại: xe chạy vào từ mép phải, dừng đúng chỗ cũ
+    await switchTheme("Sáng");
+    await sleep(750);
+    const rideBack = await evaluate(rideState);
+    await sleep(1400);
+    const rideHome = await evaluate(rideState);
+    const lightSky = await evaluate(skyState);
+    check(`${vp.name} sáng: xe đạp chạy vào từ mép phải`, !!rideBack && rideBack.shown && rideBack.x > 30, JSON.stringify(rideBack));
+    check(`${vp.name} sáng: xe đạp về đúng chỗ cũ`, !!rideHome && rideHome.shown && rideHome.x === 0, JSON.stringify(rideHome));
+    check(`${vp.name} sáng: chuyển về chế độ sáng thành công`, !(await isDarkNow()));
+    if (!vp.mobile) {
+      check("Desktop sáng: bầu trời ngày hiển thị trở lại (opacity > 0.9)", lightSky.dayOpacity > 0.9, `dayOpacity = ${lightSky.dayOpacity}`);
+      check("Desktop sáng: bầu trời đêm ẩn đi (opacity < 0.1)", lightSky.nightOpacity < 0.1, `nightOpacity = ${lightSky.nightOpacity}`);
+      check("Desktop sáng: xe đạp hiển thị đầy đủ", lightSky.subjectLoaded);
+    } else {
+      check("Mobile sáng: ảnh nền/xe đạp hiển thị đầy đủ", lightSky.mobileLoaded && lightSky.mobileOpacity > 0.8);
+    }
+    await shot(vp.shotBack);
+  }
+
+  // Phần dưới trang ở giao diện tối
+  await viewport(1440, 900, false);
+  await goto(`${BASE}/`, 3500);
+  await switchTheme("Tối");
+  await sleep(2200);
+  for (let i = 0; i < 60; i++) {
+    await wheel(120);
+    await sleep(30);
+  }
+  await sleep(2500);
+  await shot("desktop-bottom-dark.png");
 
   check("Console không có lỗi", consoleErrors.length === 0, consoleErrors.slice(0, 3).join(" | "));
 } catch (err) {

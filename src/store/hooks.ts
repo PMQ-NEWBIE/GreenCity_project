@@ -197,9 +197,12 @@ export interface NewPickup {
   presorted: boolean;
 }
 
+/** Mã người nhận đơn thu gom của một tài khoản người mua (vựa, ve chai dạo). */
+export const buyerTeamId = (email: string) => `u:${email}`;
+
 /**
- * Đơn thu gom: người dân tạo/hủy; đội thu gom (qua khu quản trị hoặc nút demo) nhận đơn,
- * lên đường, cân, thanh toán. Hoàn tất thì tự cộng điểm cho người gửi theo POINT_RULES.
+ * Đơn thu gom ("gọi người tới lấy"): người dân tạo/hủy; người mua (vựa, ve chai dạo) tự nhận đơn,
+ * lên đường, cân, thanh toán. Ban điều hành chỉ theo dõi. Hoàn tất thì tự cộng điểm cho người gửi theo POINT_RULES.
  */
 export function useCollect() {
   const { state, getState, dispatch } = useApp();
@@ -247,6 +250,24 @@ export function useCollect() {
       if (r?.status === "cho-nhan") save(assignTeam(r, team, appointment, new Date().toISOString()));
     },
     [find, save]
+  );
+
+  /** Người mua đang đăng nhập tự nhận một yêu cầu còn chờ, kèm giờ hẹn. */
+  const take = useCallback(
+    (id: string, appointment: string) => {
+      const user = getState().user;
+      const r = find(id);
+      if (!user || user.role !== "partner" || r?.status !== "cho-nhan") return;
+      const team = { id: buyerTeamId(user.email), name: user.name, phoneMasked: "09xx xxx xxx" };
+      // Ghi vào danh bạ người mua để ban điều hành thấy ai đang làm việc ở khu nào
+      if (!getState().partners.partners.some((p) => p.id === team.id))
+        dispatch({
+          type: "PARTNERS_UPSERT",
+          partner: { id: team.id, kind: "thu-gom", name: user.name, areas: [r.area], phoneMasked: team.phoneMasked, contactName: user.name, note: "Tài khoản người mua trên Green City", active: true },
+        });
+      save(assignTeam(r, team, appointment, new Date().toISOString()));
+    },
+    [getState, find, save, dispatch]
   );
 
   const depart = useCallback(
@@ -306,7 +327,7 @@ export function useCollect() {
     [find, save, dispatch]
   );
 
-  return { requests, mine, create, cancel, assign, depart, weigh, finish };
+  return { requests, mine, create, cancel, assign, take, depart, weigh, finish };
 }
 
 export function usePartners() {

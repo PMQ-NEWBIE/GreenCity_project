@@ -10,11 +10,23 @@
   /* Semantic UI tokens (đổi theo theme sáng/tối) */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-hover: var(--surface-hover);
+  --color-text: var(--text);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-disabled: var(--text-disabled);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-border: var(--primary-border);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -28,6 +40,39 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
+  /* Semantic status & state tokens (background, surface, text, primary, secondary, border, focus, success, warning, error, disabled) */
+  --color-focus: var(--focus);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
+  --color-disabled: var(--disabled);
+  --color-disabled-foreground: var(--disabled-foreground);
+
+  /* Nâu đất và be */
+  --color-brown: var(--brown);
+  --color-brown-hover: var(--brown-hover);
+  --color-brown-soft: var(--brown-soft);
+  --color-brown-border: var(--brown-border);
+  --color-brown-text: var(--brown-text);
+  --color-beige: var(--beige);
+
+  /* Bảng màu chuẩn Green City */
+  --color-green-950: #173F2C;
+  --color-green-800: #24573A;
+  --color-green-700: #2F7047;
+  --color-green-600: #398451;
+  --color-green-100: #E8F2E8;
+
+  --color-brown-900: var(--brown-900);
+  --color-brown-700: var(--brown-700);
+  --color-brown-600: var(--brown-600);
+  --color-brown-100: var(--brown-100);
+
+  --color-ivory: #FAF7F0;
+
   --color-leaf: var(--leaf);
   --color-forest: var(--forest);
   --color-earth: var(--earth);
@@ -36,23 +81,23 @@
   /* Màu wordmark "GREEN CITY" lấy từ logo */
   --color-brand-green: var(--brand-green);
   --color-brand-lime: var(--brand-lime);
+  --color-brand-lime-bright: #A3D65C;
 
-  /* Biểu đồ (một chuỗi số liệu) — đã chạy bộ kiểm màu dataviz cho cả nền sáng và tối */
+  /* Biểu đồ (một chuỗi số liệu) */
   --color-chart-1: var(--chart-1);
 
-  /* Thang xanh lá Green City — từ xanh sáng (50) tới xanh tối (950).
-     Lobby dùng thang này cố định, không đổi theo theme. */
-  --color-gc-50: #f3f9ee;
-  --color-gc-100: #e4f2d9;
-  --color-gc-200: #c8e5b1;
-  --color-gc-300: #a3d17c;
-  --color-gc-400: #7fb93f;
-  --color-gc-500: #4f9a2c;
-  --color-gc-600: #2f7d2c;
-  --color-gc-700: #186028;
-  --color-gc-800: #124a20;
-  --color-gc-900: #0c3517;
-  --color-gc-950: #06200d;
+  /* Thang xanh lá Green City */
+  --color-gc-50: #F4F8F3;
+  --color-gc-100: #E8F2E8;
+  --color-gc-200: #D3E4D4;
+  --color-gc-300: #A8CCA9;
+  --color-gc-400: #72A976;
+  --color-gc-500: #4B9153;
+  --color-gc-600: #398451;
+  --color-gc-700: #2F7047;
+  --color-gc-800: #24573A;
+  --color-gc-900: #1C4830;
+  --color-gc-950: #173F2C;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -62,65 +107,145 @@
 }
 
 :root {
+  color-scheme: light;
   --radius: 0.875rem;
 
-  --background: #f7faf6;
-  --foreground: #14241a;
-  --card: #ffffff;
-  --card-foreground: #14241a;
-  --popover: #ffffff;
-  --popover-foreground: #14241a;
-  --primary: #15803d;
-  --primary-foreground: #ffffff;
-  --secondary: #e8f5ec;
-  --secondary-foreground: #14532d;
-  --muted: #edf3ee;
-  --muted-foreground: #526659;
-  --accent: #e9f6ec;
-  --accent-foreground: #15803d;
-  --destructive: #dc2626;
-  --destructive-foreground: #ffffff;
-  --border: #dde8df;
-  --input: #cbdccf;
-  --ring: #16a34a;
+  --background: #FAF7F0;
+  --foreground: #253229;
+  --surface: #FFFFFF;
+  --surface-elevated: #FFFFFF;
+  --surface-hover: #F3F7F2;
+  --text: #253229;
+  --text-primary: #253229;
+  --text-secondary: #506154;
+  --text-muted: #637166;
+  --text-disabled: #8A9A8D;
+  --card: #FFFFFF;
+  --card-foreground: #253229;
+  --popover: #FFFFFF;
+  --popover-foreground: #253229;
+  --primary: #2F7047;
+  --primary-hover: #24573A;
+  --primary-active: #1C4830;
+  --primary-soft: #E8F2E8;
+  --primary-border: #B3D6B9;
+  --primary-foreground: #FFFFFF;
+  --secondary: #E8F2E8;
+  --secondary-foreground: #173F2C;
+  --muted: #F0EFEA;
+  --muted-foreground: #637166;
+  --accent: #E8F2E8;
+  --accent-foreground: #24573A;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --border: #DDE5DB;
+  --input: #DDE5DB;
+  --ring: #398451;
 
-  --leaf: #16a34a;
-  --forest: #14532d;
-  --earth: #8b6848;
-  --warn: #b45309;
-  --brand-green: #186028;
-  --brand-lime: #70a820;
-  --chart-1: #15803d;
+  --focus: #398451;
+  --success: #2F7047;
+  --success-foreground: #FFFFFF;
+  --warning: #B45309;
+  --warning-foreground: #FFFFFF;
+  --error: #DC2626;
+  --error-foreground: #FFFFFF;
+  --disabled: #E8EFE8;
+  --disabled-foreground: #8A9A8D;
+
+  --brown: #8A6346;
+  --brown-hover: #765038;
+  --brown-soft: #EFE2D2;
+  --brown-border: #D1B89D;
+  --brown-text: #4A3327;
+  --beige: #F5EDE0;
+
+  --brown-900: #4A3327;
+  --brown-700: #765038;
+  --brown-600: #8A6346;
+  --brown-100: #EFE2D2;
+
+  --leaf: #398451;
+  --forest: #24573A;
+  --earth: #8A6346;
+  --warn: #B45309;
+  --brand-green: #24573A;
+  --brand-lime: #6BA333;
+  --chart-1: #2F7047;
 }
 
 .dark {
-  --background: #09120c;
-  --foreground: #eef5ef;
-  --card: #111e16;
-  --card-foreground: #eef5ef;
-  --popover: #15241b;
-  --popover-foreground: #eef5ef;
-  --primary: #22c55e;
-  --primary-foreground: #052e16;
-  --secondary: #182e21;
-  --secondary-foreground: #86efac;
-  --muted: #15241a;
-  --muted-foreground: #9ab3a1;
-  --accent: #183022;
-  --accent-foreground: #86efac;
-  --destructive: #f87171;
-  --destructive-foreground: #1c0505;
-  --border: #213a2b;
-  --input: #2a4535;
-  --ring: #4ade80;
+  color-scheme: dark;
 
-  --leaf: #4ade80;
-  --forest: #86efac;
-  --earth: #c9a27c;
-  --warn: #fbbf24;
-  --brand-green: #5cc46b;
-  --brand-lime: #a3d65c;
-  --chart-1: #16a34a;
+  /* A. Màu nền và bề mặt */
+  --background: #121813;
+  --foreground: #EDF3ED;
+  --surface: #19221B;
+  --surface-elevated: #222D24;
+  --surface-hover: #29372B;
+  --border: #344137;
+  --card: #19221B;
+  --card-foreground: #EDF3ED;
+  --popover: #222D24;
+  --popover-foreground: #EDF3ED;
+
+  /* B. Màu xanh lá thương hiệu */
+  --primary: #6DBA80;
+  --primary-hover: #82CD93;
+  --primary-active: #55A96A;
+  --primary-soft: #243F2D;
+  --primary-border: #426B4A;
+  --primary-foreground: #0D1710;
+
+  --secondary: #243F2D;
+  --secondary-foreground: #EDF3ED;
+  --muted: #1B261D;
+  --muted-foreground: #8C9B8E;
+  --accent: #243F2D;
+  --accent-foreground: #82CD93;
+  --destructive: #F87171;
+  --destructive-foreground: #1C0505;
+  --border: #344137;
+  --input: #344137;
+  --ring: #6DBA80;
+  --focus: #6DBA80;
+
+  /* C. Màu nâu đất và màu vật liệu tái chế */
+  --brown: #B58A68;
+  --brown-hover: #C9A184;
+  --brown-soft: #34291F;
+  --brown-border: #5B4635;
+  --brown-text: #D7C2A7;
+  --beige: #D7C2A7;
+
+  --brown-900: #34291F;
+  --brown-700: #B58A68;
+  --brown-600: #5B4635;
+  --brown-100: #D7C2A7;
+
+  /* D. Màu chữ */
+  --text: #EDF3ED;
+  --text-primary: #EDF3ED;
+  --text-secondary: #B7C4B8;
+  --text-muted: #8C9B8E;
+  --text-disabled: #69776B;
+
+  /* Trạng thái */
+  --success: #6DBA80;
+  --success-foreground: #0D1710;
+  --warning: #E5A93C;
+  --warning-foreground: #1F1404;
+  --error: #F87171;
+  --error-foreground: #1C0505;
+  --disabled: #1E2820;
+  --disabled-foreground: #69776B;
+
+  --leaf: #6DBA80;
+  --forest: #82CD93;
+  --earth: #B58A68;
+  --warn: #E5A93C;
+  --brand-green: #5CC46B;
+  --brand-lime: #A3D65C;
+  --chart-1: #6DBA80;
 }
 
 @layer base {
@@ -136,8 +261,12 @@
     min-height: 100dvh;
   }
   ::selection {
-    background: #a3d17c;
-    color: #06200d;
+    background: #E8F2E8;
+    color: #173F2C;
+  }
+  .dark ::selection {
+    background: #243F2D;
+    color: #EDF3ED;
   }
   /* Focus rõ ràng cho bàn phím ở mọi nút / link */
   :where(a, button, input, select, textarea, [tabindex]):focus-visible {
@@ -153,7 +282,7 @@
       0 6px 18px -12px rgba(12, 38, 22, 0.12);
   }
   .dark .elevate-card {
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35), 0 6px 18px -4px rgba(0, 0, 0, 0.45);
   }
   .hide-scrollbar {
     scrollbar-width: none;
@@ -224,16 +353,12 @@
   animation: page-enter 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Đổi theme: chỉ chuyển màu trong 200ms, không đụng layout */
-html.theme-transitioning,
-html.theme-transitioning *,
-html.theme-transitioning *::before,
-html.theme-transitioning *::after {
-  transition:
-    background-color 200ms ease,
-    border-color 200ms ease,
-    color 200ms ease !important;
-  transition-delay: 0s !important;
+/* Đổi theme (ThemeToggle dùng View Transitions): cả trang mờ dần từ ảnh chụp cũ sang mới trên GPU,
+   không bắt từng phần tử chạy transition màu. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+  animation-timing-function: ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {

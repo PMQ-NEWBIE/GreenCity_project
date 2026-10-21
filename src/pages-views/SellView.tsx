@@ -4,7 +4,8 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Camera, MapPin, Send, Trash2 } from "lucide-react";
 import { useApp } from "@/store/app-store";
-import { CATEGORIES, SAMPLE_IMAGES } from "@/data/mock-data";
+import { SAMPLE_IMAGES } from "@/data/mock-data";
+import { MARKET_AUDIENCE, MARKET_LABEL, categoriesOf, marketOf } from "@/lib/market";
 import { SmartImage } from "@/components/greencity/SmartImage";
 import { SubmitButton } from "@/components/greencity/SubmitButton";
 import { ChoiceChip, FieldError, PageContainer, PageIntro, StepHeading, buttonClass, inputClass } from "@/components/greencity/ui";
@@ -98,7 +99,7 @@ export function SellView() {
       toast(
         "success",
         visibility === "draft" ? "Đã lưu nháp" : "Đã đăng tin",
-        visibility === "draft" ? "Tin chỉ hiện trong Hồ sơ của bạn." : "Tin của bạn đã lên sàn."
+        visibility === "draft" ? "Tin chỉ hiện trong Tin đăng của tôi." : "Tin của bạn đã lên sàn."
       );
       router.push(ROUTES.product(product.id));
     }, 500);
@@ -213,7 +214,7 @@ export function SellView() {
             </div>
             <div>
               <label htmlFor="sell-category" className="mb-1.5 block text-[14px] font-semibold text-foreground">
-                Loại vật liệu
+                Loại hàng
               </label>
               <select
                 id="sell-category"
@@ -227,13 +228,23 @@ export function SellView() {
                 className={selectCls(errors.category)}
               >
                 <option value="">Chọn loại…</option>
-                {CATEGORIES.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name} ({c.priceHint})
-                  </option>
+                {/* Hai nhóm: phế liệu đi tới người thu mua, đồ thanh lý đi tới người dân */}
+                {(["scrap", "secondhand"] as const).map((m) => (
+                  <optgroup key={m} label={MARKET_LABEL[m]}>
+                    {categoriesOf(m).map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} ({c.priceHint})
+                      </option>
+                    ))}
+                  </optgroup>
                 ))}
               </select>
               <FieldError id="sell-category-err" msg={errors.category} />
+              {category && (
+                <p className="mt-2 rounded-lg bg-accent px-3 py-2 text-[13.5px] text-accent-foreground" aria-live="polite">
+                  <strong>{MARKET_LABEL[marketOf(category)]}.</strong> {MARKET_AUDIENCE[marketOf(category)]}
+                </p>
+              )}
             </div>
             <div>
               <label htmlFor="sell-description" className="mb-1.5 block text-[14px] font-semibold text-foreground">
@@ -263,7 +274,7 @@ export function SellView() {
 
           {/* Bước 3: Giá & khu vực */}
           <section aria-labelledby="step-3" className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-5 sm:p-6">
-            <StepHeading id="step-3" step={3} title="Giá và nơi lấy hàng" hint="Chưa chắc giá? Xem giá gợi ý ở ô Loại vật liệu." />
+            <StepHeading id="step-3" step={3} title="Giá và nơi lấy hàng" hint="Chưa chắc giá? Xem giá gợi ý ở ô Loại hàng." />
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
                 <label htmlFor="sell-price" className="mb-1.5 block text-[14px] font-semibold text-foreground">

@@ -19,7 +19,7 @@ export const POINT_RULES: PointRule[] = [
     activity: "Bán ve chai qua thu gom tận nhà",
     points: 2,
     unit: "kg",
-    condition: "Tính trên khối lượng thực tế khi đội thu gom cân tại nhà bạn.",
+    condition: "Tính trên khối lượng thực tế khi người thu mua cân tại nhà bạn.",
   },
   {
     id: "pickup-sorted",
@@ -27,7 +27,7 @@ export const POINT_RULES: PointRule[] = [
     activity: "Thu gom tận nhà, đồ đã phân loại sẵn",
     points: 10,
     unit: "lần",
-    condition: "Cộng thêm khi đội thu gom xác nhận đồ đã được tách riêng theo loại.",
+    condition: "Cộng thêm khi người thu mua xác nhận đồ đã được tách riêng theo loại.",
   },
   {
     id: "pickup-cash-to-points",

@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { CtvView } from "@/features/ctv/CtvView";
+import { StatsView } from "@/features/stats/StatsView";
 
-export const metadata: Metadata = { title: "Khu cộng tác viên" };
+export const metadata: Metadata = { title: "Thống kê môi trường" };
 
 export default function Page() {
   // Suspense: View có thể đọc tham số trên URL bằng useSearchParams
   return (
     <Suspense>
-      <CtvView />
+      <StatsView />
     </Suspense>
   );
 }

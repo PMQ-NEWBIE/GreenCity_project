@@ -1,5 +1,5 @@
 import type { CollectionRequest, DemoUser, Product, UserRole } from "@/types";
-import type { AppState } from "./app-store";
+import type { AppMode, AppState } from "./app-store";
 import { pointsHydrate, pointsPersist, type PointsState } from "./slices/points";
 import { rewardsHydrate, rewardsPersist, type RewardsState } from "./slices/rewards";
 import { swapHydrate, swapPersist, type SwapState } from "./slices/swap";
@@ -9,6 +9,8 @@ import { binsHydrate, binsPersist, type BinsState } from "./slices/bins";
 import { litterHydrate, litterPersist, type LitterState } from "./slices/litter";
 import { lotsHydrate, lotsPersist, type LotsState } from "./slices/lots";
 import { consultsHydrate, consultsPersist, type ConsultsState } from "./slices/consults";
+import { ordersHydrate, ordersPersist, type OrdersState } from "./slices/orders";
+import { demandsHydrate, demandsPersist, type DemandsState } from "./slices/demands";
 
 const KEY_V1 = "greencity-demo-v1";
 const KEY_V2 = "greencity-demo-v2";
@@ -27,9 +29,12 @@ export interface PersistShape {
   litter: LitterState;
   lots: LotsState;
   consults: ConsultsState;
+  orders: OrdersState;
+  demands: DemandsState;
+  mode: AppMode;
 }
 
-const ROLES: UserRole[] = ["resident", "collaborator", "business", "operator"];
+const ROLES: UserRole[] = ["resident", "partner", "collaborator", "business", "operator"];
 
 function readUser(raw: unknown): DemoUser | null {
   if (!raw || typeof raw !== "object") return null;
@@ -62,6 +67,9 @@ function parse(raw: Record<string, unknown>): PersistShape {
     litter: litterHydrate(raw.litter),
     lots: lotsHydrate(raw.lots),
     consults: consultsHydrate(raw.consults),
+    orders: ordersHydrate(raw.orders),
+    demands: demandsHydrate(raw.demands),
+    mode: raw.mode === "buy" ? "buy" : "sell",
   };
 }
 
@@ -93,6 +101,9 @@ export function savePersisted(state: AppState): "ok" | "quota" | "error" {
     litter: litterPersist(state.litter),
     lots: lotsPersist(state.lots),
     consults: consultsPersist(state.consults),
+    orders: ordersPersist(state.orders),
+    demands: demandsPersist(state.demands),
+    mode: state.mode,
   };
   try {
     window.localStorage.setItem(KEY_V2, JSON.stringify(payload));

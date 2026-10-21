@@ -26,6 +26,11 @@ import { binsHydrate, binsInitial, binsReducer, type BinsAction, type BinsState 
 import { litterHydrate, litterInitial, litterReducer, type LitterAction, type LitterState } from "./slices/litter";
 import { lotsHydrate, lotsInitial, lotsReducer, type LotsAction, type LotsState } from "./slices/lots";
 import { consultsHydrate, consultsInitial, consultsReducer, type ConsultsAction, type ConsultsState } from "./slices/consults";
+import { ordersHydrate, ordersInitial, ordersReducer, type OrdersAction, type OrdersState } from "./slices/orders";
+import { demandsHydrate, demandsInitial, demandsReducer, type DemandsAction, type DemandsState } from "./slices/demands";
+import type { AppMode } from "@/lib/access";
+
+export type { AppMode };
 
 export interface AppState {
   /** true sau khi đã đọc localStorage — trước đó chưa biết người dùng đã đăng nhập hay chưa. */
@@ -47,6 +52,9 @@ export interface AppState {
   litter: LitterState;
   lots: LotsState;
   consults: ConsultsState;
+  orders: OrdersState;
+  demands: DemandsState;
+  mode: AppMode;
 }
 
 /** Thời điểm và id do nơi gọi tạo ra, để reducer luôn cho cùng kết quả với cùng một action. */
@@ -60,9 +68,11 @@ export type Action =
   | { type: "LOGOUT" }
   | ({ type: "HYDRATE"; data: PersistShape | null } & Stamp)
   | { type: "SET_ROLE"; role: UserRole }
+  | { type: "SET_MODE"; mode: AppMode }
   | { type: "TOGGLE_FAVORITE"; id: string }
   | { type: "ADD_PRODUCT"; product: Product }
   | { type: "REMOVE_PRODUCT"; id: string }
+  | { type: "SET_PRODUCT_STATUS"; id: string; status: Product["status"] }
   | { type: "UPDATE_USER"; name: string; email: string }
   | { type: "PUSH_TOAST"; toast: ToastItem }
   | { type: "DISMISS_TOAST"; id: string }
@@ -75,7 +85,9 @@ export type Action =
   | BinsAction
   | LitterAction
   | LotsAction
-  | ConsultsAction;
+  | ConsultsAction
+  | OrdersAction
+  | DemandsAction;
 
 const initialState: AppState = {
   ready: false,
@@ -94,6 +106,9 @@ const initialState: AppState = {
   litter: litterInitial,
   lots: lotsInitial,
   consults: consultsInitial,
+  orders: ordersInitial,
+  demands: demandsInitial,
+  mode: "sell",
 };
 
 /** Người dùng chưa có điểm chào mừng thì cộng một lần (đọc số điểm từ POINT_RULES). */
@@ -126,6 +141,8 @@ export function reducer(state: AppState, action: Action): AppState {
   if (action.type.startsWith("LOTS_")) return { ...state, lots: lotsReducer(state.lots, action as LotsAction) };
   if (action.type.startsWith("CONSULTS_"))
     return { ...state, consults: consultsReducer(state.consults, action as ConsultsAction) };
+  if (action.type.startsWith("ORDERS_")) return { ...state, orders: ordersReducer(state.orders, action as OrdersAction) };
+  if (action.type.startsWith("DEMANDS_")) return { ...state, demands: demandsReducer(state.demands, action as DemandsAction) };
   if (action.type !== "REWARDS_REDEEM" && action.type.startsWith("REWARDS_"))
     return { ...state, rewards: rewardsReducer(state.rewards, action as RewardsAction) };
 
@@ -152,6 +169,9 @@ export function reducer(state: AppState, action: Action): AppState {
             litter: d.litter,
             lots: d.lots,
             consults: d.consults,
+            orders: d.orders,
+            demands: d.demands,
+            mode: d.mode,
           }
         : {
             ...state,
@@ -162,12 +182,16 @@ export function reducer(state: AppState, action: Action): AppState {
             litter: litterHydrate(null),
             lots: lotsHydrate(null),
             consults: consultsHydrate(null),
+            orders: ordersHydrate(null),
+            demands: demandsHydrate(null),
             points: pointsHydrate(null),
           };
       return withWelcome(next, action);
     }
     case "SET_ROLE":
       return state.user ? { ...state, user: { ...state.user, role: action.role } } : state;
+    case "SET_MODE":
+      return { ...state, mode: action.mode };
     case "TOGGLE_FAVORITE": {
       const has = state.favorites.includes(action.id);
       return {
@@ -177,6 +201,8 @@ export function reducer(state: AppState, action: Action): AppState {
     }
     case "ADD_PRODUCT":
       return { ...state, products: [action.product, ...state.products] };
+    case "SET_PRODUCT_STATUS":
+      return { ...state, products: state.products.map((p) => (p.id === action.id ? { ...p, status: action.status } : p)) };
     case "REMOVE_PRODUCT":
       return { ...state, products: state.products.filter((p) => p.id !== action.id) };
     case "UPDATE_USER":
@@ -225,6 +251,7 @@ interface AppContextValue {
   login: (user: DemoUser, remember?: boolean) => void;
   logout: () => void;
   setRole: (role: UserRole) => void;
+  setMode: (mode: AppMode) => void;
   toggleFavorite: (id: string) => void;
   addProduct: (product: Product) => void;
   removeProduct: (id: string) => void;
@@ -272,7 +299,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       quotaWarnedRef.current = true;
       toast("error", "Bộ nhớ trình duyệt đã đầy", "Thay đổi mới chỉ giữ trong lần mở này. Xóa bớt tin có ảnh để lưu tiếp.");
     }
-  }, [state.user, state.remember, state.favorites, state.products, state.points, state.rewards, state.swap, state.collect, state.partners, state.bins, state.litter, state.lots, state.consults, toast]);
+  }, [state.user, state.remember, state.favorites, state.products, state.points, state.rewards, state.swap, state.collect, state.partners, state.bins, state.litter, state.lots, state.consults, state.orders, state.demands, state.mode, toast]);
 
   const login = useCallback(
     (user: DemoUser, remember = true) => dispatch({ type: "LOGIN", user, remember, ...stamp() }),
@@ -280,6 +307,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   );
   const logout = useCallback(() => dispatch({ type: "LOGOUT" }), [dispatch]);
   const setRole = useCallback((role: UserRole) => dispatch({ type: "SET_ROLE", role }), [dispatch]);
+  const setMode = useCallback((mode: AppMode) => dispatch({ type: "SET_MODE", mode }), [dispatch]);
   const toggleFavorite = useCallback((id: string) => dispatch({ type: "TOGGLE_FAVORITE", id }), [dispatch]);
   const addProduct = useCallback((product: Product) => dispatch({ type: "ADD_PRODUCT", product }), [dispatch]);
   const removeProduct = useCallback((id: string) => dispatch({ type: "REMOVE_PRODUCT", id }), [dispatch]);
@@ -297,6 +325,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       login,
       logout,
       setRole,
+      setMode,
       toggleFavorite,
       addProduct,
       removeProduct,
@@ -304,7 +333,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       toast,
       dismissToast,
     }),
-    [state, getState, dispatch, login, logout, setRole, toggleFavorite, addProduct, removeProduct, updateUser, toast, dismissToast]
+    [state, getState, dispatch, login, logout, setRole, setMode, toggleFavorite, addProduct, removeProduct, updateUser, toast, dismissToast]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -20,7 +20,8 @@ export interface NewLot {
 }
 
 /**
- * Chợ vật liệu (A7): doanh nghiệp đặt giữ lô 48 giờ; vận hành tạo lô, chốt bán, bỏ giữ.
+ * Chợ lô vật liệu: vựa (người thu mua) và điểm thu gom (cộng tác viên) đăng lô đã gom đủ số lượng;
+ * doanh nghiệp đặt giữ 48 giờ; người đăng lô chốt bán hoặc bỏ giữ. Ban điều hành chỉ theo dõi.
  * Hạn giữ tính lúc đọc: quá 48 giờ chưa chốt thì lô tự về "đang bán".
  */
 export function useMaterials() {
@@ -32,6 +33,8 @@ export function useMaterials() {
     return state.lots.lots.map((l) => withEffectiveStatus(l, now));
   }, [state.lots.lots]);
   const myHolds = useMemo(() => lots.filter((l) => l.status === "dang-giu" && l.reservation?.businessId === uid), [lots, uid]);
+  /** Lô do chính tài khoản này đăng (vựa / điểm thu gom) */
+  const myLots = useMemo(() => lots.filter((l) => !!uid && l.sellerId === uid), [lots, uid]);
 
   const current = useCallback(
     (id: string) => {
@@ -88,14 +91,18 @@ export function useMaterials() {
   const createLot = useCallback(
     (input: NewLot): MaterialLot => {
       const now = new Date();
+      const user = getState().user;
       const seq = String(getState().lots.lots.length + 1).padStart(2, "0");
       const lot: MaterialLot = {
         ...input,
         id: newId("lo"),
         code: `LO-${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}-${seq}`,
-        inspector: getState().user?.name ?? "Nhóm vận hành",
+        inspector: user?.name ?? "Nhóm vận hành",
+        sellerId: user?.email,
+        sellerName: user?.name,
+        sellerKind: user?.role === "collaborator" ? "diem-thu-gom" : "vua",
         inspectedAt: now.toISOString(),
-        image: LOT_IMAGE[input.material] ?? LOT_IMAGE["Nhựa các loại"],
+        image: LOT_IMAGE[input.material] ?? "",
         status: "san-sang",
       };
       save(lot);
@@ -104,5 +111,5 @@ export function useMaterials() {
     [getState, save]
   );
 
-  return { lots, myHolds, reserve, release, markSold, createLot };
+  return { lots, myHolds, myLots, reserve, release, markSold, createLot };
 }

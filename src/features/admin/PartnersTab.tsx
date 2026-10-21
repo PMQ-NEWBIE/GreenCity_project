@@ -11,7 +11,7 @@ import type { Partner, PartnerKind } from "@/types/features";
 import { cn } from "@/lib/utils";
 
 const KIND_LABEL: Record<PartnerKind, string> = {
-  "thu-gom": "Đối tác thu gom",
+  "thu-gom": "Vựa / người thu mua",
   "che-bien-phan": "Cơ sở chế biến phân bón",
 };
 

@@ -4,11 +4,11 @@ import { useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { RotateCcw, Search, SlidersHorizontal, X } from "lucide-react";
 import { useApp } from "@/store/app-store";
-import { CATEGORIES } from "@/data/mock-data";
 import { ProductCard } from "@/components/greencity/ProductCard";
 import { EmptyState } from "@/components/greencity/EmptyState";
 import { PageContainer, buttonClass, inputClass } from "@/components/greencity/ui";
-import { AREAS, type CategoryId } from "@/types";
+import { AREAS, type CategoryId, type Market } from "@/types";
+import { categoriesOf, marketOf } from "@/lib/market";
 import { cn } from "@/lib/utils";
 
 type SortKey = "newest" | "price-asc" | "price-desc";
@@ -24,10 +24,15 @@ const PRICE_BUCKETS: { key: PriceKey; label: string; test: (p: number) => boolea
 ];
 
 const CATEGORY_PARAM = "danh-muc";
-const isCategory = (v: string | null): v is CategoryId => CATEGORIES.some((c) => c.id === v);
 
-export function DiscoverView() {
+/**
+ * Tìm tin để mua — chỉ trong một chợ:
+ * người dân (chế độ mua) xem đồ thanh lý, người thu mua xem phế liệu.
+ */
+export function DiscoverView({ market = "secondhand" }: { market?: Market }) {
   const { state } = useApp();
+  const CATEGORIES = categoriesOf(market);
+  const isCategory = (v: string | null): v is CategoryId => CATEGORIES.some((c) => c.id === v);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -55,7 +60,9 @@ export function DiscoverView() {
     const bucket = PRICE_BUCKETS.find((b) => b.key === price)!;
     const list = state.products.filter(
       (p) =>
+        !p.isMine &&
         p.status !== "draft" &&
+        marketOf(p.categoryId) === market &&
         (status === "all" || p.status === "available") &&
         (category === "all" || p.categoryId === category) &&
         (area === "all" || p.area === area) &&
@@ -65,7 +72,7 @@ export function DiscoverView() {
     return list.sort((a, b) =>
       sort === "price-asc" ? a.price - b.price : sort === "price-desc" ? b.price - a.price : a.postedHoursAgo - b.postedHoursAgo
     );
-  }, [state.products, search, category, price, area, sort, status]);
+  }, [state.products, search, category, price, area, sort, status, market]);
 
   const activeFilters = [price !== "all", area !== "all", status !== "available"].filter(Boolean).length;
   const hasAnyFilter = activeFilters > 0 || category !== "all" || search.trim() !== "";
@@ -96,7 +103,7 @@ export function DiscoverView() {
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Tìm: giấy carton, lon nhôm, quạt cũ…"
+            placeholder={market === "scrap" ? "Tìm: giấy carton, lon nhôm, sắt vụn…" : "Tìm: quạt, bàn ghế, tủ kệ cũ…"}
             className={cn(inputClass(), "pl-12 pr-11")}
           />
           {search && (

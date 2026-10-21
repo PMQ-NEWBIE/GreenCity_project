@@ -48,7 +48,7 @@ export function GcModal({ open, onClose, title, description, children, size = "m
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          className="fixed inset-0 z-[70] flex items-end justify-center bg-black/55 sm:items-center sm:p-6"
+          className="fixed inset-0 z-[70] flex items-end justify-center bg-black/55 dark:bg-black/75 sm:items-center sm:p-6"
           onClick={onClose}
         >
           <m.div
@@ -62,7 +62,7 @@ export function GcModal({ open, onClose, title, description, children, size = "m
             exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className={cn(
-              "relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-3xl border border-border bg-card text-card-foreground shadow-2xl outline-none sm:rounded-3xl",
+              "relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-3xl border border-border bg-popover text-popover-foreground shadow-2xl outline-none sm:rounded-3xl",
               size === "sm" ? "sm:max-w-md" : "sm:max-w-xl"
             )}
             onClick={(e) => e.stopPropagation()}
@@ -78,7 +78,7 @@ export function GcModal({ open, onClose, title, description, children, size = "m
                 type="button"
                 onClick={onClose}
                 aria-label="Đóng"
-                className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+                className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-surface-hover hover:text-foreground"
               >
                 <X className="h-5 w-5" aria-hidden="true" />
               </button>

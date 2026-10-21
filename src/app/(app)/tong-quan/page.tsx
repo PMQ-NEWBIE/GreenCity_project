@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { DashboardView } from "@/pages-views/DashboardView";
+import { HomeRedirect } from "@/pages-views/HomeRedirect";
 
-export const metadata: Metadata = { title: "Tổng quan" };
+export const metadata: Metadata = { title: "Green City" };
 
+/** Điểm vào chung (sau đăng nhập, nút trên lobby): chuyển tới trang đầu đúng vai trò và chế độ. */
 export default function Page() {
-  return <DashboardView />;
+  return <HomeRedirect />;
 }

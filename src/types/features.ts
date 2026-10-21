@@ -376,7 +376,14 @@ export interface MaterialLot {
   reservation?: LotReservation;
   soldAt?: string;
   soldTo?: string;
+  /** Ai bán lô: vựa (tài khoản người thu mua) hoặc điểm thu gom (cộng tác viên). Lô mẫu cũ không có. */
+  sellerId?: string;
+  sellerName?: string;
+  sellerKind?: LotSellerKind;
 }
+
+/** vua: vựa / người thu mua gom từ người dân · diem-thu-gom: thùng và điểm thu gom do cộng tác viên trực */
+export type LotSellerKind = "vua" | "diem-thu-gom";
 
 /* --------------------------- Tư vấn phân loại (A8) --------------------------- */
 
@@ -405,4 +412,77 @@ export interface ConsultTicket {
   /** Gợi ý tự động lúc gửi */
   suggestions: ClassifyResult[];
   answer?: { group: WasteGroup; guidance: string; by: string; at: string };
+}
+
+/* --------------------------- Đơn mua bán giữa người dân --------------------------- */
+
+/**
+ * pending: chờ người bán xác nhận · accepted: người bán đã nhận, chờ gặp giao hàng ·
+ * done: đã giao xong · declined: người bán từ chối · cancelled: một bên hủy
+ */
+export type OrderStatus = "pending" | "accepted" | "done" | "declined" | "cancelled";
+
+export interface OrderEvent {
+  at: string;
+  status: OrderStatus;
+  by: "buyer" | "seller";
+  /** Lý do từ chối / hủy */
+  note?: string;
+}
+
+export interface Order {
+  id: string;
+  productId: string;
+  /** Chụp lại tin lúc đặt — tin bị xóa hay đổi giá thì đơn vẫn đúng như lúc đặt */
+  product: { name: string; image: string; price: number; unit: string; area: string };
+  /** Email người mua; người mua mô phỏng (bản demo) có dạng "demo:<tên>" */
+  buyerId: string;
+  buyerName: string;
+  /** Email người bán nếu là tin của người dùng; người bán trong dữ liệu mẫu có dạng "demo:<tên>" */
+  sellerId: string;
+  sellerName: string;
+  /** Người mua ghi, ví dụ "khoảng 15 kg", "cả lô" */
+  quantity: string;
+  /** Khung giờ hẹn tới lấy hàng (TIME_OPTIONS) */
+  meetTime: string;
+  note: string;
+  createdAt: string;
+  status: OrderStatus;
+  events: OrderEvent[];
+}
+
+/* ------------------- Nhu cầu thu mua của doanh nghiệp ------------------- */
+
+/** dang-mua: còn nhận chào hàng · da-du: doanh nghiệp đã gom đủ, đóng lại */
+export type DemandStatus = "dang-mua" | "da-du";
+export type DemandOfferStatus = "cho" | "nhan" | "tu-choi";
+
+/** Vựa hoặc điểm thu gom chào hàng vào một nhu cầu */
+export interface DemandOffer {
+  id: string;
+  fromId: string;
+  fromName: string;
+  fromKind: LotSellerKind;
+  kg: number;
+  pricePerKg: number;
+  note: string;
+  at: string;
+  status: DemandOfferStatus;
+}
+
+/** Doanh nghiệp đăng "cần mua X kg loại Y, giá Z" — ví dụ cơ sở phân hữu cơ cần rác rau củ ở chợ */
+export interface PurchaseDemand {
+  id: string;
+  businessId: string;
+  businessName: string;
+  /** Một trong LOT_MATERIALS */
+  material: string;
+  kg: number;
+  pricePerKg: number;
+  /** Khu vực ưu tiên nhận hàng; null = cả thành phố */
+  area: Area | null;
+  note: string;
+  createdAt: string;
+  status: DemandStatus;
+  offers: DemandOffer[];
 }

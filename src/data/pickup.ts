@@ -1,9 +1,9 @@
 import type { PayoutMethod, PickupRequest, PickupStatus } from "@/types/features";
 
 export const PICKUP_STATUS_LABEL: Record<PickupStatus, string> = {
-  "cho-nhan": "Đang tìm người thu gom",
-  "da-nhan": "Đã có đội nhận",
-  "dang-den": "Đội đang tới",
+  "cho-nhan": "Đang chờ người mua nhận",
+  "da-nhan": "Đã có người nhận",
+  "dang-den": "Người mua đang tới",
   "da-can": "Đã cân xong",
   "hoan-tat": "Hoàn tất",
   "da-huy": "Đã hủy",
@@ -12,8 +12,8 @@ export const PICKUP_STATUS_LABEL: Record<PickupStatus, string> = {
 /** Tên bước trên dòng thời gian (ngắn hơn nhãn trạng thái). */
 export const PICKUP_STEP_LABEL: Record<PickupStatus, string> = {
   "cho-nhan": "Gửi yêu cầu",
-  "da-nhan": "Đội nhận đơn, hẹn giờ",
-  "dang-den": "Đội lên đường",
+  "da-nhan": "Người mua nhận đơn, hẹn giờ",
+  "dang-den": "Người mua lên đường",
   "da-can": "Cân tại nhà",
   "hoan-tat": "Thanh toán, cộng điểm",
   "da-huy": "Đã hủy",
@@ -32,7 +32,7 @@ export const CANCEL_REASONS = [
 ] as const;
 
 /**
- * Giá thu mua tham khảo (đồng/kg) — đội thu gom sửa được khi cân.
+ * Giá thu mua tham khảo (đồng/kg) — người mua sửa được khi cân.
  * Khóa trùng với MATERIAL_OPTIONS trong src/types/index.ts.
  */
 export const MATERIAL_PRICE_PER_KG: Record<string, number> = {

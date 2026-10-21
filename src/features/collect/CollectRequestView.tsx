@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, CalendarClock, Coins, FlaskConical, MapPin, Phone, Scale, Truck, XCircle } from "lucide-react";
-import { useCollect, useCurrentUser, usePartners, useToast } from "@/store/hooks";
+import { buyerTeamId, useCollect, useCurrentUser, usePartners, useToast } from "@/store/hooks";
 import { EmptyState } from "@/components/greencity/EmptyState";
 import { GcModal } from "@/components/greencity/GcModal";
 import { SmartImage } from "@/components/greencity/SmartImage";
@@ -24,17 +24,26 @@ export function CollectRequestView({ id }: { id: string }) {
   const user = useCurrentUser();
   const r = requests.find((x) => x.id === id);
   const isOwner = !!r && !!user && r.ownerId === user.email;
+  // Ban điều hành chỉ theo dõi; người mua (vựa, ve chai dạo) nhận đơn còn chờ và làm tiếp đơn mình đã nhận
   const isOps = user?.role === "operator";
+  const isBuyer = user?.role === "partner";
+  const isTaker = !!r && !!user && r.team?.id === buyerTeamId(user.email);
+  const buyerCanAct = !!r && isBuyer && (r.status === "cho-nhan" || isTaker);
+  const back = isOwner
+    ? { href: ROUTES.collect, label: "Yêu cầu của bạn" }
+    : isBuyer
+      ? { href: ROUTES.partnerPickups, label: "Yêu cầu tới lấy" }
+      : { href: `${ROUTES.admin}?tab=don-thu-gom`, label: "Giám sát thu gom" };
 
-  if (!r || (!isOwner && !isOps)) {
+  if (!r || (!isOwner && !isOps && !buyerCanAct)) {
     return (
       <PageContainer>
         <EmptyState
           title="Không tìm thấy yêu cầu"
-          description="Yêu cầu không tồn tại hoặc không phải của bạn."
+          description={isBuyer ? "Yêu cầu không còn hoặc đã có người mua khác nhận." : "Yêu cầu không tồn tại hoặc không phải của bạn."}
           action={
-            <Link href={ROUTES.collect} className={buttonClass.primary}>
-              Về trang gọi thu gom
+            <Link href={back.href} className={buttonClass.primary}>
+              {back.label}
             </Link>
           }
         />
@@ -44,12 +53,9 @@ export function CollectRequestView({ id }: { id: string }) {
 
   return (
     <PageContainer className="max-w-5xl">
-      <Link
-        href={isOwner ? ROUTES.collect : `${ROUTES.admin}?tab=don-thu-gom`}
-        className={cn(buttonClass.ghost, "-ml-3 text-muted-foreground hover:text-foreground")}
-      >
+      <Link href={back.href} className={cn(buttonClass.ghost, "-ml-3 text-muted-foreground hover:text-foreground")}>
         <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-        {isOwner ? "Yêu cầu của bạn" : "Hàng chờ thu gom"}
+        {back.label}
       </Link>
 
       <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
@@ -78,7 +84,12 @@ export function CollectRequestView({ id }: { id: string }) {
         <div className="flex flex-col gap-6">
           {r.team && <TeamCard request={r} />}
           {r.weighLines && <WeighCard request={r} />}
-          {isOps && !isFinal(r.status) && <PickupOpsPanel request={r} />}
+          {buyerCanAct && !isFinal(r.status) && <PickupOpsPanel request={r} />}
+          {isOps && !isFinal(r.status) && (
+            <p className="rounded-2xl border border-border bg-muted/50 p-4 text-[14px] text-muted-foreground">
+              Người mua (vựa, ve chai) tự nhận và làm đơn. Ban điều hành chỉ theo dõi; đơn chờ lâu thì liên hệ người mua ở {r.area}.
+            </p>
+          )}
           {isOwner && !isFinal(r.status) && <DemoBox request={r} />}
           {isOwner && canCancel(r.status) && <CancelBox request={r} />}
         </div>
@@ -187,7 +198,7 @@ function WeighCard({ request: r }: { request: PickupRequest }) {
         </table>
       </div>
       <p className="mt-3 text-[13px] text-muted-foreground">
-        Đội thu gom {r.sortedConfirmed ? "xác nhận đồ đã được phân loại đúng." : "ghi nhận đồ chưa được phân loại."}
+        Người mua {r.sortedConfirmed ? "xác nhận đồ đã được phân loại đúng." : "ghi nhận đồ chưa được phân loại."}
       </p>
       {r.payout && (
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-accent px-4 py-3">
@@ -215,12 +226,12 @@ function DemoBox({ request: r }: { request: PickupRequest }) {
     if (r.status === "cho-nhan") {
       const teams = partners.filter((p) => p.kind === "thu-gom" && p.active);
       const team = teams.find((p) => p.areas.includes(r.area)) ?? teams[0];
-      if (!team) return toast("error", "Chưa có đội thu gom nào đang hoạt động");
+      if (!team) return toast("error", "Chưa có người mua nào đang hoạt động");
       assign(r.id, { id: team.id, name: team.name, phoneMasked: team.phoneMasked }, tomorrowNine().toISOString());
       toast("success", `${team.name} đã nhận đơn`, "Hẹn 9 giờ sáng mai.");
     } else if (r.status === "da-nhan") {
       depart(r.id);
-      toast("info", "Đội đang trên đường tới");
+      toast("info", "Người mua đang trên đường tới");
     } else if (r.status === "dang-den") {
       // Giả lập: mỗi loại 5kg theo giá tham khảo
       weigh(
@@ -243,7 +254,7 @@ function DemoBox({ request: r }: { request: PickupRequest }) {
         Chế độ demo
       </h3>
       <p className="mt-1 text-[14px] text-muted-foreground">
-        Bản thật, các bước này do đội thu gom bấm. Ở bản demo bạn tự chuyển để xem hết quy trình.
+        Bản thật, các bước này do người mua (vựa, ve chai) bấm. Ở bản demo bạn tự chuyển để xem hết quy trình.
       </p>
       {r.status === "da-can" && (
         <div className="mt-4">
@@ -268,7 +279,7 @@ function CancelBox({ request: r }: { request: PickupRequest }) {
 
   const confirm = () => {
     const text = reason === "khac" ? other.trim() : reason;
-    if (!text) return setError(reason === "khac" ? "Ghi lý do giúp đội thu gom" : "Chọn một lý do");
+    if (!text) return setError(reason === "khac" ? "Ghi lý do giúp người mua" : "Chọn một lý do");
     cancel(r.id, text);
     setOpen(false);
     toast("info", "Đã hủy yêu cầu", text);

@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { AdminView } from "@/features/admin/AdminView";
+import { CtvView } from "@/features/ctv/CtvView";
 
-export const metadata: Metadata = { title: "Quản trị vận hành" };
+export const metadata: Metadata = { title: "Hàng chờ kiểm tra" };
 
 export default function Page() {
   // Suspense: View có thể đọc tham số trên URL bằng useSearchParams
   return (
     <Suspense>
-      <AdminView />
+      <CtvView />
     </Suspense>
   );
 }

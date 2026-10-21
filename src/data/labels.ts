@@ -99,6 +99,7 @@ export const GREEN_SHOP_KIND_LABEL: Record<GreenShopKind, string> = {
 
 export const ROLE_LABEL: Record<UserRole, string> = {
   resident: "Người dân",
+  partner: "Người thu mua",
   collaborator: "Cộng tác viên",
   business: "Doanh nghiệp tái chế",
   operator: "Nhóm vận hành",

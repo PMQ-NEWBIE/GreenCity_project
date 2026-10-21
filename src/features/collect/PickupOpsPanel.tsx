@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Plus, Scale, Trash2, Truck, Wallet } from "lucide-react";
-import { useCollect, usePartners, useToast } from "@/store/hooks";
+import { useCollect, useToast } from "@/store/hooks";
 import { FieldError, buttonClass, inputClass } from "@/components/greencity/ui";
 import { MATERIAL_PRICE_PER_KG, PAYOUT_LABEL } from "@/data/pickup";
 import { POINT_RULES } from "@/data/point-rules";
@@ -27,8 +27,8 @@ export function tomorrowNine(): Date {
 }
 
 /**
- * Thao tác của đội thu gom cho một đơn: nhận đơn → lên đường → cân → thanh toán.
- * Dùng ở trang chi tiết đơn (vai trò vận hành) và trong khu quản trị.
+ * Thao tác của người mua (vựa, ve chai dạo) cho một yêu cầu thu gom:
+ * nhận đơn → lên đường → cân → thanh toán. Dùng ở trang chi tiết trong khu người mua.
  */
 export function PickupOpsPanel({ request: r }: { request: PickupRequest }) {
   if (r.status === "cho-nhan") return <AssignStep request={r} />;
@@ -50,58 +50,30 @@ function Panel({ icon: Icon, title, children }: { icon: typeof Truck; title: str
   );
 }
 
+/** Người mua tự nhận yêu cầu và hẹn giờ tới lấy. */
 function AssignStep({ request: r }: { request: PickupRequest }) {
-  const { assign } = useCollect();
-  const { partners } = usePartners();
+  const { take } = useCollect();
   const toast = useToast();
-  // Đội phụ trách đúng quận lên đầu
-  const teams = useMemo(
-    () =>
-      partners
-        .filter((p) => p.kind === "thu-gom" && p.active)
-        .sort((a, b) => Number(b.areas.includes(r.area)) - Number(a.areas.includes(r.area))),
-    [partners, r.area]
-  );
-  const [teamId, setTeamId] = useState(teams[0]?.id ?? "");
   const [when, setWhen] = useState(() => localInputValue(tomorrowNine()));
   const [error, setError] = useState("");
 
   const submit = () => {
-    const team = teams.find((t) => t.id === teamId);
     const at = new Date(when);
-    if (!team) return setError("Chọn đội thu gom");
     if (Number.isNaN(at.getTime())) return setError("Chọn giờ hẹn");
-    assign(r.id, { id: team.id, name: team.name, phoneMasked: team.phoneMasked }, at.toISOString());
-    toast("success", `${team.name} đã nhận đơn`);
+    take(r.id, at.toISOString());
+    toast("success", "Bạn đã nhận đơn", `Hẹn ${r.ownerName} lúc ${at.toLocaleString("vi-VN", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })}.`);
   };
 
   return (
-    <Panel icon={Truck} title="Giao cho đội thu gom">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor={`team-${r.id}`} className="mb-1.5 block text-[14px] font-semibold text-foreground">
-            Đội thu gom
-          </label>
-          <select
-            id={`team-${r.id}`}
-            value={teamId}
-            onChange={(e) => setTeamId(e.target.value)}
-            className={cn(inputClass(), "select-chevron cursor-pointer appearance-none")}
-          >
-            {teams.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-                {t.areas.includes(r.area) ? ` (phụ trách ${r.area})` : ""}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor={`when-${r.id}`} className="mb-1.5 block text-[14px] font-semibold text-foreground">
-            Giờ hẹn
-          </label>
-          <input id={`when-${r.id}`} type="datetime-local" value={when} onChange={(e) => setWhen(e.target.value)} className={inputClass()} />
-        </div>
+    <Panel icon={Truck} title="Nhận đơn này">
+      <p className="text-[14px] text-muted-foreground">
+        Người nhận trước sẽ giữ đơn. Hẹn giờ trong khung {r.time.toLowerCase()} mà người gửi đã chọn.
+      </p>
+      <div className="mt-4 max-w-xs">
+        <label htmlFor={`when-${r.id}`} className="mb-1.5 block text-[14px] font-semibold text-foreground">
+          Giờ hẹn
+        </label>
+        <input id={`when-${r.id}`} type="datetime-local" value={when} onChange={(e) => setWhen(e.target.value)} className={inputClass()} />
       </div>
       <FieldError msg={error} />
       <button type="button" onClick={submit} className={cn(buttonClass.primary, "mt-4 w-full sm:w-auto")}>
@@ -115,17 +87,17 @@ function DepartStep({ request: r }: { request: PickupRequest }) {
   const { depart } = useCollect();
   const toast = useToast();
   return (
-    <Panel icon={Truck} title="Đội lên đường">
-      <p className="text-[14px] text-muted-foreground">Bấm khi đội bắt đầu đi tới nhà người gửi. Người gửi sẽ thấy "Đội đang tới".</p>
+    <Panel icon={Truck} title="Lên đường">
+      <p className="text-[14px] text-muted-foreground">Bấm khi bạn bắt đầu đi tới nhà người gửi. Họ sẽ thấy "Người mua đang tới".</p>
       <button
         type="button"
         onClick={() => {
           depart(r.id);
-          toast("info", "Đã báo đội đang tới");
+          toast("info", "Đã báo người gửi là bạn đang tới");
         }}
         className={cn(buttonClass.primary, "mt-4 w-full sm:w-auto")}
       >
-        Đội đã lên đường
+        Tôi đang tới
       </button>
     </Panel>
   );

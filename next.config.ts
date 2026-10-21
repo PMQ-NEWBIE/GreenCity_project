@@ -12,9 +12,15 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     qualities: [70, 80],
   },
-  // Đường dẫn cũ /lobby (bản nháp trước) giờ là trang chủ
   async redirects() {
-    return [{ source: "/lobby", destination: "/", permanent: true }];
+    return [
+      // Đường dẫn cũ /lobby (bản nháp trước) giờ là trang chủ
+      { source: "/lobby", destination: "/", permanent: true },
+      // Khu quản lý đã tách ra khu làm việc riêng (2026-10)
+      { source: "/quan-tri", destination: "/van-hanh", permanent: false },
+      { source: "/cho-vat-lieu", destination: "/doanh-nghiep", permanent: false },
+      { source: "/thong-ke", destination: "/doanh-nghiep/thong-ke", permanent: false },
+    ];
   },
 };
 

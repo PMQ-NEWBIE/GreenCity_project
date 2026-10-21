@@ -44,7 +44,7 @@ export function CollectView() {
     if (materials.length === 0) errs.materials = "Chọn ít nhất một loại";
     if (!quantity.trim()) errs.quantity = "Ước chừng là được, ví dụ: 2 bao, 15kg";
     if (!area) errs.area = "Chọn khu vực";
-    if (address.trim().length < 5) errs.address = "Ghi tên đường và phường để đội tìm đường";
+    if (address.trim().length < 5) errs.address = "Ghi tên đường và phường để người mua tìm đường";
     if (!time) errs.time = "Chọn khung giờ bạn có nhà";
     setErrors(errs);
     const firstError = Object.keys(errs)[0];
@@ -107,14 +107,14 @@ export function CollectView() {
               <span>
                 <span className="block text-[15px] font-bold text-foreground">Tôi đã phân loại sẵn</span>
                 <span className="block text-[13px] text-muted-foreground">
-                  Giấy, nhựa, kim loại để riêng từng túi. Được cộng thêm {sortedBonus.points} điểm khi đội thu gom xác nhận.
+                  Giấy, nhựa, kim loại để riêng từng túi. Được cộng thêm {sortedBonus.points} điểm khi người thu mua xác nhận.
                 </span>
               </span>
             </label>
           </fieldset>
 
           <div>
-            <StepHeading step={2} title="Khoảng bao nhiêu?" hint="Ảnh không bắt buộc, nhưng giúp đội mang đúng xe." />
+            <StepHeading step={2} title="Khoảng bao nhiêu?" hint="Ảnh không bắt buộc, nhưng giúp người mua mang đúng xe." />
             <label htmlFor="collect-quantity" className="sr-only">
               Khối lượng hoặc số lượng ước tính
             </label>
@@ -208,7 +208,7 @@ export function CollectView() {
           </fieldset>
 
           <div>
-            <StepHeading step={4} title="Ghi chú cho đội thu gom" hint="Không bắt buộc." />
+            <StepHeading step={4} title="Ghi chú cho người thu mua" hint="Không bắt buộc." />
             <label htmlFor="collect-note" className="sr-only">
               Ghi chú
             </label>
@@ -255,7 +255,7 @@ export function CollectView() {
                 <strong>1.</strong> Đội thu gom phụ trách khu của bạn nhận đơn và hẹn giờ.
               </li>
               <li>
-                <strong>2.</strong> Tới nơi, đội cân từng loại ngay trước mặt bạn.
+                <strong>2.</strong> Tới nơi, người mua cân từng loại ngay trước mặt bạn.
               </li>
               <li>
                 <strong>3.</strong> Bạn nhận tiền mặt, chuyển khoản, hoặc quy ra điểm thưởng.

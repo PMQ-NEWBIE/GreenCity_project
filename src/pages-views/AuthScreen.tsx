@@ -12,7 +12,7 @@ import { SubmitButton } from "@/components/greencity/SubmitButton";
 import { ThemeToggle } from "@/components/greencity/ThemeToggle";
 import { LOBBY_ASSETS } from "@/lobby/assets";
 import { NEXT_PARAM, ROUTES } from "@/lib/routes";
-import { roleFromEmail } from "@/lib/access";
+import { homeFor, roleFromEmail } from "@/lib/access";
 import { ROLE_LABEL } from "@/data/labels";
 import { isEmailFormat } from "@/utils/format";
 import type { DemoUser, UserRole } from "@/types";
@@ -47,6 +47,7 @@ function nameFromEmail(email: string) {
 /** Tài khoản demo cho từng vai trò (email quyết định vai trò — xem roleFromEmail). */
 const DEMO_ACCOUNTS: Record<UserRole, { email: string; name: string }> = {
   resident: { email: "demo@greencity.vn", name: "Demo" },
+  partner: { email: "doitac@greencity.vn", name: "Vựa ve chai Minh Đức" },
   collaborator: { email: "ctv@greencity.vn", name: "Cộng tác viên Hòa" },
   business: { email: "doanhnghiep@greencity.vn", name: "Tái chế Phương Nam" },
   operator: { email: "vanhanh@greencity.vn", name: "Tổ vận hành" },
@@ -66,7 +67,7 @@ function memberSinceLabel() {
 
 function SidePanel() {
   return (
-    <div className="relative hidden overflow-hidden bg-gc-800 lg:block">
+    <div className="relative hidden overflow-hidden bg-gc-950 dark:bg-surface lg:block">
       {/* Ảnh minh họa — thay file tại public/lobby (xem src/lobby/assets.ts) */}
       <Image
         src={LOBBY_ASSETS.authPanel.src}
@@ -76,7 +77,7 @@ function SidePanel() {
         quality={70}
         className="object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-gc-950/90 via-gc-950/30 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-gc-950/95 via-gc-950/40 to-transparent dark:from-background/95 dark:via-background/50 dark:to-transparent" />
       <div className="relative flex h-full flex-col justify-between p-12">
         <Link href={ROUTES.home} aria-label="Về trang chủ Green City" className="w-fit rounded-full">
           <Logo size={44} variant="white" />
@@ -85,7 +86,7 @@ function SidePanel() {
           <blockquote className="text-[26px] font-bold leading-snug">
             “Một chồng báo cũ, vài túi lon nhôm — đủ cho một chuyến xe thu gom ghé qua.”
           </blockquote>
-          <figcaption className="mt-4 text-[15px] text-gc-200">
+          <figcaption className="mt-4 text-[15px] text-gc-100 dark:text-text-secondary">
             Green City nối bạn với người thu gom ve chai ngay trong khu phố.
           </figcaption>
         </figure>
@@ -113,8 +114,8 @@ export function AuthScreen({ mode, next }: { mode: AuthMode; next: string | null
 
   // Đã đăng nhập rồi thì không ở lại trang đăng nhập
   useEffect(() => {
-    if (state.ready && state.user && mode !== "forgot") router.replace(next ?? ROUTES.dashboard);
-  }, [state.ready, state.user, mode, next, router]);
+    if (state.ready && state.user && mode !== "forgot") router.replace(next ?? homeFor(state.user.role, state.mode));
+  }, [state.ready, state.user, state.mode, mode, next, router]);
 
   const clearError = (key: string) => setErrors((er) => (er[key] ? { ...er, [key]: "" } : er));
 
@@ -166,7 +167,7 @@ export function AuthScreen({ mode, next }: { mode: AuthMode; next: string | null
       // "Ghi nhớ đăng nhập" chỉ có ở màn đăng nhập; đăng ký luôn ghi nhớ
       login(user, mode === "login" ? remember : true);
       toast("success", mode === "register" ? "Tạo tài khoản xong" : "Đăng nhập thành công", `Chào ${user.name}!`);
-      router.replace(next ?? ROUTES.dashboard);
+      router.replace(next ?? homeFor(user.role, state.mode));
     }, 600);
   };
 
@@ -194,8 +195,10 @@ export function AuthScreen({ mode, next }: { mode: AuthMode; next: string | null
           <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">{copy.lead}</p>
 
           {mode === "forgot" && forgotSent ? (
-            <div className="mt-8 rounded-2xl border border-primary/30 bg-accent p-6" role="status">
-              <MailCheck className="h-8 w-8 text-primary" aria-hidden="true" />
+            <div className="mt-8 rounded-2xl border border-primary/30 bg-accent/80 p-6 shadow-sm" role="status">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <MailCheck className="h-6 w-6 text-primary" aria-hidden="true" />
+              </div>
               <p className="mt-3 text-[16px] font-bold text-foreground">Đã gửi hướng dẫn</p>
               <p className="mt-1 text-[14px] leading-relaxed text-muted-foreground">
                 Nếu <strong className="text-foreground">{email}</strong> có trong hệ thống, bạn sẽ nhận được email
@@ -203,7 +206,7 @@ export function AuthScreen({ mode, next }: { mode: AuthMode; next: string | null
               </p>
               <Link
                 href={withNext(ROUTES.login)}
-                className="mt-5 flex h-12 items-center justify-center rounded-xl bg-primary text-[15px] font-semibold text-primary-foreground hover:bg-primary/90"
+                className="mt-5 flex h-12 items-center justify-center rounded-xl bg-primary text-[15px] font-semibold text-primary-foreground hover:bg-primary-hover active:bg-primary-active transition-colors shadow-sm"
               >
                 Quay lại đăng nhập
               </Link>
@@ -293,25 +296,25 @@ export function AuthScreen({ mode, next }: { mode: AuthMode; next: string | null
                 <button
                   type="button"
                   onClick={() => fillDemo()}
-                  className="rounded-lg py-1 text-[14px] font-medium text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
+                  className="rounded-lg py-1 text-[14px] font-semibold text-primary underline-offset-4 hover:underline"
                 >
                   Chỉ xem thử? Điền sẵn tài khoản demo
                 </button>
               )}
               {mode === "login" && (
-                <p className="-mt-3 flex flex-wrap items-center justify-center gap-x-1 text-[13px] text-muted-foreground">
+                <div className="-mt-1 flex flex-wrap items-center justify-center gap-1.5 text-[13px] text-muted-foreground">
                   <span>Hoặc thử vai trò:</span>
-                  {(["collaborator", "business", "operator"] as const).map((r) => (
+                  {(["partner", "collaborator", "business", "operator"] as const).map((r) => (
                     <button
                       key={r}
                       type="button"
                       onClick={() => fillDemo(r)}
-                      className="min-h-11 rounded-lg px-1.5 font-semibold text-primary underline-offset-4 hover:underline"
+                      className="inline-flex min-h-8 items-center rounded-lg border border-border bg-card px-2.5 py-1 text-[12px] font-semibold text-foreground transition-colors hover:border-primary/50 hover:text-primary hover:bg-surface-hover shadow-xs"
                     >
                       {ROLE_LABEL[r]}
                     </button>
                   ))}
-                </p>
+                </div>
               )}
             </form>
           )}

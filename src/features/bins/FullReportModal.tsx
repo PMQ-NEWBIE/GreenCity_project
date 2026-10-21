@@ -15,7 +15,7 @@ const LEVELS = [
   { key: "day", label: "Đã đầy", desc: "Không bỏ thêm được, đồ tràn ra ngoài" },
 ] as const;
 
-/** Báo thùng đầy để đội thu gom tới đổ sớm. */
+/** Báo thùng đầy để cộng tác viên của điểm thu gom xử lý sớm. */
 export function FullReportModal({ bin, onClose }: { bin: Bin | null; onClose: () => void }) {
   return (
     <GcModal open={!!bin} onClose={onClose} title="Báo thùng đầy" description={bin ? `${bin.code} · ${bin.name}` : undefined} size="sm">
@@ -38,8 +38,8 @@ function FullReportForm({ bin, onDone }: { bin: Bin; onDone: () => void }) {
     window.setTimeout(() => {
       const res = reportFull(bin.id, level);
       setStatus("success");
-      if (res.merged) toast("info", "Đã có người báo thùng này", "Cảm ơn bạn, báo cáo được gộp vào để đội ưu tiên.");
-      else if (res.points > 0) toast("success", "Đã báo thùng đầy", `+${res.points} điểm khi đội xác nhận.`);
+      if (res.merged) toast("info", "Đã có người báo thùng này", "Cảm ơn bạn, báo cáo được gộp vào để điểm thu gom ưu tiên.");
+      else if (res.points > 0) toast("success", "Đã báo thùng đầy", `+${res.points} điểm khi cộng tác viên xác nhận.`);
       else toast("success", "Đã báo thùng đầy", "Hôm nay bạn đã được tính điểm cho thùng này rồi.");
       onDone();
     }, 400);
@@ -68,7 +68,7 @@ function FullReportForm({ bin, onDone }: { bin: Bin; onDone: () => void }) {
         ))}
       </div>
       <p className="text-[13px] text-muted-foreground">
-        Báo đúng được +{rule.points} điểm khi đội thu gom xác nhận. {rule.condition}
+        Báo đúng được +{rule.points} điểm khi cộng tác viên xác nhận. {rule.condition}
       </p>
       <SubmitButton status={status} loadingText="Đang gửi…" successText="Đã báo">
         Gửi báo cáo

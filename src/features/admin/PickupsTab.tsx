@@ -22,7 +22,7 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: "all", label: "Tất cả" },
 ];
 
-/** IV.1 — hàng chờ đơn thu gom. Bấm một đơn để mở trang chi tiết, có bảng thao tác cho đội thu gom. */
+/** Giám sát đơn thu gom: người mua (vựa, ve chai) tự nhận và làm đơn; ban điều hành xem tiến độ, đơn nào chờ lâu. */
 export function PickupsTab() {
   const { requests } = useCollect();
   const [filter, setFilter] = useState<Filter>("mo");

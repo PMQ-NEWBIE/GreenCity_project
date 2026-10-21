@@ -14,7 +14,11 @@ import { PickupsTab } from "./PickupsTab";
 import { PointsTab } from "./PointsTab";
 import { ReportsTab } from "./ReportsTab";
 
-/** Khu quản trị cho nhóm vận hành (IV.1–4). */
+/**
+ * Ban điều hành: chỉ quản trị và theo dõi, không mua bán.
+ * Theo dõi đơn thu gom (người mua tự nhận), xác minh điểm rác, trả lời câu hỏi phân loại,
+ * quản lý thùng / điểm thu gom, điểm thưởng và danh bạ người mua, cơ sở xử lý.
+ */
 export function AdminView() {
   const { requests } = useCollect();
   const { bins, reports } = useBins();
@@ -32,18 +36,18 @@ export function AdminView() {
 
   return (
     <PageContainer>
-      <PageIntro title="Quản trị vận hành">
-        Nhận đơn thu gom, xử lý báo cáo, theo dõi thùng, chỉnh điểm thưởng và quản lý đối tác. Số liệu là dữ liệu minh họa.
+      <PageIntro title="Bảng điều hành">
+        Theo dõi đơn thu gom do người mua tự nhận, xác minh điểm rác, trả lời câu hỏi phân loại, quản lý thùng, điểm thưởng và danh bạ người mua. Số liệu là dữ liệu minh họa.
       </PageIntro>
       <div className="mt-6">
         <UrlTabs
           label="Khu quản trị"
           tabs={[
-            { key: "don-thu-gom", label: "Đơn thu gom", count: openPickups, content: <PickupsTab /> },
+            { key: "don-thu-gom", label: "Giám sát thu gom", count: openPickups, content: <PickupsTab /> },
             { key: "bao-cao", label: "Báo cáo", count: openReports, content: <ReportsTab /> },
             { key: "thung", label: "Thùng", count: fullBins, content: <BinsTab /> },
             { key: "diem-thuong", label: "Điểm thưởng", count: giftsToHand, content: <PointsTab /> },
-            { key: "doi-tac", label: "Đối tác", content: <PartnersTab /> },
+            { key: "doi-tac", label: "Người mua & cơ sở xử lý", content: <PartnersTab /> },
           ]}
         />
       </div>

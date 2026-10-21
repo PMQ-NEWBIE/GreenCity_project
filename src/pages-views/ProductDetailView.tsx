@@ -1,10 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, BadgeCheck, Clock, Heart, MapPin, MessageCircle, Phone, Star, Tag, Trash2 } from "lucide-react";
+import { ArrowLeft, BadgeCheck, Clock, Heart, MapPin, MessageCircle, Phone, ShoppingBag, Star, Tag, Trash2 } from "lucide-react";
 import { useApp } from "@/store/app-store";
+import { useOrders } from "@/store/use-orders";
+import { useLinks } from "@/store/use-links";
+import { MARKET_AUDIENCE, MARKET_LABEL, canBuy, marketOf } from "@/lib/market";
+import { OrderModal } from "@/features/orders/OrderModal";
+import { OrderCard } from "@/features/orders/OrderCard";
 import { CATEGORIES } from "@/data/mock-data";
 import { GcModal } from "@/components/greencity/GcModal";
 import { SmartImage } from "@/components/greencity/SmartImage";
@@ -23,10 +28,20 @@ const SELLER_TYPE_LABEL: Record<Product["seller"]["type"], string> = {
 };
 
 export function ProductDetailView({ productId }: { productId: string }) {
-  const { state, toggleFavorite, removeProduct, toast } = useApp();
+  const { state, toggleFavorite, removeProduct, setMode, toast } = useApp();
   const router = useRouter();
   const [contactOpen, setContactOpen] = useState(false);
+  const [orderOpen, setOrderOpen] = useState(false);
+  const { openFor, incoming } = useOrders();
+  const links = useLinks();
+  const role = state.user?.role;
   const product = state.products.find((p) => p.id === productId);
+  const mine = product?.isMine;
+
+  // Người dân: tin của mình → chế độ bán; tin người khác → chế độ mua
+  useEffect(() => {
+    if (role === "resident" && mine !== undefined) setMode(mine ? "sell" : "buy");
+  }, [role, mine, setMode]);
 
   if (!product) {
     return (
@@ -35,7 +50,7 @@ export function ProductDetailView({ productId }: { productId: string }) {
           title="Không tìm thấy tin đăng"
           description="Tin có thể đã bị xóa, hoặc đường dẫn bị sai."
           action={
-            <Link href={ROUTES.discover} className={buttonClass.primary}>
+            <Link href={links.market} className={buttonClass.primary}>
               Xem các tin khác
             </Link>
           }
@@ -47,6 +62,11 @@ export function ProductDetailView({ productId }: { productId: string }) {
   const category = CATEGORIES.find((c) => c.id === product.categoryId);
   const liked = state.favorites.includes(product.id);
   const sold = product.status === "sold";
+  const myOrder = openFor(product.id);
+  const market = marketOf(product.categoryId);
+  // Tin phế liệu chỉ người thu mua đặt được, đồ thanh lý chỉ người dân đặt được
+  const buyable = canBuy(role, product);
+  const ordersHere = product.isMine ? incoming.filter((o) => o.productId === product.id) : [];
   const related = state.products
     .filter((p) => p.categoryId === product.categoryId && p.id !== product.id && p.status === "available")
     .slice(0, 4);
@@ -59,14 +79,17 @@ export function ProductDetailView({ productId }: { productId: string }) {
   const onDelete = () => {
     removeProduct(product.id);
     toast("success", "Đã xóa tin", product.name);
-    router.replace(ROUTES.profile);
+    router.replace(ROUTES.myListings);
   };
 
   return (
     <PageContainer>
-      <Link href={ROUTES.discover} className={cn(buttonClass.ghost, "-ml-3 text-muted-foreground hover:text-foreground")}>
+      <Link
+        href={product.isMine ? ROUTES.myListings : links.market}
+        className={cn(buttonClass.ghost, "-ml-3 text-muted-foreground hover:text-foreground")}
+      >
         <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-        Danh sách tin
+        {product.isMine ? "Tin đăng của tôi" : "Danh sách tin"}
       </Link>
 
       <div className="mt-3 grid gap-8 lg:grid-cols-[1.1fr_1fr]">
@@ -84,7 +107,7 @@ export function ProductDetailView({ productId }: { productId: string }) {
             <p
               className={cn(
                 "mb-4 rounded-xl px-4 py-3 text-[14px] font-semibold",
-                sold ? "bg-muted text-muted-foreground" : "bg-earth/10 text-earth"
+                sold ? "bg-muted text-muted-foreground" : "border border-brown-border bg-brown-soft text-brown-text dark:text-beige"
               )}
             >
               {sold ? "Món này đã được bán — bạn có thể tham khảo giá." : "Bản nháp — tin chưa hiện trên sàn, chỉ bạn nhìn thấy."}
@@ -110,9 +133,9 @@ export function ProductDetailView({ productId }: { productId: string }) {
             </li>
             {category && (
               <li>
-                <Link href={`${ROUTES.discover}?danh-muc=${category.id}`} className="flex items-center gap-2 hover:text-primary">
+                <Link href={`${links.market}?danh-muc=${category.id}`} className="flex items-center gap-2 hover:text-primary">
                   <Tag className="h-4 w-4 text-primary" aria-hidden="true" />
-                  {category.name}
+                  {MARKET_LABEL[market]} · {category.name}
                 </Link>
               </li>
             )}
@@ -122,24 +145,37 @@ export function ProductDetailView({ productId }: { productId: string }) {
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             {product.isMine ? (
               <>
-                <p className="flex min-h-12 flex-1 items-center rounded-xl bg-accent px-4 text-[14px] font-semibold text-accent-foreground">
+                <p className="flex min-h-12 flex-1 flex-col justify-center rounded-xl bg-accent px-4 py-2 text-[14px] font-semibold text-accent-foreground">
                   Đây là tin của bạn
+                  <span className="text-[13px] font-normal">{MARKET_AUDIENCE[market]}</span>
                 </p>
                 <button type="button" onClick={onDelete} className={cn(buttonClass.secondary, "hover:border-destructive/50 hover:text-destructive")}>
                   <Trash2 className="h-[18px] w-[18px]" aria-hidden="true" />
                   Xóa tin
                 </button>
               </>
+            ) : !buyable && !myOrder && !sold ? (
+              <p className="flex min-h-12 flex-1 items-center rounded-xl border border-border bg-muted px-4 py-2 text-[14px] text-muted-foreground">
+                {market === "scrap"
+                  ? "Tin phế liệu dành cho người thu mua (người ve chai, vựa phế liệu). Bạn có thể đăng bán ve chai của mình ở chế độ Tôi bán."
+                  : "Đồ thanh lý dành cho người dân mua lại để dùng. Khu người thu mua chỉ hiện tin phế liệu."}
+              </p>
             ) : (
               <>
-                <button
-                  type="button"
-                  onClick={() => setContactOpen(true)}
-                  disabled={sold}
-                  className={cn(buttonClass.primary, "flex-1")}
-                >
+                {myOrder ? (
+                  <Link href={links.order(myOrder.id)} className={cn(buttonClass.primary, "flex-1")}>
+                    <ShoppingBag className="h-[18px] w-[18px]" aria-hidden="true" />
+                    Bạn đã đặt, xem đơn
+                  </Link>
+                ) : (
+                  <button type="button" onClick={() => setOrderOpen(true)} disabled={sold} className={cn(buttonClass.primary, "flex-1")}>
+                    <ShoppingBag className="h-[18px] w-[18px]" aria-hidden="true" />
+                    {sold ? "Món đã bán" : "Đặt mua"}
+                  </button>
+                )}
+                <button type="button" onClick={() => setContactOpen(true)} className={buttonClass.secondary}>
                   <MessageCircle className="h-[18px] w-[18px]" aria-hidden="true" />
-                  {sold ? "Món đã bán" : "Liên hệ người bán"}
+                  Hỏi người bán
                 </button>
                 <button type="button" onClick={onFavorite} aria-pressed={liked} className={cn(buttonClass.secondary, liked && "border-primary/50 text-primary")}>
                   <Heart className={cn("h-[18px] w-[18px]", liked && "fill-current")} aria-hidden="true" />
@@ -148,6 +184,23 @@ export function ProductDetailView({ productId }: { productId: string }) {
               </>
             )}
           </div>
+
+          {product.isMine && (
+            <section aria-labelledby="orders-here" className="mt-6">
+              <h3 id="orders-here" className="text-[15px] font-bold text-foreground">
+                Đơn đặt món này ({ordersHere.length})
+              </h3>
+              {ordersHere.length > 0 ? (
+                <ul className="mt-3 grid gap-2">
+                  {ordersHere.map((o) => (
+                    <OrderCard key={o.id} order={o} side="seller" />
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-[14px] text-muted-foreground">Chưa có ai đặt. Người mua đặt xong, đơn sẽ hiện ở đây và trong mục Đơn đến.</p>
+              )}
+            </section>
+          )}
 
           <section className="mt-6 rounded-2xl border border-border bg-card p-5">
             <h3 className="text-[15px] font-bold text-foreground">Mô tả</h3>
@@ -165,7 +218,7 @@ export function ProductDetailView({ productId }: { productId: string }) {
                   <BadgeCheck className="h-4 w-4 shrink-0 text-primary" aria-label="Đã xác minh" />
                 </p>
                 <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[13px] text-muted-foreground">
-                  <span>{SELLER_TYPE_LABEL[product.seller.type]}</span>
+                  <span className="font-semibold text-brown-text dark:text-beige">{SELLER_TYPE_LABEL[product.seller.type]}</span>
                   <span aria-hidden="true">·</span>
                   <span className="flex items-center gap-1">
                     <Star className="h-3.5 w-3.5 fill-warn text-warn" aria-hidden="true" />
@@ -192,6 +245,8 @@ export function ProductDetailView({ productId }: { productId: string }) {
           </div>
         </section>
       )}
+
+      {!product.isMine && <OrderModal product={product} open={orderOpen} onClose={() => setOrderOpen(false)} />}
 
       <GcModal
         open={contactOpen}

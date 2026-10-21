@@ -1,6 +1,6 @@
 import type { Partner } from "@/types/features";
 
-/** Đối tác thu gom và cơ sở chế biến phân bón (dữ liệu minh họa, tên hư cấu). Quản lý ở /quan-tri. */
+/** Đối tác thu gom và cơ sở chế biến phân bón (dữ liệu minh họa, tên hư cấu). Quản lý ở /van-hanh. */
 export const PARTNERS_SEED: Partner[] = [
   {
     id: "dt-tu-hoa",

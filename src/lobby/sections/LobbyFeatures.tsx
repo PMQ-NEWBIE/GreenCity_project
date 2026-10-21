@@ -40,7 +40,7 @@ export function LobbyFeatures() {
       id="tinh-nang"
       data-features
       aria-labelledby="features-title"
-      className="relative scroll-mt-20 bg-gradient-to-b from-gc-100 to-gc-200 px-5 pb-24 pt-20 sm:px-6 md:pt-28 lg:px-10 lg:pb-32"
+      className="relative scroll-mt-20 bg-gradient-to-b from-ivory via-gc-50 to-gc-100 dark:from-background dark:via-surface dark:to-background px-5 pb-24 pt-20 sm:px-6 md:pt-28 lg:px-10 lg:pb-32"
     >
       <div className="mx-auto max-w-6xl">
         <InkHeading
@@ -48,7 +48,7 @@ export function LobbyFeatures() {
           inkId="features"
           variant="leaf"
           id="features-title"
-          className="max-w-[16ch] text-[clamp(2rem,4.2vw,3.6rem)] font-extrabold leading-[1.05] tracking-[-0.02em] text-gc-900"
+          className="max-w-[16ch] text-[clamp(2rem,4.2vw,3.6rem)] font-extrabold leading-[1.05] tracking-[-0.02em] text-gc-900 dark:text-foreground"
         />
 
         <ol className="mt-14 flex flex-col gap-20 md:mt-20 md:gap-28">
@@ -58,7 +58,7 @@ export function LobbyFeatures() {
               <li key={f.inkId} data-feature className="grid items-center gap-8 md:grid-cols-12 md:gap-12">
                 <div
                   data-feature-media
-                  className={`overflow-hidden rounded-3xl bg-gc-200 shadow-xl shadow-gc-950/5 ring-1 ring-gc-800/10 md:col-span-7 ${flip ? "md:order-2" : ""}`}
+                  className={`overflow-hidden rounded-3xl bg-card shadow-xl shadow-gc-950/5 dark:shadow-black/50 ring-1 ring-gc-800/10 dark:ring-border md:col-span-7 ${flip ? "md:order-2" : ""}`}
                 >
                   <div data-feature-img className="relative aspect-[4/3]">
                     <Image
@@ -80,19 +80,30 @@ export function LobbyFeatures() {
                     variant="leaf"
                     aria-hidden="true"
                     data-ink-number
-                    className="block text-[64px] font-extrabold leading-none tracking-[-0.02em] text-gc-900"
+                    className="block text-[64px] font-extrabold leading-none tracking-[-0.02em] text-gc-900 dark:text-primary"
                   />
                   <InkHeading
                     as="h3"
                     inkId={f.inkId}
                     variant="leaf"
-                    className="mt-3 text-[clamp(1.6rem,2.6vw,2.2rem)] font-extrabold leading-tight tracking-[-0.01em] text-gc-900"
+                    className="mt-3 text-[clamp(1.6rem,2.6vw,2.2rem)] font-extrabold leading-tight tracking-[-0.01em] text-gc-900 dark:text-foreground"
                   />
-                  <p className="mt-4 text-[20.4px] font-medium leading-relaxed text-gc-800">{f.text}</p>
-                  <p className="mt-5 text-[16.8px] font-bold text-gc-700">
-                    <span className="sr-only">Cách làm: </span>
-                    {f.steps.join(" → ")}
-                  </p>
+                  <p className="mt-4 text-[20.4px] font-medium leading-relaxed text-gc-800 dark:text-text-secondary">{f.text}</p>
+                  <div className="mt-5 flex flex-wrap items-center gap-2">
+                    <span className="sr-only">Cách làm: {f.steps.join(" → ")}</span>
+                    {f.steps.map((st, idx) => (
+                      <span
+                        key={st}
+                        aria-hidden="true"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-brown-border bg-brown-soft px-3 py-1 text-[13.5px] font-bold text-brown-text dark:text-beige shadow-xs"
+                      >
+                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-green-700 text-[10px] font-extrabold text-white dark:bg-primary dark:text-primary-foreground">
+                          {idx + 1}
+                        </span>
+                        {st}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </li>
             );

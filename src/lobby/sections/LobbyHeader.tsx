@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { Logo } from "@/components/greencity/Logo";
 import { useApp } from "@/store/app-store";
 import { ROUTES } from "@/lib/routes";
+import { ThemeToggle } from "@/components/greencity/ThemeToggle";
 
 /**
  * Header cố định. Trạng thái cuộn (.is-scrolled / .is-hidden) do animations/header.ts gắn trực tiếp
@@ -16,7 +17,7 @@ export function LobbyHeader() {
 
   return (
     <header data-header data-intro className="lobby-header fixed inset-x-0 top-0 z-50">
-      <div className="lobby-header__bg absolute inset-0" aria-hidden="true" />
+      <div className="lobby-header__bg lobby-theme-fade absolute inset-0" aria-hidden="true" />
       <div className="lobby-header__bar relative mx-auto flex h-[76px] max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-10">
         <Link href={ROUTES.home} aria-label="Green City — về đầu trang" className="lobby-header__logo shrink-0 rounded-xl">
           {/* Điện thoại hẹp: chỉ biểu tượng để đủ chỗ cho 2 nút */}
@@ -25,10 +26,11 @@ export function LobbyHeader() {
         </Link>
 
         <nav aria-label="Tài khoản" className="flex items-center gap-2 sm:gap-3">
+          <ThemeToggle />
           {loggedIn ? (
             <Link
               href={ROUTES.dashboard}
-              className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-xl bg-gc-700 px-3.5 sm:px-4 text-[15px] font-semibold text-white transition-colors hover:bg-gc-800"
+              className="lobby-theme-fade inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-xl bg-gc-700 dark:bg-primary px-3.5 sm:px-4 text-[15px] font-semibold text-white dark:text-primary-foreground transition-colors hover:bg-gc-800 dark:hover:bg-primary-hover shadow-sm"
             >
               Vào trang của tôi
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -37,13 +39,13 @@ export function LobbyHeader() {
             <>
               <Link
                 href={ROUTES.login}
-                className="inline-flex min-h-11 items-center whitespace-nowrap rounded-xl border-[1.5px] border-gc-700/70 px-3.5 sm:px-4 text-[15px] font-semibold text-gc-800 transition-colors hover:border-gc-700 hover:bg-gc-700/5"
+                className="lobby-theme-fade inline-flex min-h-11 items-center whitespace-nowrap rounded-xl border-[1.5px] border-gc-700/70 dark:border-primary-border px-3.5 sm:px-4 text-[15px] font-semibold text-gc-800 dark:text-foreground transition-colors hover:border-gc-700 hover:bg-gc-700/5 dark:hover:border-primary dark:hover:bg-primary-soft"
               >
                 Đăng nhập
               </Link>
               <Link
                 href={ROUTES.register}
-                className="inline-flex min-h-11 items-center whitespace-nowrap rounded-xl bg-gc-700 px-3.5 sm:px-4 text-[15px] font-semibold text-white transition-colors hover:bg-gc-800"
+                className="lobby-theme-fade inline-flex min-h-11 items-center whitespace-nowrap rounded-xl bg-gc-700 dark:bg-primary px-3.5 sm:px-4 text-[15px] font-semibold text-white dark:text-primary-foreground transition-colors hover:bg-gc-800 dark:hover:bg-primary-hover shadow-sm"
               >
                 Đăng ký
               </Link>

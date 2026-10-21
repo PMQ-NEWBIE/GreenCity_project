@@ -3,8 +3,16 @@ export type CategoryId =
   | "plastic"
   | "metal"
   | "glass"
+  | "ewaste"
   | "electronic"
   | "furniture";
+
+/**
+ * Mỗi danh mục thuộc một "chợ", quyết định ai thấy tin:
+ * - scrap: phế liệu, ve chai → chỉ người thu mua (người ve chai, vựa) thấy và đặt
+ * - secondhand: đồ thanh lý còn dùng được → người dân thấy và đặt
+ */
+export type Market = "scrap" | "secondhand";
 
 export type Unit = "kg" | "món" | "lô" | "chai";
 
@@ -14,6 +22,7 @@ export type SellerType = "individual" | "collector" | "scrapyard";
 
 export interface Category {
   id: CategoryId;
+  market: Market;
   name: string;
   shortName: string;
   description: string;
@@ -61,8 +70,11 @@ export interface CollectionRequest {
   isMine?: boolean;
 }
 
-/** Vai trò trong bản demo: người dân, cộng tác viên kiểm tra, doanh nghiệp tái chế, nhóm vận hành. */
-export type UserRole = "resident" | "collaborator" | "business" | "operator";
+/**
+ * Vai trò trong bản demo: người dân, người thu mua phế liệu (người ve chai, vựa),
+ * cộng tác viên kiểm tra, doanh nghiệp tái chế, nhóm vận hành.
+ */
+export type UserRole = "resident" | "partner" | "collaborator" | "business" | "operator";
 
 export interface DemoUser {
   name: string;

@@ -2,9 +2,9 @@ import type { BinLevel, BinReportStatus, BinType, DropoffStatus } from "@/types/
 
 /** Màu nhãn — chỉ dùng token để đúng cả nền sáng lẫn tối. */
 export const BIN_TYPE_BADGE: Record<BinType, string> = {
-  "tai-che": "bg-primary/10 text-primary",
-  "quan-ao": "bg-foreground/[0.07] text-foreground/80",
-  "huu-co": "bg-earth/15 text-earth",
+  "tai-che": "border border-primary/25 bg-primary/10 text-primary",
+  "quan-ao": "border border-brown-border bg-brown-soft text-brown-text dark:text-beige",
+  "huu-co": "border border-earth/30 bg-earth/15 text-earth",
 };
 
 export const BIN_LEVEL_BADGE: Record<BinLevel, string> = {

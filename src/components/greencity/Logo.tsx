@@ -51,7 +51,7 @@ export function Wordmark({
       style={{ fontSize }}
     >
       <span className={variant === "white" ? "text-white" : "text-brand-green"}>GREEN</span>{" "}
-      <span className={variant === "white" ? "text-[#a3d65c]" : "text-brand-lime"}>
+      <span className={variant === "white" ? "text-brand-lime-bright" : "text-brand-lime"}>
         C
         <span className="relative inline-block">
           I

@@ -11,6 +11,7 @@ import { startSmoothScroll } from "./animations/smoothScroll";
 import { playIntro, playReducedIntro } from "./animations/intro";
 import { createHeroMobileParallax, createHeroPin } from "./animations/heroScroll";
 import { startHeroFit } from "./animations/heroFit";
+import { startThemeRide } from "./animations/themeRide";
 import { startMagnetic, startMouseParallax } from "./animations/pointer";
 import { revealFeatures, revealInkHeadings, startHeaderBehavior } from "./animations/sections";
 import { startInkSway } from "./animations/ink";
@@ -35,6 +36,8 @@ export function LobbyPage() {
       startHeaderBehavior(root);
       // Đo trước intro: lá / xe đạp đã đúng chỗ ngay khung hình đầu tiên hiện ra
       const stopHeroFit = startHeroFit(root);
+      // Đổi sáng / tối: xe ve chai chạy đi (đêm) hoặc chạy về (ngày) — yêu cầu của người dùng
+      const stopThemeRide = startThemeRide(root, window.matchMedia(LOBBY_MEDIA.reduceMotion).matches);
 
       // Intro chỉ chạy một lần; mouse parallax đợi intro xong để không tranh thuộc tính x/y
       let introDone = false;
@@ -104,13 +107,14 @@ export function LobbyPage() {
         mmLayout.revert();
         mmIntro.revert();
         stopHeroFit();
+        stopThemeRide();
       };
     },
     { scope: rootRef }
   );
 
   return (
-    <div ref={rootRef} className="lobby relative overflow-x-clip bg-gc-50 text-gc-900">
+    <div ref={rootRef} className="lobby relative overflow-x-clip bg-gc-50 text-gc-900 dark:bg-background dark:text-foreground">
       {/* Lớp hạt film rất nhẹ — ảnh tĩnh, không animate */}
       <div aria-hidden="true" className="lobby-grain pointer-events-none fixed inset-0 z-[70]" />
       <LobbyHeader />

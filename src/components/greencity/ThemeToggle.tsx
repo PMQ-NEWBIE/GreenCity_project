@@ -19,6 +19,25 @@ const THEME_OPTIONS = [
 
 const emptySubscribe = () => () => {};
 
+/**
+ * Trang có [data-theme-scene] (lobby) tự diễn cảnh đổi sáng / tối: bầu trời mờ dần sang đêm, chữ giữ nguyên chỗ.
+ * Gắn .theme-scene-switching ~1 giây để vài phần tử trong cảnh chuyển màu từ từ (xem lobby.css).
+ */
+function markSceneSwitching() {
+  const root = document.documentElement;
+  root.classList.add("theme-scene-switching");
+  window.setTimeout(() => root.classList.remove("theme-scene-switching"), 1000);
+}
+
+/** Gắn lớp sáng / tối lên <html> ngay lập tức (next-themes làm việc này sau một nhịp render). */
+function paintTheme(val: string) {
+  const dark = val === "dark" || (val === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const root = document.documentElement;
+  root.classList.toggle("dark", dark);
+  root.classList.toggle("light", !dark);
+  root.style.colorScheme = dark ? "dark" : "light";
+}
+
 export function ThemeToggle({ className, variant = "button" }: ThemeToggleProps) {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const mounted = useSyncExternalStore(
@@ -30,14 +49,24 @@ export function ThemeToggle({ className, variant = "button" }: ThemeToggleProps)
   const menuRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
 
+  /**
+   * Đổi theme bằng View Transitions: trình duyệt chụp khung hình cũ và mới rồi mờ dần trên GPU — một hiệu ứng duy nhất.
+   * Không bật transition màu cho mọi phần tử: trang lobby có hàng nghìn nút (chữ lá SVG, nhiều lớp ảnh, GSAP)
+   * nên tính lại màu từng phần tử mỗi khung hình làm giật.
+   * Lớp .dark được gắn ngay trong callback để khung hình "mới" đã đúng màu; next-themes lưu lựa chọn như cũ.
+   */
   const handleThemeChange = (val: string) => {
-    if (typeof document !== "undefined" && !reduced) {
-      document.documentElement.classList.add("theme-transitioning");
-      window.setTimeout(() => {
-        document.documentElement.classList.remove("theme-transitioning");
-      }, 240);
+    const apply = () => {
+      paintTheme(val);
+      setTheme(val);
+    };
+    if (reduced) return apply();
+    if (document.querySelector("[data-theme-scene]")) {
+      markSceneSwitching();
+      return apply();
     }
-    setTheme(val);
+    if (typeof document.startViewTransition !== "function") return apply();
+    document.startViewTransition(apply);
   };
 
   useEffect(() => {
@@ -104,14 +133,14 @@ export function ThemeToggle({ className, variant = "button" }: ThemeToggleProps)
                   className={cn(
                     "flex h-9 w-9 items-center justify-center rounded-xl transition-colors",
                     active
-                      ? "bg-primary text-white"
+                      ? "bg-primary text-primary-foreground"
                       : "bg-muted text-foreground/70 group-hover:text-primary"
                   )}
                 >
                   <Icon className="h-4.5 w-4.5" />
                 </span>
                 {active && (
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
                     <Check className="h-3 w-3" strokeWidth={3} />
                   </span>
                 )}
@@ -173,7 +202,7 @@ export function ThemeToggle({ className, variant = "button" }: ThemeToggleProps)
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reduced ? undefined : { opacity: 0, y: -6, scale: 0.95 }}
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute right-0 top-12 z-50 min-w-[160px] overflow-hidden rounded-2xl border border-border bg-card p-1.5 shadow-xl"
+            className="absolute right-0 top-12 z-50 min-w-[160px] overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground p-1.5 shadow-xl"
           >
             <p className="px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
               Giao diện
@@ -194,8 +223,8 @@ export function ThemeToggle({ className, variant = "button" }: ThemeToggleProps)
                     "flex w-full items-center justify-between gap-3 rounded-xl px-2.5 py-2 text-left text-[13px] font-semibold transition-colors duration-150",
                     "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary",
                     isSelected
-                      ? "bg-primary text-white"
-                      : "text-foreground hover:bg-accent hover:text-primary"
+                      ? "bg-primary text-primary-foreground font-bold"
+                      : "text-foreground hover:bg-surface-hover hover:text-primary"
                   )}
                 >
                   <span className="flex items-center gap-2">

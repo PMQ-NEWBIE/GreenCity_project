@@ -14,7 +14,7 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import sharp from "sharp";
-import { LOBBY_ASSETS } from "../../src/lobby/assets.ts";
+import { LOBBY_ASSETS, MOBILE_HERO_READY } from "../../src/lobby/assets.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const RAW_DIR = path.join(ROOT, "assets-src", "lobby");
@@ -23,6 +23,7 @@ const PUBLIC_DIR = path.join(ROOT, "public");
 /** Cách đặt ảnh thô vào khung đích cho từng key */
 const PLACEMENT = {
   sky: { mode: "cover", position: "centre" },
+  mobileHero: { mode: "cover", position: "south" }, // giữ phần đáy: xe đạp và vỉa hè
   subject: { mode: "subject" }, // tách nền, cắt sát, đặt giữa-dưới, bánh xe chạm mép dưới
   foreground: { mode: "foreground" }, // tách nền, bám đáy, ép 40% phía trên trong suốt
   feature1: { mode: "cover", position: sharp.strategy.attention },
@@ -177,6 +178,10 @@ for (const key of keys) {
   const spec = LOBBY_ASSETS[key];
   const raw = findRaw(key);
   const target = path.join(PUBLIC_DIR, spec.src);
+  if (!raw && key === "mobileHero" && !MOBILE_HERO_READY) {
+    console.log(`– ${key.padEnd(14)} chưa có ảnh thô (tùy chọn — điện thoại đang dùng bầu trời + xe đạp)`);
+    continue;
+  }
   if (!raw) {
     console.log(`✗ ${key.padEnd(14)} THIẾU ảnh thô: assets-src/lobby/${key}.png (hoặc .jpg/.webp)`);
     failed++;

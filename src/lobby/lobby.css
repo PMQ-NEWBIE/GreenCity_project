@@ -120,6 +120,41 @@ html.lenis body {
   bottom: min(0px, calc(32svh - 19.6vw));
 }
 
+/* Mặt đất cho xe đạp trên điện thoại (khi chưa có ảnh hero dọc) — xem MobileGround trong LobbyHero.tsx.
+   Mọi số đo tính theo khung vuông của ảnh xe. */
+.lobby-ground > * {
+  position: absolute;
+}
+/* Sương: bắt đầu từ ngang yên xe, dày dần tới chỗ bánh xe chạm đất rồi phủ kín xuống mép dưới hero */
+.lobby-ground__mist {
+  left: 50%;
+  top: 45%;
+  width: 100vw;
+  height: calc(55% + 12svh);
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to bottom,
+    rgb(228 242 217 / 0) 0%,
+    rgb(228 242 217 / 0.5) 28%,
+    rgb(228 242 217 / 0.86) 52%,
+    rgb(228 242 217 / 0.97) 70%
+  );
+}
+/* Bóng chung dưới cả xe, nghiêng theo mặt đất (bánh trước thấp hơn bánh sau) */
+.lobby-ground__shadow {
+  left: 6%;
+  width: 84%;
+  bottom: -3.5%;
+  height: 9%;
+  transform: rotate(-4.5deg);
+  background: radial-gradient(closest-side, rgb(38 48 28 / 0.3), rgb(38 48 28 / 0.12) 60%, transparent);
+}
+/* Bóng đậm ngay chỗ bánh xe chạm đất */
+.lobby-ground__contact {
+  height: 4%;
+  background: radial-gradient(closest-side, rgb(30 36 22 / 0.5), rgb(30 36 22 / 0.18) 55%, transparent);
+}
+
 /* ---------- Ink Headings ---------- */
 @media (max-width: 767.98px) {
   .lobby [data-ink-plant]:not([data-lite]) {

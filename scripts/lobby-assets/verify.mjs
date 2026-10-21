@@ -6,7 +6,7 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import sharp from "sharp";
-import { LOBBY_ASSETS } from "../../src/lobby/assets.ts";
+import { LOBBY_ASSETS, MOBILE_HERO_READY } from "../../src/lobby/assets.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 
@@ -57,11 +57,31 @@ function looksLikeCheckerboard(data, w, h, channels) {
   });
 }
 
+/**
+ * Độ chi tiết: trung bình |Laplacian| trên ảnh xám thu về rộng 540px.
+ * Ảnh chụp thật có vật thể: ~15–31. Trời trơn / hẻm mờ: ~2–8. Ảnh vẽ bằng code (khối màu phẳng, gradient): ~1–5.
+ */
+async function detailScore(buf, fy0, fy1, fx0 = 0, fx1 = 1) {
+  const { data, info } = await sharp(buf).resize(540).greyscale().raw().toBuffer({ resolveWithObject: true });
+  const { width: w, height: h } = info;
+  let sum = 0, n = 0;
+  for (let y = Math.max(1, Math.floor(h * fy0)); y < Math.min(h - 1, Math.floor(h * fy1)); y++)
+    for (let x = Math.max(1, Math.floor(w * fx0)); x < Math.min(w - 1, Math.floor(w * fx1)); x++, n++) {
+      const i = y * w + x;
+      sum += Math.abs(4 * data[i] - data[i - 1] - data[i + 1] - data[i - w] - data[i + w]);
+    }
+  return sum / n;
+}
+
 const results = [];
 const add = (key, ok, msg, level = ok ? "PASS" : "FAIL") => results.push({ key, level, msg });
 
 for (const [key, spec] of Object.entries(LOBBY_ASSETS)) {
   const file = path.join(ROOT, "public", spec.src);
+  if (!existsSync(file) && key === "mobileHero" && !MOBILE_HERO_READY) {
+    results.push({ key, level: "SKIP", msg: "Chưa có (tùy chọn) — điện thoại đang dùng bầu trời + xe đạp có sương và bóng đổ" });
+    continue;
+  }
   if (!existsSync(file)) {
     add(key, false, `Thiếu file ${spec.src}`);
     continue;
@@ -143,6 +163,22 @@ for (const [key, spec] of Object.entries(LOBBY_ASSETS)) {
     const contrast = (p5 + 0.05) / (0.03 + 0.05);
     add(key, contrast >= 4.5, `Vùng tiêu đề: tương phản tệ nhất với chữ xanh đậm = ${contrast.toFixed(1)}:1 (yêu cầu ≥ 4.5:1) — nửa trái phải sáng, thoáng`);
   }
+  if (key === "mobileHero") {
+    // Trên điện thoại 390×844 ảnh bị cắt ~9% mỗi bên. Tiêu đề, slogan, nút nằm trong khoảng 8–48% chiều cao.
+    const p5 = percentile(region(0.1, 0.08, 0.9, 0.48), 0.05);
+    const contrast = (p5 + 0.05) / (0.03 + 0.05);
+    add(key, contrast >= 4.5, `Vùng chữ (8–48% chiều cao): tương phản tệ nhất với chữ xanh đậm = ${contrast.toFixed(1)}:1 (yêu cầu ≥ 4.5:1 — trời / hẻm mờ thật sáng)`);
+    const calm = await detailScore(buf, 0.08, 0.48, 0.1, 0.9);
+    add(key, calm <= 9, `Vùng chữ đủ yên: độ chi tiết ${calm.toFixed(1)} (tối đa 9 — không dây điện, biển hiệu, mái nhà sắc nét sau chữ)`);
+    const real = await detailScore(buf, 0.58, 0.95, 0.1, 0.9);
+    add(key, real >= 12, `Nửa dưới là ảnh chụp thật: độ chi tiết ${real.toFixed(1)} (yêu cầu ≥ 12; ảnh vẽ bằng code / khối màu phẳng chỉ ~1–5)`);
+    let dark = 0, n = 0;
+    for (const l of region(0.15, 0.62, 0.85, 0.92)) {
+      n++;
+      if (l < 0.25) dark++;
+    }
+    add(key, dark / n >= 0.08, `Có vật thể đậm (xe đạp, bánh xe) ở 62–92% chiều cao: ${Math.round((dark / n) * 100)}% điểm ảnh tối (yêu cầu ≥ 8%)`);
+  }
   if (key === "ctaBackground") {
     const mean = region(0, 0, 0.5, 1).reduce((a, b) => a + b, 0) / region(0, 0, 0.5, 1).length;
     add(key, mean <= 0.3, `Nửa trái (chữ trắng) độ sáng trung bình ${mean.toFixed(2)} (yêu cầu ≤ 0.30 — tối, ít chi tiết)`);
@@ -161,11 +197,11 @@ for (const r of results) {
     current = r.key;
     console.log(`\n${r.key} → ${LOBBY_ASSETS[r.key].src}`);
   }
-  console.log(`  ${r.level === "PASS" ? "PASS" : "FAIL"}  ${r.msg}`);
+  console.log(`  ${r.level}  ${r.msg}`);
 }
 console.log(
   fails.length
     ? `\n✗ ${fails.length} mục FAIL — CHƯA HOÀN THÀNH. Sửa ảnh rồi chạy lại (không sửa ngưỡng).`
-    : `\n✓ TẤT CẢ ĐẠT (${results.length} mục).`
+    : `\n✓ TẤT CẢ ĐẠT (${results.filter((r) => r.level === "PASS").length} mục).`
 );
 process.exit(fails.length ? 1 : 0);

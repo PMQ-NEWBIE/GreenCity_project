@@ -157,9 +157,20 @@ try {
   const subjectOverlap = await evaluate(`(() => {
     const cta = document.querySelector('[data-hero-cta]').getBoundingClientRect();
     const img = document.querySelector('[data-layer="subject"] img');
+    if (img && !img.offsetWidth) return null; // đã có ảnh hero dọc → lớp xe đạp ẩn
     return img ? Math.round(img.getBoundingClientRect().top - cta.bottom) : null;
   })()`);
   check("Mobile: xe/vật thể nằm dưới nút CTA", subjectOverlap === null || subjectOverlap > -60, `khoảng cách = ${subjectOverlap}px`);
+  const backdrop = await evaluate(`(() => {
+    const img = document.querySelector('[data-layer="sky"] img');
+    const portrait = !!document.querySelector('[data-layer="sky"] source');
+    return { portrait, src: img?.currentSrc ?? "", ok: !!img && img.complete && img.naturalWidth > 0 };
+  })()`);
+  check(
+    backdrop.portrait ? "Mobile: tải đúng ảnh hero dọc (hero-mobile)" : "Mobile: ảnh nền tải được",
+    backdrop.ok && (!backdrop.portrait || backdrop.src.includes("hero-mobile")),
+    backdrop.src.split("?")[1]?.slice(0, 60) ?? backdrop.src
+  );
 
   // ---------- Trang đăng nhập (ảnh panel) ----------
   await viewport(1440, 900, false);

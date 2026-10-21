@@ -48,6 +48,7 @@ function fitSubject(subject: HTMLElement, box: Box, mobile: boolean) {
   subject.style.width = "";
   subject.style.height = "";
   subject.style.display = "";
+  if (!subject.offsetWidth) return; // điện thoại đã có ảnh hero dọc → lớp xe đạp ẩn
   const left = subject.offsetLeft;
   const top = subject.offsetTop;
   const w = subject.offsetWidth;

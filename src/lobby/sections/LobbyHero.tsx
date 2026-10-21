@@ -1,7 +1,8 @@
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 import { ArrowDown, ArrowRight } from "lucide-react";
-import { LOBBY_ASSETS } from "../assets";
+import { LOBBY_ASSETS, MOBILE_HERO_READY } from "../assets";
+import { LOBBY_MEDIA } from "../config";
 import { ROUTES } from "@/lib/routes";
 import { InkHeading } from "../ink/InkHeading";
 
@@ -22,15 +23,7 @@ export function LobbyHero() {
       {/* Lớp 1 — bầu trời */}
       <div data-layer="sky" className="absolute inset-0 z-0">
         <div data-mouse="sky" data-intro="desktop" className="absolute -inset-[4%]">
-          <Image
-            src={LOBBY_ASSETS.sky.src}
-            alt={LOBBY_ASSETS.sky.alt}
-            fill
-            sizes="100vw"
-            quality={80}
-            loading="eager"
-            className="object-cover object-center"
-          />
+          <HeroBackdrop />
         </div>
       </div>
 
@@ -84,9 +77,10 @@ export function LobbyHero() {
       {/* Lớp 4 — vật thể chính (che một phần tiêu đề) */}
       <div
         data-layer="subject"
-        className="pointer-events-none absolute inset-x-0 bottom-16 z-30 mx-auto h-[31svh] w-[90vw] max-w-[440px] md:inset-x-auto md:bottom-0 md:right-[-1vw] md:h-[84svh] md:w-[min(60vw,84svh)] md:max-w-none lg:right-0"
+        className={`pointer-events-none absolute inset-x-0 bottom-[6svh] z-30 mx-auto h-[34svh] w-[90vw] max-w-[440px] md:inset-x-auto md:bottom-0 md:right-[-1vw] md:h-[84svh] md:w-[min(60vw,84svh)] md:max-w-none lg:right-0 ${MOBILE_HERO_READY ? "max-md:hidden" : ""}`}
       >
-        <div data-mouse="subject" data-intro="desktop" className="relative h-full w-full">
+        <div data-mouse="subject" data-intro="desktop" className="relative h-full w-full [container-type:size]">
+          {!MOBILE_HERO_READY && <MobileGround />}
           <Image
             src={LOBBY_ASSETS.subject.src}
             alt={LOBBY_ASSETS.subject.alt}
@@ -127,7 +121,7 @@ export function LobbyHero() {
       <a
         href="#tinh-nang"
         data-scroll-hint
-        className="absolute inset-x-0 bottom-5 z-50 mx-auto w-fit rounded-xl px-3 py-1 text-[13px] font-semibold text-gc-900"
+        className="absolute inset-x-0 bottom-5 z-50 mx-auto hidden w-fit rounded-xl px-3 py-1 text-[13px] font-semibold text-gc-900 md:block"
       >
         <span data-hint-inner data-intro className="flex flex-col items-center gap-1">
           Cuộn xuống
@@ -138,5 +132,45 @@ export function LobbyHero() {
       {/* Lớp màu phủ dần ở cuối đoạn ghim → nối liền sang phần tính năng */}
       <div data-veil aria-hidden="true" className="pointer-events-none absolute inset-0 z-[60] bg-gc-100 opacity-0" />
     </section>
+  );
+}
+
+/**
+ * Lớp 1. Có ảnh dọc riêng cho điện thoại thì dùng <picture> để mỗi máy chỉ tải đúng một ảnh.
+ * Ảnh dọc đã có sẵn xe đạp đứng trên vỉa hè → lớp 4 ẩn trên điện thoại.
+ */
+function HeroBackdrop() {
+  const common = { fill: true, sizes: "100vw", quality: 80, loading: "eager" } as const;
+  if (!MOBILE_HERO_READY) {
+    return <Image src={LOBBY_ASSETS.sky.src} alt={LOBBY_ASSETS.sky.alt} {...common} className="object-cover object-center" />;
+  }
+  const {
+    props: { srcSet: mobile },
+  } = getImageProps({ ...common, src: LOBBY_ASSETS.mobileHero.src, alt: LOBBY_ASSETS.mobileHero.alt });
+  const { props } = getImageProps({ ...common, src: LOBBY_ASSETS.sky.src, alt: LOBBY_ASSETS.sky.alt });
+  return (
+    <picture>
+      <source media={LOBBY_MEDIA.mobile} srcSet={mobile} />
+      {/* eslint-disable-next-line jsx-a11y/alt-text -- props (gồm alt) do getImageProps tạo */}
+      <img {...props} fetchPriority="high" className="object-cover object-center max-md:object-bottom" />
+    </picture>
+  );
+}
+
+/**
+ * Điện thoại, khi chưa có ảnh dọc: ảnh nền chụp từ trên mái nhà, xe đạp đặt thẳng lên đó trông như đang bay.
+ * Cho mái nhà tan vào một dải sương làm "mặt đất", thêm bóng đổ dưới hai bánh xe.
+ * Đặt trong khung vuông đúng bằng chỗ ảnh xe được vẽ (ảnh vuông, object-contain, bám đáy) nên bóng luôn khớp bánh xe
+ * dù heroFit.ts có thu nhỏ xe. Số đo bánh xe lấy từ ảnh hero-layer-4-subject.webp: bánh trước chạm đất ở (19%, 99%),
+ * bánh sau và chân chống ở (66–82%, 95%) — mặt đất hơi nghiêng vì xe chụp chéo 3/4.
+ */
+function MobileGround() {
+  return (
+    <div aria-hidden="true" className="lobby-ground absolute bottom-0 left-1/2 aspect-square w-[min(100cqw,100cqh)] -translate-x-1/2 md:hidden">
+      <div className="lobby-ground__mist" />
+      <div className="lobby-ground__shadow" />
+      <div className="lobby-ground__contact left-[9%] w-[22%] [bottom:-1.5%]" />
+      <div className="lobby-ground__contact left-[63%] w-[24%] [bottom:3%]" />
+    </div>
   );
 }

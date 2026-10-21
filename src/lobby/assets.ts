@@ -35,6 +35,16 @@ export const LOBBY_ASSETS = {
     transparent: true,
     maxKB: 300,
   },
+  /** Hero ĐIỆN THOẠI (< 768px) — MỘT ảnh dọc chụp liền khối: xe đạp ve chai dựng trên vỉa hè hẻm Sài Gòn,
+   *  nửa trên là trời / hẻm mờ sáng để đặt chữ. Thay cho lớp 1 + lớp 4 khi MOBILE_HERO_READY = true. */
+  mobileHero: {
+    src: "/lobby/hero-mobile.webp",
+    width: 1080,
+    height: 1920,
+    alt: "Xe đạp ve chai chở bìa carton và bao chai nhựa dựng bên vỉa hè hẻm Sài Gòn buổi sớm",
+    transparent: false,
+    maxKB: 260,
+  },
   /** Lớp 5 — tán lá và sương mỏng sát mép dưới; 40% phía trên trong suốt hoàn toàn
    *  (lớp này cao 30% màn hình, không được che nút "Bắt đầu ngay") */
   foreground: {
@@ -88,6 +98,13 @@ export const LOBBY_ASSETS = {
     maxKB: 220,
   },
 } as const satisfies Record<string, LobbyAsset>;
+
+/**
+ * Bật true khi public/lobby/hero-mobile.webp đã qua `npm run assets:verify`.
+ * false: điện thoại ghép bầu trời + xe đạp tách nền, có dải sương và bóng đổ để xe đứng trên mặt đất
+ * (ảnh bầu trời chụp từ trên mái nhà nên xe đặt thẳng lên đó trông như đang bay).
+ */
+export const MOBILE_HERO_READY = false;
 
 /** Hạt nhiễu film grain (ô 128px lặp lại) — đã tạo sẵn, không cần thay. */
 export const GRAIN_TILE = "/lobby/grain.png";

@@ -88,8 +88,12 @@ html.lenis body {
    khoảng trống phía trên tô đúng màu trời ở mép trên ảnh (#dee9db) → trời liền mạch, xe hạ xuống dưới nút. */
 @media (max-width: 767.98px) and (max-aspect-ratio: 9 / 16) {
   .lobby-hero-portrait,
-  .lobby-hero-bike {
+  .lobby-hero-bike,
+  .lobby-hero-half {
     object-fit: contain;
+  }
+  .lobby-hero-half {
+    background-color: #dee9db;
   }
   .lobby-hero-portrait {
     background-color: #dee9db;
@@ -104,9 +108,26 @@ html.lenis body {
 
 /* Ban đêm xe ve chai đã đi về (yêu cầu của người dùng): ẩn ngay từ khung hình đầu, trước khi JS chạy.
    Lúc đổi theme, animations/themeRide.ts ghi đè để xe chạy ra khỏi khung / chạy vào. Đừng thay bằng làm tối xe. */
-.dark [data-ride] {
+.dark [data-ride],
+.dark [data-door] {
   opacity: 0;
   visibility: hidden;
+}
+
+/* Điện thoại: nền ngày mở ra như cửa nên trời đêm phải hiện ngay bên dưới khi sang tối,
+   và khi về sáng thì giữ trời đêm tới lúc 2 nửa cửa khép xong (~0,9 giây) mới tắt. */
+/* (Bộ chọn có [data-hero] để thắng luật `.lobby-sky-night { transition: … }` phía dưới — shorthand đó xóa delay.)
+   Sang tối: chữ trong hero chờ nền ngày mở ra (~1,15 giây) mới đổi sang màu sáng, tránh chữ sáng nằm trên nền ngày. */
+@media (max-width: 767.98px) {
+  [data-hero] .lobby-sky-night {
+    transition-delay: 900ms;
+  }
+  .dark [data-hero] .lobby-sky-night {
+    transition-delay: 0s;
+  }
+  html.dark.theme-scene-switching [data-hero] .lobby-theme-fade {
+    transition-delay: 1150ms !important;
+  }
 }
 
 /* Chỉ trong lúc đang đổi theme (ThemeToggle gắn .theme-scene-switching ~1 giây): vài phần tử hero đổi màu từ từ

@@ -21,12 +21,13 @@ const emptySubscribe = () => () => {};
 
 /**
  * Trang có [data-theme-scene] (lobby) tự diễn cảnh đổi sáng / tối: bầu trời mờ dần sang đêm, chữ giữ nguyên chỗ.
- * Gắn .theme-scene-switching ~1 giây để vài phần tử trong cảnh chuyển màu từ từ (xem lobby.css).
+ * Gắn .theme-scene-switching ~2,4 giây để vài phần tử trong cảnh chuyển màu từ từ (xem lobby.css).
  */
 function markSceneSwitching() {
   const root = document.documentElement;
   root.classList.add("theme-scene-switching");
-  window.setTimeout(() => root.classList.remove("theme-scene-switching"), 1000);
+  // Đủ lâu cho cả cảnh trên điện thoại: xe chạy đi + nền mở ra (~2,1 giây), chữ đổi màu sau cùng
+  window.setTimeout(() => root.classList.remove("theme-scene-switching"), 2400);
 }
 
 /** Gắn lớp sáng / tối lên <html> ngay lập tức (next-themes làm việc này sau một nhịp render). */

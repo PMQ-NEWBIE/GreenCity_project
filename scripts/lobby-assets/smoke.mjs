@@ -124,7 +124,7 @@ try {
   await goto(`${BASE}/`, 3500);
   await shot("desktop-1440.png");
   check("Desktop: có đủ 5 lớp hero", (await evaluate(`document.querySelectorAll('[data-layer]').length`)) === 5);
-  check("Desktop: nút 'Bắt đầu ngay' không bị lớp nào che", await evaluate(ctaUncovered));
+  check("Desktop: nút 'Bán ve chai ngay' không bị lớp nào che", await evaluate(ctaUncovered));
   check("Desktop: không có thanh cuộn ngang", await evaluate(`document.documentElement.scrollWidth <= innerWidth`));
   const titleOk = await evaluate(`(() => { const h = document.querySelector('#hero-title'); return h && getComputedStyle(h).opacity === '1' && h.getBoundingClientRect().height > 40; })()`);
   check("Desktop: tiêu đề hiển thị sau intro", titleOk);
@@ -152,7 +152,7 @@ try {
   await viewport(390, 844, true);
   await goto(`${BASE}/`, 3500);
   await shot("mobile-390.png");
-  check("Mobile: nút 'Bắt đầu ngay' không bị che", await evaluate(ctaUncovered));
+  check("Mobile: nút 'Bán ve chai ngay' không bị che", await evaluate(ctaUncovered));
   check("Mobile: không có thanh cuộn ngang", await evaluate(`document.documentElement.scrollWidth <= innerWidth`));
   const subjectOverlap = await evaluate(`(() => {
     const cta = document.querySelector('[data-hero-cta]').getBoundingClientRect();
@@ -169,7 +169,8 @@ try {
   if (backdrop.portrait) {
     // Ảnh hero dọc hiện tại: đỉnh xe (giỏ, nón) ở ~44% chiều cao ảnh. Tính chỗ ảnh thật sự được vẽ theo object-fit.
     const gap = await evaluate(`(() => {
-      const img = document.querySelector('[data-layer="sky"] img');
+      // Lớp xe tách từ ảnh dọc (cùng khung với ảnh gốc)
+      const img = document.querySelector(".lobby-hero-bike") ?? document.querySelector('[data-layer="sky"] img');
       const r = img.getBoundingClientRect();
       const fit = getComputedStyle(img).objectFit;
       const scale = (fit === "contain" ? Math.min : Math.max)(r.width / 1080, r.height / 1920);
@@ -200,13 +201,17 @@ try {
     const r = [...document.querySelectorAll("[data-ride]")].find((e) => e.offsetWidth > 0);
     if (!r) return null;
     const cs = getComputedStyle(r);
-    return { x: Math.round(new DOMMatrix(cs.transform).m41), shown: cs.visibility !== "hidden" && Number(cs.opacity) > 0.5 };
+    // Độ hiện thật = nhân độ mờ của xe và mọi lớp bao ngoài (lớp cha mờ đi thì xe cũng mờ theo dù chính nó opacity 1)
+    let seen = 1;
+    for (let e = r; e; e = e.parentElement) seen *= Number(getComputedStyle(e).opacity);
+    return { x: Math.round(new DOMMatrix(cs.transform).m41), seen: Math.round(seen * 100) / 100, shown: cs.visibility !== "hidden" && seen > 0.8 };
   })()`;
   const skyState = `(() => {
     const day = document.querySelector(".lobby-sky-day");
     const night = document.querySelector(".lobby-sky-night");
     const subject = document.querySelector('[data-layer="subject"] img');
-    const mobileImg = document.querySelector('.lobby-hero-portrait');
+    // Điện thoại: nền ngày là 2 nửa cửa (.lobby-hero-half); ảnh .lobby-hero-portrait chỉ còn dùng trên máy tính
+    const mobileImg = document.querySelector('.lobby-hero-half') ?? document.querySelector('.lobby-hero-portrait');
     return {
       dayOpacity: day ? parseFloat(getComputedStyle(day).opacity) : null,
       nightOpacity: night ? parseFloat(getComputedStyle(night).opacity) : null,
@@ -215,6 +220,16 @@ try {
       mobileLoaded: mobileImg ? !!mobileImg.complete && mobileImg.naturalWidth > 0 && mobileImg.offsetHeight > 0 : false,
       mobileOpacity: mobileImg ? parseFloat(getComputedStyle(mobileImg).opacity) : null,
     };
+  })()`;
+  // Điện thoại: 2 nửa nền ngày (cửa) — vị trí dọc và có đang hiện không
+  const doorState = `(() => {
+    const d = (k) => {
+      const e = document.querySelector('[data-door="' + k + '"]');
+      if (!e || !e.offsetWidth) return null;
+      const cs = getComputedStyle(e);
+      return { y: Math.round(new DOMMatrix(cs.transform).m42), shown: cs.visibility !== "hidden" && Number(cs.opacity) > 0.5 };
+    };
+    return { top: d("top"), bottom: d("bottom") };
   })()`;
   const switchTheme = async (label) => {
     await evaluate(`document.querySelector('[aria-haspopup="menu"][aria-label^="Chuyển đổi giao diện"]')?.click()`);
@@ -242,12 +257,20 @@ try {
       await sleep(1500);
     }
 
-    // Chuyển Sáng → Tối: giữa chừng xe đang chạy sang trái, xong thì ẩn
+    // Chuyển Sáng → Tối: giữa chừng xe đang chạy sang trái, xong thì ẩn.
+    // Điện thoại: xe đi xong (~1,2s) thì nền ngày tách đôi — trên lên, dưới xuống — lộ phố đêm.
     await switchTheme("Tối");
     await sleep(750);
     const rideMid = await evaluate(rideState);
-    await sleep(1400);
+    await sleep(vp.mobile ? 950 : 1400);
+    const doorsOpening = await evaluate(doorState);
+    if (vp.mobile) await sleep(1000);
     const rideEnd = await evaluate(rideState);
+    if (vp.mobile) {
+      const doorsEnd = await evaluate(doorState);
+      check("Mobile tối: nền ngày tách đôi ở chân trời — nửa trên trượt lên, nửa dưới trượt xuống", !!doorsOpening.top && doorsOpening.top.shown && doorsOpening.top.y < -20 && doorsOpening.bottom.shown && doorsOpening.bottom.y > 20, JSON.stringify(doorsOpening));
+      check("Mobile tối: mở xong thì 2 nửa nền ngày ẩn, chỉ còn phố đêm", !!doorsEnd.top && !doorsEnd.top.shown && !doorsEnd.bottom.shown, JSON.stringify(doorsEnd));
+    }
     const darkSky = await evaluate(skyState);
     check(`${vp.name} tối: xe đạp đang chạy ra khỏi khung giữa lúc chuyển`, !!rideMid && rideMid.shown && rideMid.x < -30, JSON.stringify(rideMid));
     check(`${vp.name} tối: chuyển xong thì xe đạp ẩn (ban đêm không có xe)`, !!rideEnd && !rideEnd.shown, JSON.stringify(rideEnd));
@@ -267,12 +290,22 @@ try {
     }
     await shot(vp.shotDark);
 
-    // Chuyển Tối → Sáng trở lại: xe chạy vào từ mép phải, dừng đúng chỗ cũ
+    // Chuyển Tối → Sáng trở lại: (điện thoại) 2 nửa nền khép lại trước, rồi xe chạy vào từ mép phải, dừng đúng chỗ cũ
     await switchTheme("Sáng");
-    await sleep(750);
+    let doorsClosing = null;
+    if (vp.mobile) {
+      await sleep(350);
+      doorsClosing = await evaluate(doorState);
+      await sleep(950);
+    } else await sleep(750);
     const rideBack = await evaluate(rideState);
-    await sleep(1400);
+    await sleep(vp.mobile ? 1600 : 1400);
     const rideHome = await evaluate(rideState);
+    if (vp.mobile) {
+      const doorsHome = await evaluate(doorState);
+      check("Mobile sáng: 2 nửa nền ngày đang khép lại (trên hạ xuống, dưới nâng lên)", !!doorsClosing.top && doorsClosing.top.shown && doorsClosing.top.y < 0 && doorsClosing.bottom.y > 0, JSON.stringify(doorsClosing));
+      check("Mobile sáng: 2 nửa nền ngày khép kín đúng chỗ", !!doorsHome.top && doorsHome.top.shown && doorsHome.top.y === 0 && doorsHome.bottom.y === 0, JSON.stringify(doorsHome));
+    }
     const lightSky = await evaluate(skyState);
     check(`${vp.name} sáng: xe đạp chạy vào từ mép phải`, !!rideBack && rideBack.shown && rideBack.x > 30, JSON.stringify(rideBack));
     check(`${vp.name} sáng: xe đạp về đúng chỗ cũ`, !!rideHome && rideHome.shown && rideHome.x === 0, JSON.stringify(rideHome));

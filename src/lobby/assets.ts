@@ -55,7 +55,7 @@ export const LOBBY_ASSETS = {
     maxKB: 260,
   },
   /** Lớp 5 — tán lá và sương mỏng sát mép dưới; 40% phía trên trong suốt hoàn toàn
-   *  (lớp này cao 30% màn hình, không được che nút "Bắt đầu ngay") */
+   *  (lớp này cao 30% màn hình, không được che nút "Bán ve chai ngay") */
   foreground: {
     src: "/lobby/hero-layer-5-foreground.webp",
     width: 2560,
@@ -122,6 +122,9 @@ export const MOBILE_HERO_READY = true;
 export const MOBILE_HERO_LAYERS = {
   empty: "/lobby/hero-mobile-empty.webp",
   bike: "/lobby/hero-mobile-bike.webp",
+  /** Đường chân trời (trời giáp mặt đường) theo tỉ lệ chiều cao ảnh — 1288/1920, khớp HORIZON trong split-mobile-hero.mjs.
+   *  Sang tối, nền ngày tách đôi tại đây: nửa trên trượt lên, nửa dưới trượt xuống. */
+  horizon: 1288 / 1920,
 } as const;
 
 

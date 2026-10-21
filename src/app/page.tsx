@@ -3,7 +3,7 @@ import { LobbyPage } from "@/lobby/LobbyPage";
 
 const title = "Green City — Bán ve chai, gọi thu gom tận nhà";
 const description =
-  "Đồ cũ nhà bạn chưa phải là rác. Bán ve chai, thanh lý đồ cũ, hoặc gọi người tới tận nhà thu gom — ngay trong khu phố của bạn.";
+  "Đồ cũ nhà bạn chưa phải là rác. Đăng bán ve chai trong một phút, hoặc gọi người thu mua quanh bạn tới tận nhà cân và trả tiền.";
 
 export const metadata: Metadata = {
   title: { absolute: title },

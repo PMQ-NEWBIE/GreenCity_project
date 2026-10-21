@@ -136,14 +136,14 @@ try {
   await sleep(1100);
   await shot("hero-1440-3.5s.png");
 
-  // Kiểm tra nút Bắt đầu ngay hiện trước 3.0s
+  // Kiểm tra nút Bán ve chai ngay hiện trước 3.0s
   const ctaVisible = await evaluate(`(() => {
     const cta = document.querySelector('[data-hero-cta] a');
     if (!cta) return false;
     const style = getComputedStyle(cta);
     return style.opacity === '1' && style.visibility !== 'hidden';
   })()`);
-  check("Desktop: Nút 'Bắt đầu ngay' hiển thị đầy đủ", ctaVisible);
+  check("Desktop: Nút 'Bán ve chai ngay' hiển thị đầy đủ", ctaVisible);
 
   // Intro chữ lá dài hơn mốc 3.5s (viết 3.2s rồi lá vắt rơi, hoa nở) → chờ cho xong hẳn
   await sleep(3000);

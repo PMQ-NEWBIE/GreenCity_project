@@ -31,7 +31,8 @@ export function LobbyHero() {
           className="lobby-hero-sky absolute -inset-[4%]"
         >
           {/* Ban ngày: ảnh bầu trời sáng sớm (kèm ảnh dọc trên điện thoại) */}
-          <div className="lobby-sky-day absolute inset-0">
+          {/* Điện thoại có ảnh dọc: nền ngày là 2 nửa cửa (MobileDayDoors) thay cho lớp này */}
+          <div className={`lobby-sky-day absolute inset-0 ${MOBILE_HERO_READY ? "max-md:hidden" : ""}`}>
             <HeroBackdrop />
           </div>
 
@@ -53,6 +54,13 @@ export function LobbyHero() {
             aria-hidden="true"
             className="lobby-hero-night pointer-events-none absolute inset-0"
           />
+
+          {/* Nền ngày điện thoại tách đôi ở đường chân trời như mở cửa → lộ phố đêm (animations/themeRide.ts) */}
+          {MOBILE_HERO_READY && <MobileDayDoors />}
+
+          {/* Xe của ảnh hero dọc (chỉ điện thoại). Phải nằm NGOÀI .lobby-sky-day: lớp đó mờ đi khi sang tối,
+              xe nằm trong thì chỉ mờ tại chỗ chứ không thấy chạy. Ở đây xe chạy rõ trên nền phố đêm. */}
+          {MOBILE_HERO_READY && <MobileHeroBike />}
         </div>
       </div>
 
@@ -86,10 +94,10 @@ export function LobbyHero() {
 
           <p className="lobby-theme-fade mt-5 max-w-[30rem] text-[clamp(1rem,1.35vw,1.2rem)] leading-relaxed text-gc-800 dark:text-text-secondary md:mt-7">
             <span data-slogan-line data-intro className="block">
-              Bán ve chai, thanh lý đồ cũ, hoặc gọi người tới tận nhà thu gom.
+              Nhà có giấy báo, chai nhựa, lon nhôm, sắt vụn? Đăng bán trong một phút.
             </span>
             <span data-slogan-line data-intro className="block">
-              Tất cả ở một chỗ — ngay trong khu phố của bạn.
+              Hoặc bấm gọi — người thu mua quanh bạn tới tận nhà, cân và trả tiền.
             </span>
           </p>
 
@@ -103,7 +111,7 @@ export function LobbyHero() {
                 href={ROUTES.register}
                 className="lobby-theme-fade group inline-flex min-h-[54px] items-center gap-2.5 rounded-2xl bg-gc-700 dark:bg-primary px-7 text-[16px] font-bold text-white dark:text-primary-foreground shadow-[0_10px_24px_-12px_rgb(12_53_23/0.7)] dark:shadow-[0_10px_24px_-12px_rgba(0,0,0,0.8)] transition-colors hover:bg-gc-800 dark:hover:bg-primary-hover"
               >
-                Bắt đầu ngay
+                Bán ve chai ngay
                 <ArrowRight
                   className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-0.5"
                   aria-hidden="true"
@@ -229,11 +237,6 @@ function HeroBackdrop() {
     src: MOBILE_HERO_LAYERS.empty,
     alt: LOBBY_ASSETS.mobileHero.alt,
   });
-  const { props: bike } = getImageProps({
-    ...common,
-    src: MOBILE_HERO_LAYERS.bike,
-    alt: "",
-  });
   const { props } = getImageProps({
     ...common,
     src: LOBBY_ASSETS.sky.src,
@@ -250,11 +253,6 @@ function HeroBackdrop() {
           className="lobby-hero-portrait object-cover object-center max-md:object-bottom"
         />
       </picture>
-      {/* Lớp xe của ảnh dọc — chỉ điện thoại; data-ride: animations/themeRide.ts cho xe chạy đi / chạy về */}
-      <div data-ride className="absolute inset-0 md:hidden">
-        {/* eslint-disable-next-line jsx-a11y/alt-text -- alt rỗng do getImageProps tạo (ảnh trang trí, đã mô tả ở ảnh nền) */}
-        <img {...bike} fetchPriority="high" className="lobby-hero-bike object-cover object-center max-md:object-bottom" />
-      </div>
     </>
   );
 }
@@ -280,3 +278,35 @@ function MobileGround() {
     </div>
   );
 }
+
+/** Lớp xe tách từ ảnh hero dọc — cùng khung và cách co giãn với nền nên chồng khít. data-ride: animations/themeRide.ts. */
+function MobileHeroBike() {
+  const { props: bike } = getImageProps({ fill: true, sizes: "100vw", quality: 80, loading: "eager", src: MOBILE_HERO_LAYERS.bike, alt: "" });
+  return (
+    <div data-ride className="absolute inset-0 md:hidden">
+      {/* eslint-disable-next-line jsx-a11y/alt-text -- alt rỗng do getImageProps tạo (ảnh trang trí, đã mô tả ở ảnh nền) */}
+      <img {...bike} fetchPriority="high" className="lobby-hero-bike object-cover object-center max-md:object-bottom" />
+    </div>
+  );
+}
+
+/**
+ * Nền ngày trên điện thoại (ảnh dọc đã bỏ xe) vẽ 2 lần: một bản giữ phần trên đường chân trời, một bản giữ phần dưới.
+ * Sang tối: xe chạy đi rồi 2 nửa trượt ra (trên lên, dưới xuống) như mở cửa, lộ phố đêm phía sau.
+ * Sang sáng: 2 nửa khép lại rồi xe chạy vào. Cắt (clip-path) và trượt do animations/themeRide.ts tính theo khung ảnh thật.
+ * Cùng URL ảnh với <source> điện thoại của HeroBackdrop nên trình duyệt chỉ tải một lần.
+ */
+function MobileDayDoors() {
+  const { props: day } = getImageProps({ fill: true, sizes: "100vw", quality: 80, loading: "eager", src: MOBILE_HERO_LAYERS.empty, alt: "" });
+  return (
+    <div className="absolute inset-0 md:hidden" data-doors={MOBILE_HERO_LAYERS.horizon}>
+      {(["top", "bottom"] as const).map((half) => (
+        <div key={half} data-door={half} className="lobby-hero-door absolute inset-0">
+          {/* eslint-disable-next-line jsx-a11y/alt-text -- alt rỗng do getImageProps tạo (ảnh trang trí) */}
+          <img {...day} fetchPriority="high" className="lobby-hero-half object-cover object-center max-md:object-bottom" />
+        </div>
+      ))}
+    </div>
+  );
+}
+

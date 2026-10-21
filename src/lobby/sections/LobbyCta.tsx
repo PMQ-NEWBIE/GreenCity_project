@@ -29,7 +29,7 @@ export function LobbyCta() {
           className="max-w-[18ch] text-[clamp(2rem,4.6vw,4rem)] font-extrabold leading-[1.05] tracking-[-0.02em] text-white"
         />
         <p className="mt-5 max-w-xl text-[17px] leading-relaxed text-gc-100">
-          Tạo tài khoản miễn phí, chưa tới một phút. Đã có tài khoản thì đăng nhập để tiếp tục.
+          Tạo tài khoản miễn phí rồi đăng tin ve chai đầu tiên, tất cả chưa tới một phút. Đã có tài khoản thì đăng nhập để tiếp tục.
         </p>
         <div className="mt-9 flex flex-wrap items-center gap-3">
           <div data-magnetic className="inline-block">

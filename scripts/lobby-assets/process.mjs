@@ -143,7 +143,7 @@ async function buildForeground(rawPath, spec) {
     .resize(spec.width, spec.height, { fit: "cover", position: "south", kernel: "lanczos3" })
     .raw()
     .toBuffer({ resolveWithObject: true });
-  // Ép 40% phía trên trong suốt hoàn toàn, mờ dần tới 55% — để không bao giờ che nút "Bắt đầu ngay"
+  // Ép 40% phía trên trong suốt hoàn toàn, mờ dần tới 55% — để không bao giờ che nút "Bán ve chai ngay"
   const { width: w, height: h } = info;
   const y0 = Math.round(h * 0.4);
   const y1 = Math.round(h * 0.55);
